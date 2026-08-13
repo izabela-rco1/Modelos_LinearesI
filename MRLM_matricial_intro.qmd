@@ -1,0 +1,235 @@
+---
+title: "Modelos de regressão linear múltipla (MRLM) e representação matricial"
+---
+
+::: {.chapterintro data-latex=""}
+Na aula de hoje vamos generalizar a teoria de modelos de regressão linear (MRL), ou seja, consideraremos os modelos lineares de regressão múltipla (MLRM). Serão apresentados a forma geral do modelo, o sistema de equações normais (SEN) obtido utilizando o método de Mínimos Quadrados (MMQ) para estimação dos parâmetros. Além disso, será apresentada uma introdução e a notação referente à representação matricial dos MRL. 
+
+Essa aula é baseada no capítulo 7 de _Linear Models in Statistics_ (Rencher e Schaalje, 2008) e nos capítulos 1 e 8 de Charnet et al. (2008)
+:::
+
+
+## Modelo de regressão linear múltipla (MRLM) 
+
+Um MRLM é utilizado para representar a relação entre a variável resposta $Y$ (variável dependente) e várias variáveis explicativas (variáveis independentes). Esse modelo pode ser representado por:
+
+$$
+Y = \beta_{0} + \beta_{1}x_{1} + \beta_{2}x_{2} + \ldots + \beta_{k}x_{k} + \varepsilon,
+$$
+em que $Y$ é a variável resposta, os parâmetros $\beta_{0}, \beta_{1}, \ldots, \beta_{k}$ são os coeficientes de regressão e $\varepsilon$ é o termo do erro como explicado no MRLS e MRLQ.
+
+Considere que se tenha uma amostra de $n$ valores de $Y$ e, associado a cada um desses valores, se tenha valores fixos para as variáveis explicativas $x_1, x_2, \dots, x_k$. Assim, considerando essa amostra, pode-se representar o MRLM por:
+
+$$
+y_i = \beta_{0} + \beta_{1}x_{1i} + \beta_{2}x_{2i} + \ldots + \beta_{k}x_{ki} + \varepsilon_i,
+$$
+com $i=1,2,\ldots,n$, erros idenpendentes e identicamente distribuídos segundo uma normal com variância única, ou seja, $\varepsilon_i \sim \textrm{N}(0; \sigma^{2})$.
+
+Na estimação dos parâmetros do modelo ($\beta_{0}, \beta_{1}, \beta_{2}, \ldots, \beta_{k}$) pode-se utilizar o método de mínimos quadrados, semelhante ao que foi realizado nos MRLS e MRLQ. Assim, tem-se:
+
+$$
+\sum_{i=1}^{n} \varepsilon_{i}^2= \sum_{i=1}^{n} (y_i - \beta_{0} + \beta_{1}x_{1i} + \beta_{2}x_{2i} + \ldots + \beta_{k}x_{ki})^2. 
+$$
+O sistema de equações normais (SEN) é obtido derivando $\sum_{i=1}^{n} \varepsilon_{i}^2$ em relação a cada um dos parâmetros e igualando essas derivadas a zero. Dessa forma obtém-se o seguinte SEN:
+
+$$
+\left\{
+\begin{array}{ccc} 
+\sum_{i=1}^{n} y_i & = & n \hat{\beta_{0}} + \hat{\beta_{1}} \sum_{i=1}^{n} x_{1i} + \hat{\beta_{2}} \sum_{i=1}^{n} x_{2i} + \ldots + \hat{\beta_{k}} \sum_{i=1}^{n} x_{ki} \\
+\sum_{i=1}^{n} y_i x_{1i} & = & \hat{\beta_{0}} \sum_{i=1}^{n} x_{1i} + \hat{\beta_{1}} \sum_{i=1}^{n} x_{1i}^2 + \hat{\beta_{2}} \sum_{i=1}^{n} x_{1i}x_{2i} + \ldots + \hat{\beta_{k}} \sum_{i=1}^{n} x_{1i}x_{ki} \\
+\sum_{i=1}^{n} y_i x_{2i} & = & \hat{\beta_{0}} \sum_{i=1}^{n} x_{2i} + \hat{\beta_{1}} \sum_{i=1}^{n} x_{1i}x_{2i} + \hat{\beta_{2}} \sum_{i=1}^{n} x_{2i}^2 + \ldots + \hat{\beta_{k}} \sum_{i=1}^{n} x_{2i}x_{ki} \\
+\vdots & \vdots & \vdots \\
+\sum_{i=1}^{n} y_i x_{ki} & = & \hat{\beta_{0}} \sum_{i=1}^{n} x_{ki} + \hat{\beta_{1}} \sum_{i=1}^{n} x_{1i}x_{ki} + \hat{\beta_{2}} \sum_{i=1}^{n} x_{2i}x_{ki} + \ldots + \hat{\beta_{k}} \sum_{i=1}^{n} x_{ki}^2
+\end{array}
+\right.
+$$
+Pode-se observar que o SEN contém $k+1$ equações linearmente independentes, o que garante uma solução única ou estimativas únicas para os parâmetros. Porém, a obtenção dos estimadores $\hat{\beta}_{0}, \hat{\beta}_{1}, \hat{\beta}_{2}, \ldots, \hat{\beta}_{k}$ é extremamente laboriosa. 
+
+No entanto, qualquer modelo de regressão linear pode ser representado matricialmente, o que facilita bastante a estimação dos parâmetros do modelo, conforme veremos a seguir.
+
+
+## Representação matricial dos modelos lineares - MRLS, MRLQ e MRLM
+
+### Modelo de regressão linear simples - MRLS
+
+Considerando o MRLS dado por:
+$$
+y_{i} = \beta_{0} + \beta_{1}x_{i} + \varepsilon_{i}
+$$
+com $i=1,2,\ldots,n$, pode-se descrever cada valor observado ($y_i$) como
+$$
+\begin{array}{ccc}
+y_{1} & = & \beta_{0} + \beta_{1}x_{1} + \varepsilon_{1} \\
+y_{2} & = & \beta_{0} + \beta_{1}x_{2} + \varepsilon_{2} \\
+y_{3} & = & \beta_{0} + \beta_{1}x_{3} + \varepsilon_{3} \\
+\vdots & \vdots & \vdots \\
+y_{n} & = & \beta_{0} + \beta_{1}x_{n} + \varepsilon_{n}
+\end{array}
+$$
+Considerando essa representação, pode-se observar que os valores observados ($y_i's$) podem ser expressos como um vetor e que este pode ser representado pela soma de outros dois vetores: um referente à parte determinística ($\beta_0 + \beta_1 x_i$) e outro referente à parte aleatória ($\varepsilon_i$). Assim, tem-se:
+$$
+\begin{bmatrix}
+y_1 \\ y_2 \\ y_3 \\ \vdots \\ y_n
+\end{bmatrix} =
+\begin{bmatrix}
+\beta_{0} + \beta_{1}x_{1} \\
+\beta_{0} + \beta_{1}x_{2} \\
+\beta_{0} + \beta_{1}x_{3} \\
+\vdots \\
+\beta_{0} + \beta_{1}x_{n}
+\end{bmatrix} +
+\begin{bmatrix}
+\varepsilon_1 \\ \varepsilon_2 \\ 
+\varepsilon_3 \\ \vdots \\ \varepsilon_n
+\end{bmatrix}.
+$$
+Além disso, o vetor referente à parte determinística pode ser representado como o produto de uma matriz e o vetor de parâmetros, ou seja,
+$$
+\begin{bmatrix}
+\beta_{0} + \beta_{1}x_{1} \\
+\beta_{0} + \beta_{1}x_{2} \\
+\beta_{0} + \beta_{1}x_{3} \\
+\vdots \\
+\beta_{0} + \beta_{1}x_{n}
+\end{bmatrix} =
+\begin{bmatrix}
+1 & x_{1} \\
+1 & x_{2} \\
+1 & x_{3} \\
+\vdots & \vdots \\
+1 & x_{n}
+\end{bmatrix}
+\begin{bmatrix}
+\beta_0 \\ \beta_1
+\end{bmatrix}.
+$$
+Dessa forma, tem-se a seguinte representação matricial do MRLS:
+$$
+\begin{bmatrix}
+y_1 \\ y_2 \\ y_3 \\ \vdots \\ y_n
+\end{bmatrix} =
+\begin{bmatrix}
+1 & x_{1} \\
+1 & x_{2} \\
+1 & x_{3} \\
+\vdots & \vdots \\
+1 & x_{n}
+\end{bmatrix}
+\begin{bmatrix}
+\beta_0 \\ \beta_1
+\end{bmatrix} +
+\begin{bmatrix}
+\varepsilon_1 \\ \varepsilon_2 \\ 
+\varepsilon_3 \\ \vdots \\ \varepsilon_n
+\end{bmatrix}
+$$
+$$
+\mathbf{Y} \quad = \qquad \mathbf{X} \qquad \boldsymbol{\beta} \quad + \quad \boldsymbol{\varepsilon}.
+$$
+Portanto, o MRLS pode ser representado matricialmente por
+$$
+\mathbf{Y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon},
+$$
+em que $\mathbf{Y}$ é o vetor $n \times 1$ de observações; $\mathbf{X}$ é uma matriz $n \times 2$, denominada de matriz de incidência ou de modelo; $\boldsymbol{\beta}$ é o vetor $2 \times 1$ de parâmetros; e $\boldsymbol{\varepsilon}$ é o vetor $n \times 1$ de erros.
+
+
+### Modelo de regressão linear quadrática - MRLQ
+
+Na representação matricial do modelo de regressão linear quadrático, consideraremos o mesmo raciocínio já utilizado. Considere o MRLQ dado por:
+$$
+y_{i} = \beta_{0} + \beta_{1}x_{i} + \beta_{2}x_{i}^2 + \varepsilon_{i},
+$$
+com $i=1,2,\ldots,n$. Pode-se descrever cada valor observado ($y_i$) como
+$$
+\begin{array}{ccc}
+y_{1} & = & \beta_{0} + \beta_{1}x_{1} + \beta_{2}x_{1}^2 + \varepsilon_{1} \\
+y_{2} & = & \beta_{0} + \beta_{1}x_{2} + \beta_{2}x_{2}^2 + \varepsilon_{2} \\
+y_{3} & = & \beta_{0} + \beta_{1}x_{3} + \beta_{2}x_{3}^2 + \varepsilon_{3} \\
+\vdots & \vdots & \vdots \\
+y_{n} & = & \beta_{0} + \beta_{1}x_{n} + \beta_{2}x_{n}^2 + \varepsilon_{n}
+\end{array}
+$$
+A partir dessa representação, é fácil ver que o MRLQ pode ser representado matricialmente por:
+$$
+\begin{bmatrix}
+y_1 \\ y_2 \\ y_3 \\ \vdots \\ y_n
+\end{bmatrix} =
+\begin{bmatrix}
+1 & x_{1} & x_{1}^2 \\
+1 & x_{2} & x_{2}^2 \\
+1 & x_{3} & x_{3}^2 \\
+\vdots & \vdots \\
+1 & x_{n} & x_{n}^2
+\end{bmatrix}
+\begin{bmatrix}
+\beta_0 \\ \beta_1 \\ \beta_2
+\end{bmatrix} +
+\begin{bmatrix}
+\varepsilon_1 \\ \varepsilon_2 \\ 
+\varepsilon_3 \\ \vdots \\ \varepsilon_n
+\end{bmatrix},
+$$
+ou seja,
+$$
+\mathbf{Y} \quad = \quad \quad \mathbf{X} \qquad \qquad \boldsymbol{\beta} \quad + \quad \boldsymbol{\varepsilon}.
+$$
+Portanto, o MRLQ pode ser representado matricialmente de forma semelhante ao MRLS, ou seja,
+$$
+\mathbf{Y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon},
+$$
+em que $\mathbf{Y}$ é o vetor $n \times 1$ de observações; $\mathbf{X}$ é uma matriz $n \times 3$, denominada de matriz de incidência ou de modelo; $\boldsymbol{\beta}$ é o vetor $3 \times 1$ de parâmetros; e $\boldsymbol{\varepsilon}$ é o vetor $n \times 1$ de erros.
+
+
+### Modelo de regressão linear múltipla - MRLM
+
+Generalizando, o MRLM pode ser representado por $\mathbf{Y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon}
+$, ou seja, considerando
+
+$$
+y_{i} = \beta_{0} + \beta_{1}x_{1i} + \beta_{2}x_{2i} + \beta_{3}x_{3i} + \ldots + \beta_{k}x_{ki} + \varepsilon_{i},
+$$
+com $i=1,2,\ldots,n$, tem-se:
+$$
+\begin{array}{ccc}
+y_{1} & = & \beta_{0} + \beta_{1}x_{11} + \beta_{2}x_{21} + \beta_{3}x_{31} + \ldots + \beta_{k}x_{k1} + \varepsilon_{1} \\
+y_{2} & = & \beta_{0} + \beta_{1}x_{12} + \beta_{2}x_{22} + \beta_{3}x_{32} + \ldots + \beta_{k}x_{k2} + \varepsilon_{2} \\
+y_{3} & = & \beta_{0} + \beta_{1}x_{13} + \beta_{2}x_{23} + \beta_{3}x_{33} + \ldots + \beta_{k}x_{k3} + \varepsilon_{3} \\
+\vdots & \vdots & \vdots \\
+y_{n} & = & \beta_{0} + \beta_{1}x_{1n} + \beta_{2}x_{2n} + \beta_{3}x_{3n} + \ldots + \beta_{k}x_{kn} + \varepsilon_{n}
+\end{array}
+$$
+Assim,
+$$
+\begin{bmatrix}
+y_1 \\ y_2 \\ y_3 \\ \vdots \\ y_n
+\end{bmatrix} =
+\begin{bmatrix}
+1 & x_{11} & x_{21} & x_{31} & \cdots & x_{k1} \\
+1 & x_{12} & x_{22} & x_{32} & \cdots & x_{k2} \\
+1 & x_{13} & x_{23} & x_{33} & \cdots & x_{k3} \\
+\vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+1 & x_{1n} & x_{2n} & x_{3n} & \cdots & x_{kn}
+\end{bmatrix}
+\begin{bmatrix}
+\beta_0 \\ \beta_1 \\ \beta_2 \\ \beta_3 \\ \vdots \\ \beta_k
+\end{bmatrix} +
+\begin{bmatrix}
+\varepsilon_1 \\ \varepsilon_2 \\ 
+\varepsilon_3 \\ \vdots \\ \varepsilon_n
+\end{bmatrix},
+$$
+ou seja,
+$$
+\mathbf{Y} \qquad = \qquad \qquad \qquad \mathbf{X} \qquad \qquad \qquad \quad \boldsymbol{\beta} \quad + \quad \boldsymbol{\varepsilon}.
+$$
+Portanto, o MRLM é dado por
+$$
+\mathbf{Y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon},
+$$
+em que $\mathbf{Y}$ é o vetor $n \times 1$ de observações; $\mathbf{X}$ é uma matriz $n \times (k+1)$, denominada de matriz de incidência ou de modelo; $\boldsymbol{\beta}$ é o vetor $(k+1) \times 1$ de parâmetros; e $\boldsymbol{\varepsilon}$ é o vetor $n \times 1$ de erros.
+
+Nas aulas posteriores, veremos qual é a vantagem de representar qualquer modelo de regressão linear nessa forma matricial única, ou seja, $\mathbf{Y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon}$. Porém, antes disso, faremos uma breve revisão de alguns conceitos de álgebra de matrizes.
+
+
+
+

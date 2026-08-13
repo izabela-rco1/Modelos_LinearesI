@@ -1,0 +1,480 @@
+---
+title: "Estimação em Modelos de Regressão Linear"
+---
+
+::: {.chapterintro data-latex=""}
+Hoje vamos estudar alguns resultados probabilísticos dos estimadores de mínimos quadrados que são a base para a inferência em modelos de regressão linear. Iniciamos pela distribuição de probabilidades de $Y$, quando faremos uma breve revisão da distribuição normal multivariada. Na sequência, serão apresentados os resultados para os estimadores de mínimos quadrados, bem como os valores ajustados e resíduos na forma matricial. Vamos finalizar com uma aplicação desses resultados para a obtenção de intervalos de confiança para os parâmetros de um MRL.
+
+Essa aula é baseada no capítulo 5 de Kutner et al. (2004) e no capítulo 8 de Charnet et al. (2008) .
+:::
+
+## A distribuição de probabilidades do vetor $\mathbf{Y}$
+
+Iniciamos nossos estudos com o Modelo de Regressão Linear Simples (MRLS), um caso especial do Modelo de Regressão Linear (MRL). Todos os modelos dessa classe podem ser representados na forma matricial, o que traz algumas vantagens. Já conhecemos os pressupostos do MRLS em relação à distribuição de probabilidade dos erros, que agora serão revisitados no caso mais geral.
+
+Sob um MRL,  
+
+$$
+\mathbf{Y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}, \quad \text{sendo } \boldsymbol{\varepsilon} \sim N_n(\mathbf{0} \,;\, \sigma^2 \mathbf{I}).
+$$
+
+Desta forma, $\mathbf{Y}$, correspondente aos valores $\mathbf{x}$, tem distribuição normal multivariada, de ordem $n$, com vetor de médias e matriz de variâncias e covariâncias, respectivamente, dados por:
+
+$$
+\begin{aligned}
+E[\mathbf{Y}] &= E[\mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}] \\
+&= E[\mathbf{X}\boldsymbol{\beta}] + E[\boldsymbol{\varepsilon}] \\
+&= \mathbf{X}\boldsymbol{\beta} + \mathbf{0} \\
+&= \mathbf{X}\boldsymbol{\beta} 
+\end{aligned}
+$$
+
+e
+
+$$
+\begin{aligned}
+Var[\mathbf{Y}] &= Var[\mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}] \\
+&= Var[\mathbf{X}\boldsymbol{\beta}] + Var[\boldsymbol{\varepsilon}] \\
+&= \sigma^2 \mathbf{I}
+\end{aligned}
+$$
+
+$$
+\Rightarrow \mathbf{Y} \sim N_n(\mathbf{X}\boldsymbol{\beta} \,;\, \sigma^2 \mathbf{I}).
+$$
+::: {.algebra data-latex=""}
+Note que, quando assumimos os pressupostos de homocedasticidade (variância constante) e independência dos erros, podemos expressar a matriz de variâncias e covariâncias como uma matriz escalar, $\sigma^{2}\mathbf{I}$, dada por:
+
+$$
+\begin{bmatrix}
+\sigma^2 & 0 & \cdots & 0 \\
+0 & \sigma^2 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & \sigma^2
+\end{bmatrix}
+$$
+:::
+
+### A distribuição normal multivariada
+
+Seja o vetor $\mathbf{Y}$, de dimensão $n \times 1$ contendo uma observação em cada uma das $n$ variáveis. $\mathbf{Y}$, é definido como:  
+
+$$
+\mathbf{Y} =
+\begin{bmatrix}
+Y_1 \\
+Y_2 \\
+\vdots \\
+Y_n
+\end{bmatrix}
+$$
+
+Seja o vetor de médias $\mathbf{E[Y]} = \mathbf{X}\boldsymbol{\beta}$ que aqui vamos denotar por $\boldsymbol{\mu}$. Este vetor também tem dimensão $n \times 1$ e contém os valores esperados de $Y$ para cada uma das $n$ variáveis:  
+
+$$
+\boldsymbol{\mu} =
+\begin{bmatrix}
+\mu_1 \\
+\mu_2 \\
+\vdots \\
+\mu_n
+\end{bmatrix}
+$$
+
+Finalmente, a matriz de variâncias e covariâncias de $\mathbf{Y}$, de dimensão $n \times n$, é denotada por $\boldsymbol{\Sigma}$ e contém as variâncias e covariâncias das $n$ variáveis:  
+
+
+$$
+\boldsymbol{\Sigma} =
+\begin{bmatrix}
+\sigma^2_{1} & \sigma_{12} & \cdots & \sigma_{1n} \\
+\sigma_{21} & \sigma^2_{2} & \cdots & \sigma_{2n} \\
+\vdots & \vdots & \ddots & \vdots \\
+\sigma_{n1} & \sigma_{n2} & \cdots & \sigma^2_{n}
+\end{bmatrix}
+$$
+
+Aqui, $\sigma^2_{1}$ denota a variância de $Y_1$, $\sigma_{12}$ denota a covariância entre $Y_1$ e $Y_2$, e assim por diante.  
+
+A função densidade da distribuição normal multivariada pode ser escrita como:  
+
+$$
+f(\mathbf{Y}) = \frac{1}{(2\pi)^{n/2}|\boldsymbol{\Sigma}|^{1/2}}
+\exp \left[ -\frac{1}{2} (\mathbf{Y} - \boldsymbol{\mu})' \boldsymbol{\Sigma}^{-1} (\mathbf{Y} - \boldsymbol{\mu}) \right]
+$$
+
+Aqui, $|\boldsymbol{\Sigma}|$ é o determinante da matriz de variâncias e covariâncias $\boldsymbol{\Sigma}$.  
+
+::: {.important data-latex=""}
+A função densidade normal multivariada possui algumas propriedades. Por exemplo, se $Y_1, \ldots, Y_n$ são conjuntamente normais (isto é, seguem a distribuição normal multivariada), a distribuição marginal de cada variável $Y_i$ é normal, com média $\mu_i$ e desvio padrão $\sigma_i$.  
+:::
+
+
+## Estimadores de Mínimos Quadrados  
+
+Seja $\mathbf{Y} = (y_1, \ldots, y_n)$ uma amostra aleatória observada segundo o MRL, em que $\mathbf{X}$ é a matriz do modelo cujas linhas são os valores das variáveis regressoras, e suponha que a matriz $\mathbf{X'X}$ tenha inversa. O estimador de mínimos quadrados para o vetor de parâmetros $\boldsymbol{\beta}$ é definido conforme a solução de mínimos quadrados:
+
+$$\hat{\boldsymbol{\beta}} = \mathbf{(X'X)^{-1} X'Y}$$
+
+Ao invés de calcularmos esperanças, variâncias e covariâncias separadamente para cada elemento de $\hat{\boldsymbol{\beta}}$, vamos obtê-las simultaneamente, usando notação matricial. Assim,
+
+$$
+\begin{aligned}
+E[\hat{\boldsymbol{\beta}}] &= E[\mathbf{(X'X)}^{-1} \mathbf{X'Y}] \\
+ &= \mathbf{(X'X)}^{-1} \mathbf{X}' E[\mathbf{Y}] \\
+&= \mathbf{(X'X)}^{-1} \mathbf{X'X} \boldsymbol{\beta} \\
+&= \boldsymbol{\beta}
+\end{aligned}
+$$
+
+e
+
+$$
+\begin{aligned}
+Var[\hat{\beta}]
+&= Var[(\mathbf{X'X})^{-1} \mathbf{X'Y}] \\
+&= \mathbf{(X'X)}^{-1} \mathbf{X}' \, Var[\mathbf{Y}] \, [\mathbf{(X'X)}^{-1} \mathbf{X}']' \\
+&= (\mathbf{X'X})^{-1} \mathbf{X}' \, \sigma^2 \mathbf{I} \, [\mathbf{(X'X)}^{-1} \mathbf{X}']' \\
+&= \sigma^2\, \mathbf{(X'X)}^{-1} \mathbf{X}' \,[\mathbf{(X'X)}^{-1} \mathbf{X}']'  \\
+&= \sigma^2 \mathbf{(X'X)}^{-1} \mathbf{X' X (X'X)}^{-1}\\
+&= \sigma^2 \mathbf{(X'X)}^{-1}.
+\end{aligned}
+$$
+
+Note que usamos acima a simetria da matriz $\mathbf{(X'X)}^{-1}$.
+
+
+Na seção anterior vimos que, sob um MRL, a distribuição de probabilidade do vetor $\mathbf{Y}$, correspondente aos valores prefixados das variáveis regressoras dados em $\mathbf{X}$, é $N_n(\mathbf{X}\boldsymbol{\beta};\sigma^2 \mathbf{I})$. Portanto, a distribuição de $\boldsymbol{\hat{\beta}} = \mathbf{(X'X)}^{-1} \mathbf{X'Y}$ é normal, $(k+1)$-variada, sendo $k+1$ a dimensão de $\boldsymbol{\beta}$, com vetor de esperanças e matriz de variâncias e covariâncias dados acima. Ou seja,
+
+$$
+\boldsymbol{\hat{\beta}} \sim N_{(k+1)} \left(\boldsymbol{\beta}; \, \sigma^2 \mathbf{(X'X)}^{-1} 
+\right)
+$$
+
+Como resultados, temos:
+
+- Para $\hat{\beta}_j$, elemento de $\boldsymbol{\hat{\beta}}$, $j = 0,1,\ldots,k$,
+
+$$
+\hat{\beta}_j \sim N \left( \beta_j ; \, \sigma^2 C_{j+1,j+1} \right),
+$$
+
+sendo $C_{j+1,j+1}$ o $(j+1)$-ésimo elemento da diagonal principal de $\mathbf{(X'X)}^{-1}$.
+
+- A covariância entre dois elementos de $\boldsymbol{\hat{\beta}}$, $\hat{\beta}_j$ e $\hat{\beta}_{j'}$, para $j$, $j' = 0,1,\ldots,k$, $j \neq j'$, é dada por $\sigma^2 C_{j+1,j'+1}$, sendo $C_{j+1,j'+1}$ o elemento da $(j+1)$-ésima linha e $(j'+1)$-ésima coluna de $\mathbf{(X'X)}^{-1}$.
+
+<!--
+- Para $\boldsymbol{\hat{\beta}}^{*}_{k}$, um subvetor de $\hat{\boldsymbol{\beta}}$:
+
+$$
+\boldsymbol{\hat{\beta}}^{*}_{k} \sim N(k)\left(\boldsymbol{\beta}^{*}_{k}; \, \sigma^2 \boldsymbol{\Sigma}^* 
+\right)
+$$
+
+sendo $\boldsymbol{\beta}^{*}_{k}$ o correspondente subvetor de $\boldsymbol{\beta}$ e $\sigma^2 \boldsymbol{\Sigma}^*$ a matriz formada pelos elementos de $\sigma^2 \mathbf{(X'X)}^{-1}$ correspondentes às variâncias e covariâncias dos elementos de $\boldsymbol{\hat{\beta}}^{*}_{k}$.
+-->
+
+### Valores ajustados 
+
+Seja o vetor dos valores ajustados $\hat{y_{i}}$ denotado por $\mathbf{\hat{Y}}$:  
+
+$$
+\mathbf{\hat{Y}} =
+\begin{bmatrix}
+\hat{y}_1 \\
+\hat{y}_2 \\
+\hat{y}_3 \\
+\vdots \\
+\hat{y}_n
+\end{bmatrix}
+$$  
+
+Em notação matricial, temos:  
+
+$$
+\mathbf{\hat{Y}} = \mathbf{X}\boldsymbol{\hat{\beta}}
+$$  
+
+porque:  
+
+$$
+\begin{bmatrix}
+\hat{y}_1 \\
+\hat{y}_2 \\
+\hat{y}_3 \\
+\vdots \\
+\hat{y}_n
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 & x_{11} & x_{21} & x_{31} & \cdots & x_{k1} \\
+1 & x_{12} & x_{22} & x_{32} & \cdots & x_{k2} \\
+1 & x_{13} & x_{23} & x_{33} & \cdots & x_{k3} \\
+\vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+1 & x_{1n} & x_{2n} & x_{3n} & \cdots & x_{kn}
+\end{bmatrix}
+\begin{bmatrix}
+\hat\beta_0 \\ \hat\beta_1 \\ \hat\beta_2 \\ \hat\beta_3 \\ \vdots \\ \hat\beta_k
+\end{bmatrix} 
+=
+\begin{bmatrix}
+\hat\beta_{0} + \hat\beta_{1}x_{11} + \hat\beta_{2}x_{21} + \hat\beta_{3}x_{31} + \ldots + \hat\beta_{k}x_{k1} \\
+\hat\beta_{0} + \hat\beta_{1}x_{12} + \hat\beta_{2}x_{22} + \hat\beta_{3}x_{32} + \ldots + \hat\beta_{k}x_{k2} \\
+\hat\beta_{0} + \hat\beta_{1}x_{13} + \hat\beta_{2}x_{23} + \hat\beta_{3}x_{33} + \ldots + \hat\beta_{k}x_{k3} \\
+\vdots \\
+\hat\beta_{0} + \hat\beta_{1}x_{1n} + \hat\beta_{2}x_{2n} + \hat\beta_{3}x_{3n} + \ldots + \hat\beta_{k}x_{kn}
+\end{bmatrix}
+$$  
+
+
+**A matriz "chapéu" ($\mathbf{H}$)**  
+
+Podemos expressar o resultado matricial para $\mathbf{\hat{Y}}$ usando a expressão dos estimadores de mínimos quadrados de $\boldsymbol{\beta}$. Como visto anteriormente, $\boldsymbol{\hat\beta} = (\mathbf{X'X})^{-1}\mathbf{X'Y}$. Então,
+
+$$
+\mathbf{\hat{Y}} = \mathbf{X}(\mathbf{X'X})^{-1}\mathbf{X'Y}
+$$  
+
+ou, equivalentemente:  
+
+$$
+\mathbf{\hat{Y}} = \mathbf{H Y}
+$$  
+
+em que:  
+
+$$
+\mathbf{H} = \mathbf{X}(\mathbf{X'X})^{-1}\mathbf{X}'
+$$  
+
+Então os valores ajustados $\hat{y}_i$ podem ser expressos como combinações lineares dos valores observados de $Y$, com os coeficientes sendo elementos da matriz $\mathbf{H}$. Além disso, note que a matriz $\mathbf{H}$ envolve apenas as observações da variável preditora $X$.
+
+Essa matriz quadrada ($n\times n$) $\mathbf{H}$ é chamada de **matriz chapéu (_hat matrix_)**. Ela desempenha um papel importante no diagnóstico da análise de regressão, mais especificamente, ao avaliar se os resultados podem ser indevidamente influenciados por uma ou poucas observações.  
+
+A matriz $\mathbf{H}$ é simétrica e possui a propriedade especial chamada **idempotência**:  
+
+$$
+HH = H
+$$  
+
+::: {.algebra data-latex=""}
+Em geral, uma matriz **M** é dita **idempotente** se $MM = M$.
+::: 
+
+::: {.exercicios data-latex=""}
+Considere os dados de altura (m) e de DAP (cm) de 21 Sequoias (adaptado de Levine et al., 2016). A partir do vetor $\boldsymbol{\hat{\beta}}$ obtido na aula anterior, obtenha os valores ajustados para as alturas das árvores, ou seja, o vetor $\mathbf{\hat{Y}}$.
+::: 
+
+::: {.exercicios data-latex=""}
+Considere os dados de peso do produto (kg) e temperatura ($^\circ$C) de 11 reações químicas (adaptado de Charnet et al., 2008, p.195). A partir do vetor $\boldsymbol{\hat{\beta}}$ obtido na aula anterior, obtenha os valores ajustados para os pesos do produto, ou seja, o vetor $\mathbf{\hat{Y}}$.  
+:::
+
+
+::: {.singletutorial data-latex=""}
+Considere os dados de altura (m) e de DAP (cm) de 21 Sequoias (adaptado de Levine et al., 2016). Usando o computador (R ou Python), obtenha a matriz $\mathbf{H}$ e verifique a propriedade de idempotência. 
+:::
+
+
+Agora, vamos olhar para o problema de estimar cada elemento do vetor $\mathbf{\hat{Y}}$. Seja $\mathbf{x_i}'$ a $i$-ésima linha de $\mathbf{X}$, isto é, o **vetor linha** com valores das variáveis regressoras e primeiro elemento igual a 1. O estimador de mínimos quadrados da esperança de $Y$, correspondente aos valores de $\mathbf{x_i}'$, é dado por:
+
+
+$$
+\hat{y}_i = \mathbf{x_i}' \boldsymbol{\hat{\beta}}.
+$$
+
+Este estimador tem distribuição normal univariada, com esperança e variância respectivamente iguais a:
+
+$$
+\begin{aligned}
+E[\mathbf{x_i}' \boldsymbol{\hat{\beta}}] &= \mathbf{x_i}' E[\boldsymbol{\hat{\beta}}]  \\
+&= \mathbf{x_i}' \boldsymbol{\hat{\beta}}
+\end{aligned}
+$$
+
+e
+
+$$
+\begin{aligned}
+Var[\mathbf{x_i}' \boldsymbol{\hat{\beta}}] &= \mathbf{x_i}' Var[\boldsymbol{\hat{\beta}}] \mathbf{x_i} \\
+&= \mathbf{x_i}' \sigma^2 (\mathbf{X'X})^{-1} \mathbf{x_i}\\
+&= \sigma^2 \mathbf{x_i}'(\mathbf{X'X})^{-1} \mathbf{x_i}.
+\end{aligned}
+$$
+
+Portanto,
+
+$$
+\hat{y}_i = \mathbf{x_i}' \boldsymbol{\hat{\beta}} \sim N (\mathbf{x_i}' \boldsymbol{\beta}; \, \sigma^2 \mathbf{x_i}'(\mathbf{X'X})^{-1} \mathbf{x_i}).
+$$
+
+Através da distribuição de $\mathbf{x_i}' \boldsymbol{\hat{\beta}}$, podemos definir intervalos de confiança para a esperança de $Y$, correspondente aos valores $\mathbf{x_i}$ das variáveis regressoras.  
+Um intervalo de confiança $(1-\alpha)100\%$ para $\mathbf{x_i}' \boldsymbol{\beta}$ é dado por:
+
+
+$$
+\mathbf{x_i}' \boldsymbol{\hat{\beta}} \; \pm \; t_{(\alpha/2,\,n-k-1)} \, 
+\sqrt{\widehat{\sigma^2} \mathbf{x_i}'(\mathbf{X'X})^{-1} \mathbf{x_i}}.
+$$
+
+Podemos estimar $E[Y]$, para outros valores não considerados no estudo, desde que esses valores estejam próximos dos valores observados.
+
+Também podemos definir intervalos de predição para um valor futuro de $Y$, correspondente aos valores $\mathbf{x_o}$ das variáveis regressoras.
+
+::: {.important data-latex=""}
+Intervalos de confiança são obtidos para estimar a resposta média em determinados níveis das variáveis explicativas, $\mathbf{x_i}'$. 
+
+Já os intervalos de predição são obtidos para a predição de um valor futuro, $\hat{y}_0$, não observado, correspondente a $\mathbf{x_0}'$. Nesse caso, a variável $Y_0$ não faz parte da amostra utilizada no ajuste do modelo. 
+
+Em ambos os tipos de intervalos (confiança e predição), os valores das variáveis explicativas podem ocorrer na amostra ou podem ser outros valores dentro do escopo do modelo.
+
+A diferença entre os dois intervalos pode ser resumida da seguinte maneira: no primeiro nós estimamos uma resposta média ou a média da distribuição de $Y$. No segundo, fazemos a predição de uma nova resposta, ou seja, uma observação em particular obtida da distribuição de $Y$. Acrescenta-se aqui que as respostas individuais desviam-se da resposta média. Então, além da incerteza sobre $\boldsymbol{\hat{\beta}}$, há também a variabilidade de um novo erro aleatório $\varepsilon_0$ que é considerada no processo de predição.
+::: 
+
+
+Um intervalo de predição $(1-\alpha)100\%$ é dado por:
+
+$$
+\mathbf{x_o}'\boldsymbol{\hat{\beta}} \; \pm \; t_{(\alpha/2,\,n-k-1)} \, 
+\sqrt{\widehat{\sigma^2} (1 + \mathbf{x_o}'(\mathbf{X'X})^{-1}\mathbf{x_o})},
+$$
+
+com a matriz $X$ reescrita como:
+
+$$
+\mathbf{X} =
+\begin{bmatrix}
+\mathbf{x}_1' \\
+\mathbf{x}_2' \\
+\vdots \\
+\mathbf{x}_n'
+\end{bmatrix}
+$$
+
+
+### O vetor de resíduos e o estimador de $\sigma^2$
+
+O vetor com os $n$ valores estimados, correspondentes aos valores das variáveis regressoras especificados em $\mathbf{X}$, é dado por:
+
+$$
+\mathbf{\hat{Y}} =
+\mathbf{X}\boldsymbol{\hat{\beta}}
+=
+\begin{bmatrix}
+\mathbf{x_1}' \\
+\mathbf{x_2}' \\
+\vdots \\
+\mathbf{x_n}'
+\end{bmatrix}
+\boldsymbol{\hat{\beta}}
+=
+\begin{bmatrix}
+\mathbf{x_1}'\boldsymbol{\hat{\beta}} \\
+\mathbf{x_2}'\boldsymbol{\hat{\beta}} \\
+\vdots \\
+\mathbf{x_n}'\boldsymbol{\hat{\beta}}
+\end{bmatrix}.
+$$
+
+Assim, temos o seguinte vetor de resíduos (erros estimados):
+
+$$
+\begin{bmatrix}
+\hat{\varepsilon_1} \\ \hat{\varepsilon_2} \\ 
+\vdots \\ \hat{\varepsilon_n}
+\end{bmatrix}
+=
+\mathbf{Y} - \mathbf{\hat{Y}}
+=
+\mathbf{Y} - \mathbf{X}\boldsymbol{\hat{\beta}}
+=
+\begin{bmatrix}
+y_1 \\
+y_2 \\
+\vdots \\
+y_n
+\end{bmatrix}
+-
+\begin{bmatrix}
+\mathbf{x_1}'\boldsymbol{\hat{\beta}} \\
+\mathbf{x_2}'\boldsymbol{\hat{\beta}} \\
+\vdots \\
+\mathbf{x_n}'\boldsymbol{\hat{\beta}}
+\end{bmatrix}
+=
+\begin{bmatrix}
+y_1 - \mathbf{x_1}'\boldsymbol{\hat{\beta}} \\
+y_2 - \mathbf{x_2}'\boldsymbol{\hat{\beta}} \\
+\vdots \\
+y_n - \mathbf{x_n}'\boldsymbol{\hat{\beta}}
+\end{bmatrix}.
+$$
+
+A propriedade de que a soma dos resíduos é sempre igual a zero, vista para o MRLS, é garantida para a regressão múltipla (MRLM), quando a matriz $\mathbf{X}$ tem uma coluna de elementos iguais a 1.
+
+::: {.exercicios data-latex=""}
+Considere os dados de altura (m) e de DAP (cm) de 21 Sequoias (adaptado de Levine et al., 2016). Obtenha os resíduos do modelo, ou seja, o vetor $\boldsymbol{\hat{\varepsilon}}$.
+::: 
+
+::: {.exercicios data-latex=""}
+Considere os dados de peso do produto (kg) e temperatura ($^\circ$C) de 11 reações químicas (adaptado de Charnet et al., 2008, p.195). Obtenha os resíduos do modelo, ou seja, o vetor $\boldsymbol{\hat{\varepsilon}}$.  
+:::
+
+
+Um estimador não viesado de $\sigma^2$ é dado pela soma de quadrados dos resíduos, dividida por $(n-k-1)$, sendo $(k+1)$ o posto da matriz $\mathbf{X}$, neste caso o número de colunas de $\mathbf{X}$, ou ainda, a dimensão de $\boldsymbol{\beta}$.
+
+O estimador de mínimos quadrados de $\sigma^2$ é:
+
+$$
+\widehat{\sigma^2} = \frac{(\mathbf{Y} - \mathbf{X}\hat{\boldsymbol{\beta}})'(\mathbf{Y} - \mathbf{X}\hat{\boldsymbol{\beta}})}{n - k - 1} = \frac{\boldsymbol{\hat\varepsilon}'\boldsymbol{\hat\varepsilon}}{n-k-1}
+$$
+
+
+## Aplicações: intervalos de confiança para os parâmetros
+
+Podemos definir intervalos de confiança para os parâmetros $\beta_j$ usando a seguinte quantidade pivotal:
+
+$$
+\frac{\hat{\beta}_j - \beta_j}{\left( \widehat{\sigma^2} C_{j+1,j+1} 
+\right)^{1/2}} \sim t_{(n-k-1)}, 
+\quad 	\text{para } j=0,1,\ldots,k,
+$$
+Intervalos de confiança $(1-\alpha)100\%$ para os parâmetros $\beta_j, \; j=0,1,\ldots,k$, são dados por:
+
+$$
+\hat{\beta}_j \; \pm \; t_{(\alpha/2,\,n-k-1)} \sqrt{\widehat{\sigma^2} C_{j+1,j+1}}, 
+\quad j=1,\ldots,k
+$$
+
+Lembrando que $t_{(\alpha,n)}$ é o quantil $(1-\alpha)$ da distribuição $t$ de Student com $n$ graus de liberdade
+e $C_{j+1,j+1}$ é o $(j+1)$-ésimo elemento da diagonal principal de $(\mathbf{X'X})^{-1}$, $j=0,1,\ldots,k$.
+
+
+::: {.exercicios data-latex=""}
+Considere os dados de altura (m) e de DAP (cm) de 21 Sequoias (adaptado de Levine et al., 2016). Obtenha um intervalo de confiança para o parâmetro $\beta_1$.
+::: 
+
+
+<!--
+Apesar de ser menos frequente apresentamos a seguir a quantidade pivotal e intervalo de confiança para o parâmetro $\sigma^2$. 
+
+
+$$
+\frac{(n-k-1)\widehat{\sigma^2}}{\sigma^2} \sim \chi^2_{(n-k-1)}.
+$$
+
+Através desta última distribuição, temos que $\widehat{\sigma^2}$ é não viesado para $\sigma^2$ com variância igual a $\frac{2(\sigma^2)^2}{(n-k-1)}$.
+
+
+O intervalo de confiança é dado por
+
+$$
+\left[
+\frac{\sum_{i=1}^n (y_i - \hat{y}_i)^2}{\chi^2_{(\alpha/2,\,n-k)}}
+\; , \;
+\frac{\sum_{i=1}^n (y_i - \hat{y}_i)^2}{\chi^2_{(1-\alpha/2,\,n-k)}}
+\right].
+$$
+
+em que $\chi^2_{(\alpha,n)}$ é o quantil $\alpha$ de distribuição qui-quadrado com $n$ graus de liberdade.
+-->
+

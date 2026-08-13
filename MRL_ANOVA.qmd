@@ -1,0 +1,491 @@
+---
+title: "Análise de variância (ANOVA) da regressão"
+---
+
+::: {.chapterintro data-latex=""}
+Na aula de hoje vamos apresentar a Análise de Variância (ANOVA) da Regressão, uma das metodologias para se realizar inferência sobre parâmetros de um modelo linear de regressão (MLR). Inicialmente será apresentada a ANOVA para o caso de modelos de regressão linear simples (MRLS) e, posteriormente, será generalizado para modelos de regressão linear múltipla (MRLM), considerando a notação matricial.
+
+Essa aula é baseada no capítulo 6 e 8 de _Linear Models in Statistics_ (Rencher e Schaalje, 2008), nos capítulos 3 e 8 de Charnet et al. (2008) e na apostila _Modelos de Regressão_ (Demétrio e Zocchi, 2011).
+:::
+
+## Introdução
+
+A Análise de Variância (ANAVA) ou do inglês _Analysis of Variance_ (ANOVA) é uma metodologia estatística desenvolvida por Ronald A. Fisher no início do século XX. O termo ANOVA surgiu em 1918, quando o método foi formalmente estabelecido, inicialmente em aplicações nas áreas de Genética e Experimentação Agronômica. Pode-se considerá-la como uma das metodologias mais importantes que um pesquisador dispõe para a análise de dados e interpretação de resultados experimentais.
+
+NA ANOVA trabalha-se com a variabilidade dos dados, bem como com as causas ou fontes dessa variabilidade. Consiste na partição da variância de uma variável aleatória em partes ortogonais (independentes). Considerando dados experimentais, que correspondem a realizações dessa variável aleatória, pode-se definir a ANOVA como um método no qual se realiza a decomposição da variabilidade desses dados em duas partes: uma atribuída a causas conhecidas, que podem ou não ser controladas pelo pesquisador, e outra devido a fatores não controlados, geralmente considerados como de natureza desconhecida e aleatória, geralmente devida ao acaso.
+
+No caso específico da Análise de Variância da Regressão, pode-se definir como uma metodologia com a qual verifica-se, por meio de um teste estatístico, se a variabilidade observada em uma variável dependente ($Y$) é significativamente explicada por $k$ variáveis independentes ou explicativas ($X_i$, com $i=1,2,\ldots,k$). Na ANOVA da regressão, a variação total dos dados é decomposta em fontes como _Regressão_ (a variação explicada pelo modelo proposto) e _Erro_ ou _Resíduo_ (a variação não explicada ou independente da regressão). Nessa análise utiliza-se o teste F para verificar se temos evidências de que a variação explicada pelo modelo de regressão proposto é maior do que a independente da regressão.
+
+A seguir faremos uma breve introdução à ANOVA para o caso de modelos de regressão linear simples (MRLS) e depois generalizaremos para qualquer modelo de regressão linear (MRL), considerando a notação matricial.
+
+## ANOVA da regressão - MRLS
+
+Considere o MRLS dado por:
+$$
+y_{i} = \beta_{0} + \beta_{1}x_{i} + \varepsilon_{i},
+$$ {#eq-modRLS}
+
+em que $y_i$ é o i-ésimo valor observado da variável dependente, com $i=1,2,\ldots,n$; $x_i$ é o i-ésimo valor da variável explicativa $X$; $\beta_0$ e $\beta_1$ são os parâmetros do modelo, sendo denominados de intercepto e coeficiente de regressão, respectivamente; e $\varepsilon_{i}$ é o erro aleatório associado à observação $y_i$, sendo estes independentes e identicamente distribuídos, com $\varepsilon_{i} \sim (0,\sigma^2)$.
+
+Conforme definido anteriormente, a ANOVA consiste na decomposição da variação total em uma parte devido à regressão, definida pelo modelo proposto e outra considerada como independente da regressão, a parte não explicada pelo modelo proposto, que espera-se e considera-se como devido ao acaso. A seguir apresentaremos uma de várias maneiras de se demonstrar essa decomposição. 
+
+Pode-se demonstrar que $y_i - \bar{y} =  (\hat{y}_i - \bar{y}) + (y_i - \hat{y}_i)$, o que é facilmente visualizado por meio de uma representação gráfica, conforme apresentado por Demétrio e Zocchi (2011, p.31, Figura 2.4). Além disso, $\hat{\varepsilon}_{i} = y_i - \hat{y}_i$ e, portanto,
+$$
+\begin{array}{rcl}
+(y_i-\bar{y}) & = & (\hat{y}_i - \bar{y}) + \hat{\varepsilon}_i \\
+\displaystyle \sum_{i=1}^n (y_i-\bar{y})^2 & = & \displaystyle \sum_{i=1}^n \left[ (\hat{y}_i - \bar{y}) + \hat{\varepsilon}_i \right]^2 \\
+\displaystyle \sum_{i=1}^n (y_i-\bar{y})^2 & = & \displaystyle \sum_{i=1}^n \left[ (\hat{y}_i - \bar{y})^2 + 2 (\hat{y}_i - \bar{y})\hat{\varepsilon}_i + \hat{\varepsilon}_i^2 \right] \\
+\displaystyle \sum_{i=1}^n (y_i-\bar{y})^2 & = & \displaystyle \sum_{i=1}^n (\hat{y}_i - \bar{y})^2 + 2 \displaystyle \sum_{i=1}^n (\hat{y}_i - \bar{y})\hat{\varepsilon}_i + \displaystyle \sum_{i=1}^n \hat{\varepsilon}_i^2
+\end{array}
+$$
+Nessa última definição tem-se que $\displaystyle \sum_{i=1}^n (\hat{y}_i - \bar{y})\hat{\varepsilon}_i = \displaystyle \sum_{i=1}^n \hat{y}_i \hat{\varepsilon} - \displaystyle \sum_{i=1}^n \bar{y} \hat{\varepsilon}_i = 0$, pois, como visto em aulas anteriores, $\displaystyle \sum_{i=1}^n \hat{y}_i \hat{\varepsilon} = 0$ e $\displaystyle \sum_{i=1}^n \bar{y} \hat{\varepsilon}_i =  \bar{y} \displaystyle \sum_{i=1}^n \hat{\varepsilon}_i = 0$. Além disso, como $\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i$ e $\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}$, tem-se
+$$
+\begin{array}{rcl}
+\displaystyle \sum_{i=1}^n (\hat{y}_i - \bar{y})^2 & = & \displaystyle \sum_{i=1}^n (\hat{\beta}_0 + \hat{\beta}_1 x_i - \bar{y})^2 \\
+ & = & \displaystyle \sum_{i=1}^n (\bar{y} - \hat{\beta}_1 \bar{x} + \hat{\beta}_1 x_i - \bar{y})^2 \\
+ & = & \displaystyle \sum_{i=1}^n (\hat{\beta}_1 x_i - \hat{\beta}_1 \bar{x})^2 \\
+ & = & \displaystyle \hat{\beta}_1^2 \displaystyle \sum_{i=1}^n ( x_i - \bar{x})^2
+\end{array}
+$$
+Portanto,
+$$
+\begin{array}{ccccc}
+\displaystyle \sum_{i=1}^n (y_i-\bar{y})^2 & = & \displaystyle \hat{\beta}_1^2 \displaystyle \sum_{i=1}^n ( x_i - \bar{x})^2 & + & \displaystyle \sum_{i=1}^n \hat{\varepsilon}_i^2 \\
+SQTotal & = & SQRegressão & + &  SQErro ,
+\end{array}
+$$
+em que:
+
+- $SQTotal = \displaystyle \sum_{i=1}^n (y_i-\bar{y})^2$ é a soma de quadrados dos desvios de cada observação em relação à média geral, também conhecida como **variação total dos dados**;
+
+- $SQRegressão = \displaystyle \hat{\beta}_1^2 \displaystyle \sum_{i=1}^n ( x_i - \bar{x})^2$ é a soma de quadrados que depende do coeficiente $\hat{\beta}_1$ e, portanto, é denominada de soma de quadrados da regressão. Esta representa a parte da **variação total** que é explicada pelo modelo de 1$^o$ grau ou da regressão linear simples. É comum encontrar outras formas de calcular a $SQRegressão$. Como exemplo temos:
+  + $SQRegressão = \hat{\beta}_1 \cdot SPXY = \dfrac{(SPXY)^2}{SQX},$ \
+em que
+    * $SPXY = \sum_{i=1}^n y_i x_i - \dfrac{(\sum_{i=1}^n y_i)(\sum_{i=1}^n x_i)}{n}$, e 
+    * $SQX = \sum_{i=1}^n x_i^2 - \dfrac{(\sum_{i=1}^n x_i)^2}{n}$;
+  + $SQRegressão = \hat{\beta}_0 \sum_{i=1}^n y_i + \hat{\beta}_1 \sum_{i=1}^n y_i x_i  - \dfrac{(\sum_{i=1}^n y_i)^2}{n}$.
+  
+  Pode-se demonstrar que essas três maneiras de calcular a $SQRegressão$ são equivalentes;
+  
+
+- $SQErro = SQResíduo = SQIndependente \mbox{ } da \mbox{ } Regressão = \displaystyle \sum_{i=1}^n \hat{\varepsilon}_i^2$ é a soma de quadrados **Independente da Regressão** ou do **Resíduo**, que representa o quanto o modelo de 1$^o$ grau não explica ou deixou de explicar da **variação total** da variável $Y$.
+
+Uma vez definida a decomposição da **variação total** ou da $SQTotal$, deve-se decompor os graus de liberdade associado a essa $SQ$. Sabendo-se que os graus de liberdade associado à $SQTotal$ é dado por $GLTotal = n-1$ e que o modelo considerado apresenta uma única variável regressora ou um único parâmetro no modelo ($\beta_1$), além da constante $\beta_0$, tem-se
+$$
+GLTotal = n-1 = 1 + (n - 2),
+$$
+ou seja,
+$$
+\begin{array}{ccccc}
+n-1 & = & 1 & + & (n - 2) \\
+GLTotal & = & GLRegressão & + & GLErro . 
+\end{array}
+$$
+Assim, a tabela da ANOVA é dada por:
+
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-style:solid;border-width:0px;font-family:Arial, sans-serif;font-size:16px;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:16px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;border-left:none;border-right:none}
+.tg .tg-0pky{border-color:inherit;text-align:center;vertical-align:middle}
+.tg .tg-Lpky{border-color:inherit;text-align:left;vertical-align:middle}
+</style>
+<div style="display: flex; justify-content: center;">
+<table class="tg"><thead>
+  <tr>
+    <th style="width: 50px;" class="tg-0pky">FV</th>
+    <th style="width: 50px;" class="tg-0pky">GL</th>
+    <th style="width: 100px;" class="tg-0pky">SQ</th>
+    <th style="width: 50px;" class="tg-0pky">QM</th>
+    <th style="width: 50px;" class="tg-0pky">F</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td class="tg-Lpky">Regressão</td>
+    <td class="tg-0pky">1</td>
+    <td class="tg-0pky">SQReg</td>
+    <td class="tg-0pky">QMReg</td>
+    <td class="tg-0pky">Fc</td>
+  </tr>
+  <tr>
+    <td class="tg-Lpky">Erro</td>
+    <td class="tg-0pky">n-2</td>
+    <td class="tg-0pky">SQErro</td>
+    <td class="tg-0pky">QMErro</td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <th class="tg-Lpky">Total</th>
+    <th class="tg-0pky">n-1</th>
+    <th class="tg-0pky">SQTotal</th>
+    <th class="tg-0pky"></th>
+    <th class="tg-0pky"></th>
+  </tr>
+</tbody>
+</table>
+</div>
+
+A seguir apresentam-se alguns resultados importantes para o processo de inferência sobre os parâmetros. Esses resultados não serão demonstrados, mas não é muito difícil essas demonstrações.
+
+- **Resultado 1:** $E(QMErro) = \sigma^2$, ou seja, o $QMErro$ é um estimador não-viesado de $\sigma^2$.
+
+- **Resulta 2:** Os estimadores $\hat{\beta}_0$ e $\hat{\beta}_1$ são independentes da $SQErro$.
+
+- **Resultado 3:** As distribuições das $SQ$ são dadas por:
+  i) $\dfrac{1}{\sigma^2} SQTotal \sim \chi^2 \left( n-1, \delta = \dfrac{1}{2\sigma^2} \beta_1^2 \sum_{i=1}^{n} (x_i - \bar{x})^2 \right)$, ou seja, segue uma distribuição de Qui-Quadrado com $n-1$ graus de liberdade e parâmetro de não centralidade igual a $\delta = \beta_1^2 \sum_{i=1}^{n} (x_i - \bar{x})^2$;
+  ii) $\dfrac{1}{\sigma^2} SQReg \sim \chi^2 \left( 1, \delta=\dfrac{1}{2\sigma^2} \beta_1^2 \sum_{i=1}^{n} (x_i - \bar{x})^2 \right)$, ou seja, segue uma distribuição de Qui-Quadrado com $1$ grau de liberdade e parâmetro de não centralidade igual a $\delta = \beta_1^2 \sum_{i=1}^{n} (x_i - \bar{x})^2$;
+  iii) $\dfrac{1}{\sigma^2} SQErro \sim \chi^2 (n-2)$, ou seja, segue uma distribuição de Qui-Quadrado com $n-2$ graus de liberdade.
+
+- **Resultado 4:** $SQReg$ e $SQErro$ são independentes.
+
+Considerando esses **Resultados**, tem-se que $F_c = \dfrac{QMReg}{QMErro}$ segue distribuição F, com $\nu_1 = 1$ e $\nu_2 = n-2$ graus de liberdade do numerador e denominador, respectivamente, o que será demonstrado a seguir.
+
+::: {.important data-latex=""}
+Sejam duas variáveis aleatórias independentes $U$ e $V$, que seguem distribuições Qui-Quadrado com $\nu_1$ e $\nu_2$ graus de liberdade, respectivamente, ou seja,
+$$
+U \sim \chi^2(\nu_1) \qquad \mbox{e} \qquad V \sim \chi^2(\nu_2),
+$$
+tem-se que
+$$
+\dfrac{U / \nu_1}{V/\nu_2} \sim F(\nu_1,\nu_2).
+$$
+Ademais, sob $H_0: \beta_1 = 0$, tem-se que o parâmetro de não centralidade $\delta = \dfrac{1}{2\sigma^2} \beta_1^2 \sum_{i=1}^{n} (x_i - \bar{x})^2 = 0$ e, assim, tem-se que $\dfrac{1}{\sigma^2} SQReg \sim \chi^2(1)$. 
+
+Dessa forma, considerando $U = \dfrac{1}{\sigma^2} SQReg$, com $\nu_1=1$ e $V = \dfrac{1}{\sigma^2} SQErro$, com $\nu_2=n-2$, tem-se que
+$$
+\dfrac{\dfrac{1}{\sigma^2} SQReg / 1}{\dfrac{1}{\sigma^2} SQErro / (n-2)} = \dfrac{QMReg}{QMErro} \sim F(\nu_1 = 1,\nu_2 = n-2).
+$$
+Portanto, calculando a estatística $F_c = \dfrac{QMReg}{QMErro}$ e definindo uma região crítica ou um $valor-p$ a partir de uma distribuição F, tem-se uma regra decisória que pode ser utilizada para testar as hipóteses
+$$
+\left\{ 
+\begin{array}{c} 
+H_0: \beta_1 = 0 \\ H_a: \beta_1 \ne 0 
+\end{array} \right.
+$$
+:::
+
+### Coeficiente de Determinação ($R^2$)
+
+O coeficiente de determinação ($R^2$) indica a proporção da variabilidade nos $y_i's$ observados que é explicada pelo modelo de regressão considerado. O valor do $R^2$ pertence ao intervalo $[0;1]$ e quanto mais próximo de 1, melhor é o ajuste do modelo. Ele é calculado por:
+$$
+R^2 = \dfrac{SQReg}{SQTotal} = 1 - \dfrac{SQErro}{SQTotal}.
+$$
+  
+  - **Obs. 1:** O $R^2$ está associado aos dados e ao modelo considerado. Para um mesmo conjunto de dados, se foram ajustados modelos diferentes, estes terão $R^2$ diferentes.
+
+  - **Obs. 2:** Modelos com maior número de parâmetros, o que indica maior número de variáveis explicativas, apresentam maiores $R^2$. Porém, a inclusão de uma nova variável explicativa ao modelo, não significa
+necessariamente que o novo modelo é superior a outro modelo mais simples. Por isso é perigoso utilizar apenas o $R^2$ para selecionar modelos, pois pode-se selecionar um modelo mais complexo, desnecessariamente.
+
+  - **Obs. 3:** O coeficiente de determinação corresponde ao quadrado do coeficiente de correlação _**apenas**_ no caso do modelo de regressão linear simples, ou seja, $r = \sqrt{r^2}$, em que $r^2$ é o coeficiente de determinação e $r$ é o coeficiente de correlação de Pearson. Observe que, nesse caso particular, é comum utilizar a letra _**r**_ minúscula, ou seja, $r^2$ ao invés de $R^2$.
+
+  
+::: {.exercicios data-latex=""}
+**1.** Obtenha a ANOVA considerando o modelo de regressão linear simples e os dados das Sequoias. Utilize o R ou Python para efetuar todos os cálculos detalhadamente, ou seja, obtenha as $SQ$, os $QM$, o $F_c$, o valor-p e o $R^2$, concluindo corretamente.
+:::
+
+::: {.singlelab data-latex=""}
+**2.** Faça a ANOVA dos dados das Sequoias utilizando as funções _lm()_ e _anova()_ do R. Caso queira utilizar o Python, considere as funções equivalentes.
+:::
+
+
+## ANOVA de modelos de regressão linear - representação matricial
+
+Conforme visto em outras aulas, um modelo de regressão linear (MRL) pode ser representado por
+$$
+y_i = \beta_{0} + \beta_{1}x_{1i} + \beta_{2}x_{2i} + \ldots + \beta_{k}x_{ki} + \varepsilon_i,
+$$
+em que $y_i$ é o i-ésimo valor observado da variável resposta, com $i=1,2,\ldots,n$; os parâmetros $\beta_{0}, \beta_{1}, \ldots, \beta_{k}$ são os coeficientes de regressão; $x_{1i}, x_{2i}, \dots, x_{ki}$ são os valores conhecidos das $k$ variáveis explicativas, associados à i-ésima observação $y_i$; e $\varepsilon_i$ é o erro aleatório associado à observação $y_i$, sendo estes independentes e identicamente distribuídos, com $\varepsilon_{i} \sim (0,\sigma^2)$.
+
+Também foi visto que esse modelo, bem como qualquer MRL, pode ser representado matricialmente por
+$$
+\mathbf{Y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon}
+$$
+em que $\mathbf{Y}$ é o vetor $n \times 1$ de observações; $\mathbf{X}$ é uma matriz $n \times (k+1)$, denominada de matriz de incidência ou de modelo; $\boldsymbol{\beta}$ é o vetor $(k+1) \times 1$ de parâmetros; e $\boldsymbol{\varepsilon}$ é o vetor $n \times 1$ de erros, com $\boldsymbol{\varepsilon} \sim N_n(\boldsymbol{\phi}, \mathbf{I}\sigma^2)$.
+
+Considerando o MRL essa forma matricial geral, conhecido como modelo de Gauss-Markov normal, a ANOVA da regressão é definida de forma similar ao caso particular do MRLS, ou seja, a variabilidade total dos dados é decomposta em duas fontes de variação: _Regressão_ (a variação explicada pelo modelo proposto) e _Erro_ (a variação não explicada ou independente da regressão). Portanto, tem-se a seguinte tabela da ANOVA:
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-style:solid;border-width:0px;font-family:Arial, sans-serif;font-size:16px;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:16px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;border-left:none;border-right:none}
+.tg .tg-0pky{border-color:inherit;text-align:center;vertical-align:middle}
+.tg .tg-Lpky{border-color:inherit;text-align:left;vertical-align:middle}
+</style>
+<div style="display: flex; justify-content: center;">
+<table class="tg"><thead>
+  <tr>
+    <th style="width: 50px;" class="tg-0pky">FV</th>
+    <th style="width: 50px;" class="tg-0pky">GL</th>
+    <th style="width: 100px;" class="tg-0pky">SQ</th>
+    <th style="width: 50px;" class="tg-0pky">QM</th>
+    <th style="width: 50px;" class="tg-0pky">F</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td class="tg-Lpky">Regressão</td>
+    <td class="tg-0pky">k</td>
+    <td class="tg-0pky">SQReg</td>
+    <td class="tg-0pky">QMReg</td>
+    <td class="tg-0pky">Fc</td>
+  </tr>
+  <tr>
+    <td class="tg-Lpky">Erro</td>
+    <td class="tg-0pky">n-k-1</td>
+    <td class="tg-0pky">SQErro</td>
+    <td class="tg-0pky">QMErro</td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <th class="tg-Lpky">Total</th>
+    <th class="tg-0pky">n-1</th>
+    <th class="tg-0pky">SQTotal</th>
+    <th class="tg-0pky"></th>
+    <th class="tg-0pky"></th>
+  </tr>
+</tbody>
+</table>
+</div>
+
+Nesse caso, todas as definições associadas ao teste F são similares e assim,
+$$
+F_c = \dfrac{QMReg}{QMErro} \sim F(\nu_1 = k; \nu_2 = n-k-1).
+$$
+
+Portanto, uma região crítica ou um _valor-p_ serão definidos a partir da distribuição F e as hipóteses a serem testadas são:
+$$
+\left\{ 
+\begin{array}{l}
+H_0: \beta_1 = \beta_2 = \ldots = \beta_k = 0 \\
+H_a: \beta_j \ne 0 \mbox{, para pelo menos um } j \mbox{, com } j = 1,2, \ldots, k
+\end{array} \right.
+$$
+
+::: {.important data-latex=""}
+Observe que os graus de liberdade são bem diferentes, quando comparado com a ANOVA do MRLS, com execeção dos $GLTotal$. No modelo considerado têm-se $k$ variáveis explicativas, ou seja, $k$ parâmetros desconsiderando a constante $\beta_0$. Portanto, $GLRegressão = k$ e, por diferença, $GLErro = (n-1) - k = n-k-1$. 
+
+Veja que no caso do MRLS, que é um caso particular dos MRLM, tem-se $k=1$, ou seja, apenas um parâmetro ($\beta_1$) além da constante $\beta_0$.
+:::
+
+
+Existem diferentes formas de se representar a decomposição da $SQTotal$ na soma das $SQReg$ e $SQErro$, ou seja,
+$$
+SQTotal = SQReg + SQErro,
+$$
+e definir as fórmulas matriciais para o cálculo dessas três $SQ$.
+
+Inicialmente, mostraremos uma forma mais direta, conforme apresentada por Charnet et al. (2008, p.182). Posteriormente, apresentaremos todo o desenvolvimento matricial, com um maior rigor.
+
+Como definido anteriormente,
+$$
+y_i - \bar{y} =  (\hat{y}_i - \bar{y}) + (y_i - \hat{y}_i)
+$$
+e, portanto,
+$$
+\begin{array}{rcl}
+\displaystyle \sum_{i=1}^n (y_i - \bar{y})^2 & = &  \displaystyle \sum_{i=1}^n (\hat{y}_i - \bar{y})^2 + \displaystyle \sum_{i=1}^n (y_i - \hat{y}_i)^2 \\
+SQTotal & = & SQReg + SQErro.
+\end{array}
+$$
+Assim,
+$$
+\begin{array}{rcl}
+SQTotal & = & \displaystyle \sum_{i=1}^n (y_i - \bar{y})^2 \\
+ & = & \displaystyle \sum_{i=1}^n (y_i^2 - 2y_i\bar{y} + \bar{y}^2) \\
+ & = & \displaystyle \sum_{i=1}^n y_i^2 - 2\bar{y} \displaystyle \sum_{i=1}^n y_i + \displaystyle \sum_{i=1}^n \bar{y}^2 \\
+ & = & \displaystyle \sum_{i=1}^n y_i^2 - 2 \dfrac{\displaystyle \sum_{i=1}^n y_i}{n} \displaystyle \sum_{i=1}^n y_i + n \bar{y}^2 \\
+ & = & \displaystyle \sum_{i=1}^n y_i^2 - 2 \dfrac{\left( \displaystyle \sum_{i=1}^n y_i \right)^2}{n} + n \left(\dfrac{\displaystyle \sum_{i=1}^n y_i}{n}\right)^2 \\
+ & = & \displaystyle \sum_{i=1}^n y_i^2 - 2 \dfrac{\left( \displaystyle \sum_{i=1}^n y_i \right)^2}{n} + n \dfrac{\left( \displaystyle \sum_{i=1}^n y_i \right)^2}{n^2} \\
+ & = & \displaystyle \sum_{i=1}^n y_i^2 - 2 \dfrac{\left( \displaystyle \sum_{i=1}^n y_i \right)^2}{n} + \dfrac{\left( \displaystyle \sum_{i=1}^n y_i \right)^2}{n} \\
+SQTotal & = & \displaystyle \sum_{i=1}^n y_i^2 - \dfrac{\left( \displaystyle \sum_{i=1}^n y_i \right)^2}{n},
+ \end{array}
+$$
+em que:
+
+- $\displaystyle \sum_{i=1}^n y_i^2 = \mathbf{Y}'\mathbf{Y}$; e
+
+- $\dfrac{\left( \displaystyle \sum_{i=1}^n y_i \right)^2}{n} = \dfrac{1}{n} \mathbf{Y}'\mathbf{1}\mathbf{1}'\mathbf{Y}$, com $\mathbf{1}$ sendo o vetor coluna de 1's, de dimensão $n \times 1$.
+
+Dessa forma,
+$$
+SQTotal = \mathbf{Y}'\mathbf{Y} - \dfrac{1}{n} \mathbf{Y}'\mathbf{1}\mathbf{1}'\mathbf{Y},
+$$
+em que $\dfrac{1}{n} \mathbf{Y}'\mathbf{1}\mathbf{1}'\mathbf{Y} = C$ é conhecida como _correção_. A $SQTotal$ definida dessa maneira é denominada de $SQTotal$ _corrigida_, ou seja, corrigida para a constante presente no modelo ou para a média.
+
+::: {.tip data-latex=""} 
+Pode-se observar que $\displaystyle \left( \sum_{i=1}^n y_i \right)^2 = \mathbf{Y}'\mathbf{1}\mathbf{1}'\mathbf{Y}$, pois
+$$
+\mathbf{Y}'\mathbf{1} = 
+\begin{bmatrix}
+y_1 \quad y_2 \quad \cdots \quad y_n 
+\end{bmatrix}
+\begin{bmatrix}
+1 \\ 1 \\ \vdots \\ 1
+\end{bmatrix} = \displaystyle \left( \sum_{i=1}^n y_i \right) \mbox{ e } 
+$$
+$$
+\mathbf{1}'\mathbf{Y} = 
+\begin{bmatrix}
+1 \quad 1 \quad \cdots \quad 1
+\end{bmatrix}
+\begin{bmatrix}
+y_1 \\ y_2 \\ \vdots \\ y_n 
+\end{bmatrix}
+ = \displaystyle \left( \sum_{i=1}^n y_i \right).
+$$
+Em alguns materiais, como em Kutner et al. (2004), a matriz $\mathbf{1} \mathbf{1}'$ é representada por $\mathbf{J}$, que é uma matriz de 1's, ou seja,
+$$
+\mathbf{1} \mathbf{1}' = 
+\begin{bmatrix}
+1 \\ 1 \\ \vdots \\ 1
+\end{bmatrix}
+\begin{bmatrix}
+1 \quad 1 \quad \cdots \quad 1
+\end{bmatrix} = 
+\begin{bmatrix}
+1 & 1 & \ldots & 1 \\
+1 & 1 & \ldots & 1 \\
+\vdots & \vdots & \ddots & \vdots \\
+1 & 1 & \ldots & 1 \\
+\end{bmatrix} = \mathbf{J},
+$$
+em que $\mathbf{1}$ é um vetor de 1's, de ordem $n \times 1$ e, portanto, $\mathbf{J}$ é uma matriz de 1's, de ordem $n \times n$.
+::: 
+
+\ \
+
+
+Matricialmente, a $SQErro = \displaystyle \sum_{i=1}^n (y_i - \hat{y}_i)^2$ pode ser representada por $SQErro = \mathbf{Y}'\mathbf{Y} - \boldsymbol{\hat{\beta}}'\mathbf{X}'\mathbf{Y}$, conforme demonstrado a seguir.
+
+Sendo $(y_i - \hat{y}_i)$ o i-ésimo termo do vetor $(\mathbf{Y} - \mathbf{X} \boldsymbol{\hat{\beta}})$, ou seja,
+$$
+(\mathbf{Y} - \mathbf{X} \boldsymbol{\hat{\beta}}) = 
+\begin{bmatrix}
+(y_1 - \hat{y}_1) \\ (y_2 - \hat{y}_2) \\ \vdots \\ (y_i - \hat{y}_i) \\ \vdots \\ (y_n - \hat{y}_n)
+\end{bmatrix}
+$$
+tem-se:
+$$
+\begin{array}{rcl}
+SQErro & = & \displaystyle \sum_{i=1}^n (y_i - \hat{y}_i)^2 \\
+& = & (\mathbf{Y} - \mathbf{X} \boldsymbol{\hat{\beta}})'(\mathbf{Y} - \mathbf{X} \boldsymbol{\hat{\beta}}) \\
+& = & \mathbf{Y}'\mathbf{Y} - \mathbf{Y}'\mathbf{X} \boldsymbol{\hat{\beta}} - \boldsymbol{\hat{\beta}}' \mathbf{X}' \mathbf{Y} + \boldsymbol{\hat{\beta}}' \mathbf{X}'\mathbf{X} \boldsymbol{\hat{\beta}} \\
+& = & \mathbf{Y}'\mathbf{Y} - 2 \boldsymbol{\hat{\beta}}' \mathbf{X}' \mathbf{Y} + \boldsymbol{\hat{\beta}}' \mathbf{X}'\mathbf{X} \boldsymbol{\hat{\beta}} \\
+& = & \mathbf{Y}'\mathbf{Y} - 2 \boldsymbol{\hat{\beta}}' \mathbf{X}' \mathbf{Y} + \boldsymbol{\hat{\beta}}' \mathbf{X}'\mathbf{X} (\mathbf{X}'\mathbf{X})^{-1} \mathbf{X}'\mathbf{Y} \\  
+& = & \mathbf{Y}'\mathbf{Y} - 2 \boldsymbol{\hat{\beta}}' \mathbf{X}' \mathbf{Y} + \boldsymbol{\hat{\beta}}' \mathbf{I} \mathbf{X}'\mathbf{Y} \\  
+& = & \mathbf{Y}'\mathbf{Y} - 2 \boldsymbol{\hat{\beta}}' \mathbf{X}' \mathbf{Y} + \boldsymbol{\hat{\beta}}' \mathbf{X}'\mathbf{Y} \\  
+& = & \mathbf{Y}'\mathbf{Y} - \boldsymbol{\hat{\beta}}' \mathbf{X}' \mathbf{Y}.
+\end{array}
+$$
+\ \
+
+Sabendo-se que $SQTotal = SQReg + SQErro$ tem-se que:
+$$
+\begin{array}{rcl}
+SQReg & = & SQTotal - SQErro \\
+& = & \mathbf{Y}'\mathbf{Y} - \dfrac{1}{n} \mathbf{Y}'\mathbf{1}\mathbf{1}'\mathbf{Y} - \left( \mathbf{Y}'\mathbf{Y} - \boldsymbol{\hat{\beta}}' \mathbf{X}' \mathbf{Y} \right) \\
+& = & \boldsymbol{\hat{\beta}}' \mathbf{X}' \mathbf{Y} - \dfrac{1}{n} \mathbf{Y}'\mathbf{1}\mathbf{1}'\mathbf{Y}.
+\end{array}
+$$
+\ \
+
+### Coeficiente de Determinação ($R^2$)
+
+O coeficiente de determinação ($R^2$) no caso do ajuste de um MRLM é interpretado e calculado da mesma maneira que foi apresentado para o caso dos MRLS. Assim, tem-se
+$$
+R^2 = \dfrac{SQReg}{SQTotal} = 1 - \dfrac{SQErro}{SQTotal}.
+$$
+
+Conforme mencionado anteriormente, o $R^2$ nunca diminui com a inclusão de uma nova variável independente ou explicativa ($X_i$) ao modelo, mesmo que essa nova variável não tenha importância alguma na explicação da variabilidade da variável dependente ou variável resposta ($Y$). Portanto, a inclusão de variáveis independentes, aumentando a complexidade do modelo e obtendo um $R^2$ maior, não indica necessariamente que o novo modelo é superior ao anterior. Buscando contornar essa deficiência do $R^2$, foi proposto o _**coeficiente de determinação ajustado**_ ($\bar{R}^2$) para os graus de liberdade. O $\bar{R}^2$ é definido a seguir.
+
+Sabe-se que $R^2 = 1 - \dfrac{SQErro}{SQTotal} \Longrightarrow 1 - R^2 = \dfrac{SQErro}{SQTotal}$. Assim, tem-se:
+$$
+\begin{array}{rcl}
+1 - \bar{R}^2 & = & \dfrac{SQErro/n-k-1}{SQTotal/n-1} \\
+1 - \bar{R}^2 & = & \dfrac{n-1}{n-k-1} \dfrac{SQErro}{SQTotal} \\
+1 - \bar{R}^2 & = & \dfrac{n-1}{n-k-1} (1-R^2) \\
+\bar{R}^2 & = & 1 - \dfrac{n-1}{n-k-1} (1-R^2).
+\end{array}
+$$
+Outra maneira de representar o coeficiente de determinação ajustado é obtida a partir dessa definição e é representada por:
+$$
+\bar{R}^2 = R^2 - \dfrac{k}{n-k-1} (1-R^2).
+$$
+  
+  - **Obs. 1:** $\bar{R}^2 < R^2$, exceto quando $R^2=1$.
+  
+  - **Obs. 2:** $\bar{R}^2$ pode ser negativo.
+  
+  - **Obs. 3:** Quando o objetivo é comparar modelos utilizando o coeficiente de determinação, recomenda-se utilizar o  $\bar{R}^2$. Porém, existem outros critérios que são mais indicados para esse tipo de comparação, como: Critério de Informação Akaike ($AIC$), Critério de Informação Bayesiano ($BIC$) e $C_p$ de Mallows, dentre outros.  
+
+\ \
+
+### Exemplo de MRLM - Superfície de Resposta
+
+::: {.data data-latex=""}
+Um experimento para avaliar a porcentagem de xilose em bagaço de cana-de-açúcar com 50% de umidade foi realizado no delineamento inteiramente casualizado com 24 tratamentos e 2 repetições. Os tratamentos foram dispostos no esquema fatorial 4x6 sendo 4 níveis de tempo (minutos) e 6 níveis de % de H2SO4. Os dados das médias das repetições foram:
+
+| Tratamentos | X1  | X2   | Xilose.m |
+|-------------|-----|------|----------|
+| 1           | 30  | 0,25 | 0,00     |
+| 2           | 30  | 0,50 | 1,46     |
+| 3           | 30  | 0,75 | 3,09     |
+| 4           | 30  | 1,00 | 3,01     |
+| 5           | 30  | 1,25 | 6,42     |
+| 6           | 30  | 1,50 | 6,85     |
+| 7           | 60  | 0,25 | 1,43     |
+| 8           | 60  | 0,50 | 4,87     |
+| 9           | 60  | 0,75 | 7,26     |
+| 10          | 60  | 1,00 | 7,60     |
+| 11          | 60  | 1,25 | 7,86     |
+| 12          | 60  | 1,50 | 9,49     |
+| 13          | 90  | 0,25 | 1,89     |
+| 14          | 90  | 0,50 | 6,17     |
+| 15          | 90  | 0,75 | 8,03     |
+| 16          | 90  | 1,00 | 8,24     |
+| 17          | 90  | 1,25 | 9,38     |
+| 18          | 90  | 1,50 | 9,20     |
+| 19          | 120 | 0,25 | 3,12     |
+| 20          | 120 | 0,50 | 7,10     |
+| 21          | 120 | 0,75 | 8,17     |
+| 22          | 120 | 1,00 | 8,51     |
+| 23          | 120 | 1,25 | 8,50     |
+| 24          | 120 | 1,50 | 8,37     |
+:::
+
+
+
+::: columns
+::: {.column width="35%"}
+
+```{r,warning=FALSE,message = FALSE, echo=FALSE}
+#library(downloadthis)
+library(readxl)
+
+dados.m <- read_excel("Dados/Ex_Reg_Multipla_medias.xlsx")
+
+#dados.m %>%
+#    download_this(
+#    output_name = "dados.m",
+#    output_extension = ".xlsx",
+#    button_label = "Download dos dados",
+#    button_type = "primary",
+#    has_icon = TRUE,
+#    icon = "fa fa-save"
+#  )
+```
+:::
+
+\ \
+
+::: {.singlelab data-latex=""}
+**3.** Considerando os dados de porcentagens médias de xilose em bagaço de cana-de-açúcar com 50% de umidade, obtenha a ANOVA considerando o modelo de superfície de resposta dado por:
+$$
+y_i = \beta_{0} + \beta_{1}x_{1i} + \beta_{2}x_{2i} + \beta_{3}x_{1i}^2 + \beta_{4}x_{2i}^2 + \beta_{5}x_{1i}x_{2i} + \varepsilon_i.
+$$
+Utilize o R ou Python para efetuar todos os cálculos matriciais detalhadamente, ou seja, obtenha as $SQ$, os $QM$, o $F_c$, o valor-p e o $R^2$, concluindo corretamente.
+
+**4.** Faça a ANOVA dos dados das porcentagens médias de xilose em bagaço de cana-de-açúcar com 50% de umidade, utilizando as funções _lm()_ e _anova()_ do R. Caso queira utilizar o Python, considere as funções equivalentes.
+:::
+
+

@@ -1,0 +1,667 @@
+---
+title: "Estimação em modelos de regressão linear (MRL) - representação matricial"
+---
+
+::: {.chapterintro data-latex=""}
+Na aula de hoje vamos generalizar o processo de estimação de modelos de regressão linear (MRL), considerando o método de Mínimos Quadrados (MMQ) e a notação matricial. 
+
+Essa aula é baseada nos capítulos 2 e 7 de _Linear Models in Statistics_ (Rencher e Schaalje, 2008), nos capítulos 1 e 8 de Charnet et al. (2008) e no capítulo 5 de _Applied Linear Statistical Models_ (Kutner et al., 2008).
+:::
+
+## Inversa de uma matriz
+
+Antes de apresentarmos o método de mínimos quadrados na obtenção dos estimadores dos parâmetros de um MRL na representação matricial, é importante descrevermos sobre a inversa de uma matriz. A inversa de uma matriz, mais especificamente da matriz $X'X$, será necessária na solução do sistema de equações normais (SEN).
+
+Sendo uma matriz quadrada $\mathbf{A}$, de dimensão  $r \times r$, com posto ou *rank* igual a $r$, seu determinante é diferente de zero e essa matriz é dita *não-singular*. Caso o posto dessa matriz seja inferior a $r$, ou seja, $posto(A) < r$, seu determinante é nulo e essa matriz é dita *singular*.
+
+Dada uma matriz quadrada não-singular $\mathbf{A}$, a inversa dessa matriz é denotada por $\mathbf{A}^{-1}$, tal que:
+$$
+\mathbf{A}^{-1} \mathbf{A} = \mathbf{A} \mathbf{A}^{-1} = \mathbf{I},
+$$
+em que $\mathbf{I}$ é a matriz identidade.
+
+Para exemplificar, considere a matriz $X'X$ obtida no exemplo das Sequoias, ou seja,
+$$
+X'X = 
+\begin{bmatrix}
+21,0 & 1562,1 \\
+1562,1 & 144432,0
+\end{bmatrix}.
+$$
+A sua inversa é dada por
+$$
+(X'X)^{-1} = \dfrac{1}{592915,59} 
+\begin{bmatrix}
+144432,0 & -1562,1 \\
+-1562,1 & 21,0
+\end{bmatrix}.
+$$
+e, assim
+$$
+(X'X)^{-1} (X'X) = \dfrac{1}{592915,59} 
+\begin{bmatrix}
+144432,0 & -1562,1 \\
+-1562,1 & 21,0
+\end{bmatrix}
+\begin{bmatrix}
+21,0 & 1562,1 \\
+1562,1 & 144432,0
+\end{bmatrix} = 
+\begin{bmatrix}
+1 & 0 \\
+0 & 1
+\end{bmatrix}
+$$
+A seguir vamos apresentar dois métodos para a obtenção de $\mathbf{A}^{-1}$: usando operações sobre linhas (operações elementares) e usando a matriz adjunta.
+
+### Obtenção da inversa de uma matriz $\mathbf{A}$ usando operações sobre linhas
+
+O objetivo é reduzir a matriz $\mathbf{A}$ a uma matriz identidade $\mathbf{I}$ por operações sobre as linhas e, simultaneamente, aplicar essas mesmas operações em $\mathbf{I}$ para produzir $\mathbf{A}^{-1}$, ou seja,
+$$
+\begin{bmatrix}
+\mathbf{A} & | & \mathbf{I}
+\end{bmatrix} \sim \cdots \sim
+\begin{bmatrix}
+\mathbf{I} & | & \mathbf{A}^{-1}
+\end{bmatrix}.
+$$
+
+**Exemplo:** considerando uma matriz $\mathbf{A}$ dada por:
+$$
+\mathbf{A} =
+\begin{bmatrix}
+1 & 2 & 3 \\
+2 & 5 & 3 \\
+1 & 0 & 8
+\end{bmatrix},
+$$
+o seu determinante é dado por 
+$$|\mathbf{A}| = (1 \times 5 \times 8) + (2 \times 0 \times 3) + (2 \times 3 \times 1) - (3 \times 5 \times 1) - (3 \times 0 \times 1) - (2 \times 2 \times 8) = -1.$$
+Portanto, $|\mathbf{A}| \ne 0 \Rightarrow \mathbf{A}$ é não-singular $\Rightarrow \exists \mathbf{A}^{-1}$. Dessa forma,
+
+|  |  |  |  |
+|--:|:-:|:--|---|
+| $\left[\begin{array}{rcr} 1 & 2 & 3 \\ 2 & 5 & 3 \\ 1 & 0 & 8 \end{array}\right.$ | $\left\rvert\begin{array}{rcr} \\ \\ \\ \end{array}\right.$ | $\left.\begin{array}{rcr} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{array}\right]$ | **Operação 1:** multiplicar a primeira linha por -2 e somar à segunda linha; e multiplicar a primeira linha por -1 e somar à terceira linha |
+| $\left[\begin{array}{rcr} 1 & 2 & 3 \\ 0 & 1 & -3 \\ 0 & -2 & 5 \end{array}\right.$ | $\left\rvert\begin{array}{rcr} \\ \\ \\ \end{array}\right.$ | $\left.\begin{array}{rcr} 1 & 0 & 0 \\ -2 & 1 & 0 \\ -1 & 0 & 1 \end{array}\right]$ | **Operação 2:** multiplicar a segunda linha por 2 e somar à terceira linha |
+| $\left[\begin{array}{rcr} 1 & 2 & 3 \\ 0 & 1 & -3 \\ 0 & 0 & -1 \end{array}\right.$ | $\left\rvert\begin{array}{rcr} \\ \\ \\ \end{array}\right.$ | $\left.\begin{array}{rcr} 1 & 0 & 0 \\ -2 & 1 & 0 \\ -5 & 2 & 1 \end{array}\right]$ | **Operação 3:** multiplicar a terceira linha por -1 |
+| $\left[\begin{array}{rcr} 1 & 2 & 3 \\ 0 & 1 & -3 \\ 0 & 0 & 1 \end{array}\right.$ | $\left\rvert\begin{array}{rcr} \\ \\ \\ \end{array}\right.$ | $\left.\begin{array}{rcr} 1 & 0 & 0 \\ -2 & 1 & 0 \\ 5 & -2 & -1 \end{array}\right]$ | **Operação 4:** multiplicar a terceira linha por 3 e somar à segunda linha; e multiplicar a terceira linha por -3 e somar à primeira linha |
+| $\left[\begin{array}{rcr} 1 & 2 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{array}\right.$ | $\left\rvert\begin{array}{rcr} \\ \\ \\ \end{array}\right.$ | $\left.\begin{array}{rcr} -14 & 6 & 3 \\ 13 & -5 & -3 \\ 5 & -2 & -1 \end{array}\right]$ | **Operação 5:** multiplicar a segunda linha por -2 e somar à primeira linha |
+| $\left[\begin{array}{rcr} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{array}\right.$ | $\left\rvert\begin{array}{rcr} \\ \\ \\ \end{array}\right.$ | $\left.\begin{array}{rcr} -40 & 16 & 9 \\ 13 & -5 & -3 \\ 5 & -2 & -1 \end{array}\right]$ | Fim do processo |
+
+: {tbl-colwidths="[10,5,10,75]"}
+
+
+Assim,
+$$
+\mathbf{A}^{-1} = 
+\begin{bmatrix}
+-40 & 16 & 9 \\ 13 & -5 & -3 \\ 5 & -2 & -1
+\end{bmatrix},
+$$
+ou seja,
+$$
+\mathbf{A}^{-1} \mathbf{A} = 
+\begin{bmatrix}
+-40 & 16 & 9 \\ 13 & -5 & -3 \\ 5 & -2 & -1
+\end{bmatrix}
+\begin{bmatrix}
+1 & 2 & 3 \\ 2 & 5 & 3 \\ 1 & 0 & 8
+\end{bmatrix} = 
+\begin{bmatrix}
+1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1
+\end{bmatrix} = \mathbf{I}.
+$$
+
+### Obtenção da inversa de uma matriz $\mathbf{A}$ por meio da matriz adjunta de $\mathbf{A}$
+
+Dada uma matriz $\mathbf{A}$, tal que $|\mathbf{A}| \ne 0$, tem-se que
+$$
+\mathbf{A}^{-1} = \dfrac{1}{|A|} Adj(A)
+$$
+ou ainda,
+$$
+\mathbf{A}^{-1} = \dfrac{1}{|A|} [Cof(A)]',
+$$
+em que $\mathbf{A}^{-1}$ é a inversa da matriz $\mathbf{A}$, $|\mathbf{A}|$ é o determinante de $\mathbf{A}$,  $Adj(\mathbf{A})$ é a matriz adjunta de $\mathbf{A}$ e $Cof(\mathbf{A})$ é a matriz de cofatores de $\mathbf{A}$.
+
+Os cofatores de uma matriz são definidos por
+$$
+c_{ij} = (-1)^{i+j} D_{ij},
+$$
+em que $D_{ij}$ é o determinante obtido da matriz $\mathbf{A}$, suprimindo-se a linha $i$ e a coluna $j$.
+
+**Exemplo:** considere a mesma matriz utilizada anteriormente, dada por:
+$$
+\mathbf{A} =
+\begin{bmatrix}
+1 & 2 & 3 \\
+2 & 5 & 3 \\
+1 & 0 & 8
+\end{bmatrix},
+$$
+com determinante igual a $|\mathbf{A}| = -1$. 
+
+Cada elemento da matriz de cofatores é definido por $c_{ij} = (-1)^{i+j} D_{ij}$ e, assim têm-se
+$$
+\begin{array}{lll}
+c_{11} = (-1)^{1+1} 
+\left\rvert 
+\begin{matrix} 
+5 & 3 \\ 0 & 8 
+\end{matrix}
+\right\rvert = 40; &
+c_{12} = (-1)^{1+2} 
+\left\rvert 
+\begin{matrix} 
+2 & 3 \\ 1 & 8 
+\end{matrix}
+\right\rvert = -13; &
+c_{13} = (-1)^{1+3} 
+\left\rvert 
+\begin{matrix} 
+2 & 5 \\ 1 & 0 
+\end{matrix}
+\right\rvert = -5; \\
+c_{21} = (-1)^{2+1} 
+\left\rvert 
+\begin{matrix} 
+2 & 3 \\ 0 & 8 
+\end{matrix}
+\right\rvert = -16; &
+c_{22} = (-1)^{2+2} 
+\left\rvert 
+\begin{matrix} 
+1 & 3 \\ 1 & 8 
+\end{matrix}
+\right\rvert = 5; &
+c_{23} = (-1)^{2+3} 
+\left\rvert 
+\begin{matrix} 
+1 & 2 \\ 1 & 0 
+\end{matrix}
+\right\rvert = 2; \\
+c_{31} = (-1)^{3+1} 
+\left\rvert 
+\begin{matrix} 
+2 & 3 \\ 5 & 3 
+\end{matrix}
+\right\rvert = -9; &
+c_{32} = (-1)^{3+2} 
+\left\rvert 
+\begin{matrix} 
+1 & 3 \\ 2 & 3 
+\end{matrix}
+\right\rvert = 3; &
+c_{33} = (-1)^{3+3} 
+\left\rvert 
+\begin{matrix} 
+1 & 2 \\ 2 & 5 
+\end{matrix}
+\right\rvert = 1.
+\end{array}
+$$
+Portanto, a matriz de cofatores de $\mathbf{A}$ é dada por:
+$$
+Cof(\mathbf{A}) = 
+\begin{bmatrix}
+ 40 & -13 & -5 \\
+-16 &   5 &  2 \\
+ -9 &   3 &  1 
+\end{bmatrix}.
+$$
+Dessa forma, $\mathbf{A}^{-1}$ é dada por:
+$$
+\mathbf{A}^{-1} = \dfrac{1}{|A|} [Cof(A)]' = \dfrac{1}{-1} 
+\begin{bmatrix}
+40 & -16 & -9 \\ -13 & 5 & 3 \\ -5 & 2 & 1
+\end{bmatrix} =
+\begin{bmatrix}
+-40 & 16 & 9 \\ 13 & -5 & -3 \\ 5 & -2 & -1
+\end{bmatrix},
+$$
+ou seja, o mesmo resultado obtido por meio de operações elementares.
+
+
+## Estimação em modelo de regressão linear (MRL) - matricial 
+Conforme visto anteriormente, um MRL pode ser representado matricialmente por:
+$$
+\mathbf{Y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon},
+$$
+em que $\mathbf{Y}$ é o vetor $n \times 1$ de observações; $\mathbf{X}$ é uma matriz $n \times (k+1)$, denominada de matriz de incidência ou de modelo; $\boldsymbol{\beta}$ é o vetor $(k+1) \times 1$ de parâmetros; e $\boldsymbol{\varepsilon}$ é o vetor $n \times 1$ de erros.
+
+Na estimação dos parâmetros do MRL, o primeiro objetivo é obter o estimador do vetor $\boldsymbol{\beta}$, ou seja, $\boldsymbol{\hat{\beta}}$. Para isso, pode-se utilizar o método de mínimos quadrados, que consiste em obter $\boldsymbol{\hat{\beta}}$, que minimiza a soma de quadrados dos erros ($\varepsilon_i$), ou seja,
+$$
+\displaystyle \sum_{i=1}^{n} \varepsilon_{i}^2 = \boldsymbol{\varepsilon}'\boldsymbol{\varepsilon}.
+$$
+Assim, dado
+$$
+\mathbf{Y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon},
+$$
+tem-se que $\boldsymbol{\varepsilon} = \mathbf{Y} - \mathbf{X} \boldsymbol{\beta}$ e, portanto,
+$$
+\boldsymbol{\varepsilon}'\boldsymbol{\varepsilon} =  (\mathbf{Y} - \mathbf{X} \boldsymbol{\beta})'(\mathbf{Y} - \mathbf{X} \boldsymbol{\beta}).
+$$
+Considerando os resultados (5.31) e (5.32) de Kutner et al. (2005, p.193), tem-se
+$$
+(\mathbf{Y} - \mathbf{X} \boldsymbol{\beta})' = \mathbf{Y}' - (\mathbf{X} \boldsymbol{\beta})' = \mathbf{Y}' - \boldsymbol{\beta}' \mathbf{X}'.
+$$
+
+Portanto,
+$$
+\begin{array}{ccl}
+\boldsymbol{\varepsilon}'\boldsymbol{\varepsilon} & = & (\mathbf{Y}' - \boldsymbol{\beta}' \mathbf{X}')(\mathbf{Y} - \mathbf{X} \boldsymbol{\beta}) \\
+ & = & \mathbf{Y}'\mathbf{Y} - \mathbf{Y}'\mathbf{X} \boldsymbol{\beta} - \boldsymbol{\beta}' \mathbf{X}' \mathbf{Y} + \boldsymbol{\beta}' \mathbf{X}' \mathbf{X} \boldsymbol{\beta}.
+\end{array} 
+$$
+Como definido anteriormente, as dimensões de $\mathbf{Y}$, $\mathbf{X}$ e $\boldsymbol{\beta}$ são, respectivamente, iguais a $n \times 1$, $n \times (k+1)$ e $(k+1) \times 1$. Assim, $\mathbf{Y}'\mathbf{X} \boldsymbol{\beta}$ e $\boldsymbol{\beta}' \mathbf{X}' \mathbf{Y}$ são escalares, ou seja, têm dimensão $1 \times 1$. Além disso, $(\mathbf{Y}'\mathbf{X} \boldsymbol{\beta})' = \boldsymbol{\beta}' \mathbf{X}' \mathbf{Y}$. Portanto, $\mathbf{Y}'\mathbf{X} \boldsymbol{\beta} = \boldsymbol{\beta}' \mathbf{X}' \mathbf{Y}$ são iguais e, dessa forma,
+$$
+\boldsymbol{\varepsilon}'\boldsymbol{\varepsilon} = \mathbf{Y}'\mathbf{Y} - 2 \boldsymbol{\beta}' \mathbf{X}' \mathbf{Y} + \boldsymbol{\beta}' \mathbf{X}' \mathbf{X} \boldsymbol{\beta}.
+$$
+Na obtenção de $\hat{\boldsymbol{\beta}}$ pelo método dos mínimos quadrados, deve-se derivar $\boldsymbol{\varepsilon}'\boldsymbol{\varepsilon}$ em relação a $\hat{\boldsymbol{\beta}}$ e igualar a zero. A seguir apresentamos algumas regras de derivada de matrizes e vetores que serão utilizadas.
+
+::: {.tip data-latex=""} 
+**Regras de derivadas de vetores e matrizes:**
+
+1. Sendo $\mathbf{a}$ um vetor de constantes e $\mathbf{x}$ um vetor de variáveis, tendo ambos a mesma dimensão, $u = \mathbf{a}' \mathbf{x} = \mathbf{x}' \mathbf{a}$ é um escalar. Assim, derivando $u$ em relação ao vetor $\mathbf{x}$, tem-se:
+$$
+\dfrac{\partial u}{\partial \mathbf{x}} = \dfrac{\partial (\mathbf{a}' \mathbf{x})}{\partial \mathbf{x}} = \dfrac{\partial (\mathbf{x}' \mathbf{a})}{\partial \mathbf{x}} = \mathbf{a}.
+$$
+2. Sendo $\mathbf{x}$ um vetor de variáveis e $\mathbf{A}$ uma matriz simétrica com dimensões compatíveis, a derivada de $\mathbf{x}' \mathbf{A} \mathbf{x}$ em relação a $\mathbf{x}$ é dada por:
+$$
+\dfrac{\partial (\mathbf{x}' \mathbf{A} \mathbf{x})}{\partial \mathbf{x}} = 2 \mathbf{A} \mathbf{x}.
+$$
+:::
+
+Considerando as regras de derivadas apresentadas e que $\boldsymbol{\varepsilon}'\boldsymbol{\varepsilon} = \mathbf{Y}'\mathbf{Y} - 2 \boldsymbol{\beta}' \mathbf{X}' \mathbf{Y} + \boldsymbol{\beta}' \mathbf{X}' \mathbf{X} \boldsymbol{\beta}$, tem-se
+$$
+\dfrac{\partial \boldsymbol{\varepsilon}'\boldsymbol{\varepsilon}}{\partial \boldsymbol{\beta}} = -2 \mathbf{X}' \mathbf{Y} + 2 \mathbf{X'} \mathbf{X} \boldsymbol{\beta}.
+$$
+Igualando-se a zero tem-se 
+$$
+\mathbf{X'} \mathbf{X} \boldsymbol{\hat{\beta}} = \mathbf{X}' \mathbf{Y}
+$$
+que corresponde ao sistema de equações normais (SEN), representado matricialmente.
+
+Para se obter $\hat{\boldsymbol{\beta}}$ deve-se pré-multiplicar ambos os lados do SEN, ou seja,
+$$
+\begin{array}{rcl}
+\mathbf{X'} \mathbf{X} \boldsymbol{\hat{\beta}} & = & \mathbf{X}' \mathbf{Y} \\
+(\mathbf{X'} \mathbf{X})^{-1} \mathbf{X'} \mathbf{X} \boldsymbol{\hat{\beta}} & = & (\mathbf{X'} \mathbf{X})^{-1} \mathbf{X}' \mathbf{Y} \\
+I \boldsymbol{\hat{\beta}} & = & (\mathbf{X'} \mathbf{X})^{-1} \mathbf{X}' \mathbf{Y} \\
+\boldsymbol{\hat{\beta}} & = & (\mathbf{X'} \mathbf{X})^{-1} \mathbf{X}' \mathbf{Y}.
+\end{array}
+$$
+
+A seguir apresentaremos o SEN considerando os modelos de regressão simples e quadrático, bem como as soluções para os exemplos de Sequoias e do processo químico, apresentados nas aulas anteriores.
+
+
+### Modelo de regressão linear simples
+
+No modelo de regressão linear simples, os vetores $\mathbf{Y}$ e $\hat{\boldsymbol{\beta}}$ e a matriz $\mathbf{X}$ são dados por:
+$$
+\mathbf{Y} =
+\begin{bmatrix}
+y_1 \\ y_2 \\ y_3 \\ \vdots \\ y_n
+\end{bmatrix}, \qquad \qquad
+\mathbf{X} = 
+\begin{bmatrix}
+1 & x_{1} \\
+1 & x_{2} \\
+1 & x_{3} \\
+\vdots & \vdots \\
+1 & x_{n}
+\end{bmatrix}  \qquad \mbox{e} \qquad
+\hat{\boldsymbol{\beta}} =
+\begin{bmatrix}
+\hat{\beta}_0 \\ \hat{\beta}_1
+\end{bmatrix}.
+$$
+Assim, 
+$$
+\mathbf{X}' \mathbf{X} =
+\begin{bmatrix}
+1 & 1 & 1 & \cdots & 1 \\
+x_1 & x_2 & x_3 & \cdots & x_n
+\end{bmatrix}
+\begin{bmatrix}
+1 & x_{1} \\
+1 & x_{2} \\
+1 & x_{3} \\
+\vdots & \vdots \\
+1 & x_{n}
+\end{bmatrix} = 
+\begin{bmatrix}
+n & \displaystyle \sum_{i=1}^{n} x_i \\
+\displaystyle \sum_{i=1}^{n} x_i & \displaystyle \sum_{i=1}^{n} x_i^2
+\end{bmatrix},
+$$
+$$
+\mathbf{X}' \mathbf{X} \hat{\boldsymbol{\beta}} =
+\begin{bmatrix}
+n & \displaystyle \sum_{i=1}^{n} x_i \\
+\displaystyle \sum_{i=1}^{n} x_i & \displaystyle \sum_{i=1}^{n} x_i^2
+\end{bmatrix} \begin{bmatrix}
+\hat{\beta}_0 \\ \hat{\beta}_1
+\end{bmatrix} =
+\begin{bmatrix}
+n \hat{\beta}_0 + \hat{\beta}_1 \displaystyle \sum_{i=1}^{n} x_i \\
+\hat{\beta}_0 \displaystyle \sum_{i=1}^{n} x_i + \hat{\beta}_1 \displaystyle \sum_{i=1}^{n} x_i^2
+\end{bmatrix}
+$$
+e
+$$
+\mathbf{X}' \mathbf{Y} =
+\begin{bmatrix}
+1 & 1 & 1 & \cdots & 1 \\
+x_1 & x_2 & x_3 & \cdots & x_n
+\end{bmatrix}
+\begin{bmatrix}
+y_{1} \\
+y_{2} \\
+y_{3} \\
+\vdots \\
+y_{n}
+\end{bmatrix} = 
+\begin{bmatrix}
+\displaystyle \sum_{i=1}^{n} y_i \\
+\displaystyle \sum_{i=1}^{n} y_i x_i
+\end{bmatrix}.
+$$
+Portanto, o SEN é dado por
+$$
+\mathbf{X'} \mathbf{X} \boldsymbol{\hat{\beta}} = \mathbf{X}' \mathbf{Y}
+$$
+
+$$
+\begin{bmatrix}
+n \hat{\beta}_0 + \hat{\beta}_1 \displaystyle \sum_{i=1}^{n} x_i \\
+\hat{\beta}_0 \displaystyle \sum_{i=1}^{n} x_i + \hat{\beta}_1 \displaystyle \sum_{i=1}^{n} x_i^2
+\end{bmatrix}
+\begin{bmatrix}
+\displaystyle \sum_{i=1}^{n} y_i \\
+\displaystyle \sum_{i=1}^{n} y_i x_i
+\end{bmatrix} \Longrightarrow
+\left\{
+\begin{array}{ccc} 
+\displaystyle \sum_{i=1}^{n} y_i & = & n \hat{\beta}_{0} + \hat{\beta}_{1} \displaystyle \sum_{i=1}^{n} x_i \\
+\displaystyle \sum_{i=1}^{n} y_i x_i & = & \hat{\beta}_{0} \displaystyle \sum_{i=1}^{n} x_i + \hat{\beta}_{1} \displaystyle \sum_{i=1}^{n} x_i^2 
+\end{array}
+\right.
+$$
+
+::: {.exemplos data-latex=""}
+Considerando os dados de altura (m) e de DAP (cm) de 21 Sequoias (adaptado de Levine et al., 2016), tem-se:
+$$
+\mathbf{Y} =
+\begin{bmatrix}
+37,19 \\ 58,98 \\ 50,75 \\ \vdots \\ 30,48
+\end{bmatrix}, \qquad \qquad
+\mathbf{X} = 
+\begin{bmatrix}
+1 & 50,80 \\
+1 & 91,44 \\
+1 & 45,72 \\
+\vdots & \vdots \\
+1 & 20,32
+\end{bmatrix}  \qquad \mbox{e} \qquad
+\hat{\boldsymbol{\beta}} =
+\begin{bmatrix}
+\hat{\beta}_0 \\ \hat{\beta}_1
+\end{bmatrix}.
+$$
+Assim, tem-se:
+$$
+\mathbf{X}'\mathbf{X} = 
+\begin{bmatrix}
+21,0 & 1562,1 \\
+1562,1 & 144432,0
+\end{bmatrix}, \qquad 
+(\mathbf{X}'\mathbf{X})^{-1} = \dfrac{1}{592915,59} 
+\begin{bmatrix}
+144432,0 & -1562,1 \\
+-1562,1 & 21,0
+\end{bmatrix} \qquad \mbox{e}
+$$
+$$
+\mathbf{X}'\mathbf{Y} = 
+\begin{bmatrix}
+1005,4100 \\ 83845,2984
+\end{bmatrix}.
+$$
+Como solução tem-se:
+$$
+\boldsymbol{\hat{\beta}} = (\mathbf{X'} \mathbf{X})^{-1} \mathbf{X}' \mathbf{Y} =
+\dfrac{1}{592915,59} 
+\begin{bmatrix}
+144432,0 & -1562,1 \\
+-1562,1 & 21,0
+\end{bmatrix}
+\begin{bmatrix}
+1005,4100 \\ 83845,2984
+\end{bmatrix} =
+\begin{bmatrix}
+24,0146 \\ 0,3208
+\end{bmatrix},
+$$
+ou seja, $\hat{\beta}_0 = 24,0146$ e  $\hat{\beta}_1 = 0,3208$.
+:::
+
+A seguir é apresentado em script do R para efetuar todas as operações matriciais e a estimação dos parâmetros do MRL.
+
+```{r,warning=FALSE,message = FALSE, echo=TRUE, eval=FALSE}
+#
+library(readxl)
+#
+#####################
+## Exemplo - Regressao linear simples
+## Dados de altura e DAP de sequoias
+## Adaptado de Levine et al. (2016)
+#####################
+rm(list=ls())
+#
+sequoia<- read_excel("Dados/sequoia.xlsx")
+#str(sequoia)
+#
+(n.reg1<- dim(sequoia)[1])
+(Y.reg1<- sequoia$altura_m)
+(X.reg1<- cbind(rep(1,n.reg1), sequoia$dap_cm))
+(XlX.reg1<- t(X.reg1) %*% X.reg1)
+(XlY.reg1<- t(X.reg1) %*% Y.reg1)
+#
+solve(XlX.reg1) %*% XlY.reg1 
+# ou
+solve(XlX.reg1, XlY.reg1)
+#
+(reg1<- lm(altura_m ~ dap_cm, data=sequoia))
+summary(reg1)
+anova(reg1)
+```
+
+
+### Modelo de regressão linear quadrática - MRLQ
+
+No modelo de regressão linear quadrático, os vetores $\mathbf{Y}$ e $\hat{\boldsymbol{\beta}}$ e a matriz $\mathbf{X}$ são dados por:
+$$
+\mathbf{Y} =
+\begin{bmatrix}
+y_1 \\ y_2 \\ y_3 \\ \vdots \\ y_n
+\end{bmatrix}, \qquad \qquad
+\mathbf{X} = 
+\begin{bmatrix}
+1 & x_{1} & x_{1}^2 \\
+1 & x_{2} & x_{2}^2 \\
+1 & x_{3} & x_{3}^2 \\
+\vdots & \vdots \\
+1 & x_{n} & x_{n}^2
+\end{bmatrix}  \qquad \mbox{e} \qquad
+\hat{\boldsymbol{\beta}} =
+\begin{bmatrix}
+\hat{\beta}_0 \\ \hat{\beta}_1 \\ \hat{\beta}_2
+\end{bmatrix}.
+$$
+Assim, 
+$$
+\mathbf{X}' \mathbf{X} =
+\begin{bmatrix}
+1 & 1 & 1 & \cdots & 1 \\
+x_1 & x_2 & x_3 & \cdots & x_n \\
+x_1^2 & x_2^2 & x_3^2 & \cdots & x_n^2
+\end{bmatrix}
+\begin{bmatrix}
+1 & x_{1} & x_{1}^2 \\
+1 & x_{2} & x_{2}^2 \\
+1 & x_{3} & x_{3}^2 \\
+\vdots & \vdots \\
+1 & x_{n} & x_{n}^2
+\end{bmatrix} = 
+\begin{bmatrix}
+n & \displaystyle \sum_{i=1}^{n} x_i & \displaystyle \displaystyle \sum_{i=1}^{n} x_i^2 \\
+\displaystyle \sum_{i=1}^{n} x_i & \displaystyle \sum_{i=1}^{n} x_i^2 & \displaystyle \sum_{i=1}^{n} x_i^3 \\
+\displaystyle \sum_{i=1}^{n} x_i^2 & \displaystyle \sum_{i=1}^{n} x_i^3 & \displaystyle \sum_{i=1}^{n} x_i^4
+\end{bmatrix},
+$$
+$$
+\mathbf{X}' \mathbf{X} \hat{\hat{\boldsymbol{\beta}}} =
+\begin{bmatrix}
+n & \displaystyle \sum_{i=1}^{n} x_i & \displaystyle \sum_{i=1}^{n} x_i^2 \\
+\displaystyle \sum_{i=1}^{n} x_i & \displaystyle \sum_{i=1}^{n} x_i^2 & \displaystyle \sum_{i=1}^{n} x_i^3 \\
+\displaystyle \sum_{i=1}^{n} x_i^2 & \displaystyle \sum_{i=1}^{n} x_i^3 & \displaystyle \sum_{i=1}^{n} x_i^4
+\end{bmatrix} \begin{bmatrix}
+\hat{\beta}_0 \\ \hat{\beta}_1 \\ \hat{\beta}_2
+\end{bmatrix} =
+\begin{bmatrix}
+n \hat{\beta}_0 + \hat{\beta}_1 \displaystyle \sum_{i=1}^{n} x_i + \hat{\beta}_2 \displaystyle \sum_{i=1}^{n} x_i^2 \\
+\hat{\beta}_0 \displaystyle \sum_{i=1}^{n} x_i + \hat{\beta}_1 \displaystyle \sum_{i=1}^{n} x_i^2 + \hat{\beta}_2 \displaystyle \sum_{i=1}^{n} x_i^3 \\
+\hat{\beta}_0 \displaystyle \sum_{i=1}^{n} x_i^2 + \hat{\beta}_1 \displaystyle \sum_{i=1}^{n} x_i^3 + \hat{\beta}_2 \displaystyle \sum_{i=1}^{n} x_i^4
+\end{bmatrix}
+$$
+e
+$$
+\mathbf{X}' \mathbf{Y} =
+\begin{bmatrix}
+1 & 1 & 1 & \cdots & 1 \\
+x_1 & x_2 & x_3 & \cdots & x_n \\
+x_1^2 & x_2^2 & x_3^2 & \cdots & x_n^2
+\end{bmatrix}
+\begin{bmatrix}
+y_{1} \\
+y_{2} \\
+y_{3} \\
+\vdots \\
+y_{n}
+\end{bmatrix} = 
+\begin{bmatrix}
+\displaystyle \sum_{i=1}^{n} y_i \\
+\displaystyle \sum_{i=1}^{n} y_i x_i \\
+\displaystyle \sum_{i=1}^{n} y_i x_i^2
+\end{bmatrix}.
+$$
+Portanto, o SEN é dado por
+$$
+\mathbf{X'} \mathbf{X} \boldsymbol{\hat{\beta}} = \mathbf{X}' \mathbf{Y}
+$$
+$$
+\begin{bmatrix}
+n \hat{\beta}_0 + \hat{\beta}_1 \displaystyle \sum_{i=1}^{n} x_i + \hat{\beta}_2 \displaystyle \sum_{i=1}^{n} x_i^2 \\
+\hat{\beta}_0 \displaystyle \sum_{i=1}^{n} x_i + \hat{\beta}_1 \displaystyle \sum_{i=1}^{n} x_i^2 + \hat{\beta}_2 \displaystyle \sum_{i=1}^{n} x_i^3 \\
+\hat{\beta}_0 \displaystyle \sum_{i=1}^{n} x_i^2 + \hat{\beta}_1 \displaystyle \sum_{i=1}^{n} x_i^3 + \hat{\beta}_2 \displaystyle \sum_{i=1}^{n} x_i^4
+\end{bmatrix}
+\begin{bmatrix}
+\displaystyle \sum_{i=1}^{n} y_i \\
+\displaystyle \sum_{i=1}^{n} y_i x_i \\
+\displaystyle \sum_{i=1}^{n} y_i x_i^2
+\end{bmatrix} \Longrightarrow
+\left\{
+\begin{array}{ccc} 
+\displaystyle \sum_{i=1}^{n} y_i & = & n \hat{\beta_{0}} + \hat{\beta_{1}} \displaystyle \sum_{i=1}^{n} x_i + \hat{\beta_{2}} \displaystyle \sum_{i=1}^{n} x_i^2 \\
+\displaystyle \sum_{i=1}^{n} y_i x_i & = & \hat{\beta_{0}} \displaystyle \sum_{i=1}^{n} x_i + \hat{\beta_{1}} \displaystyle \sum_{i=1}^{n} x_i^2 + \hat{\beta_{2}} \displaystyle \sum_{i=1}^{n} x_i^3 \\
+\displaystyle \sum_{i=1}^{n} y_i x_i^2 & = & \hat{\beta_{0}} \displaystyle \sum_{i=1}^{n} x_i^2 + \hat{\beta_{1}} \displaystyle \sum_{i=1}^{n} x_i^3 + \hat{\beta_{2}} \displaystyle \sum_{i=1}^{n} x_i^4 
+\end{array}
+\right.
+$$
+
+
+::: {.exemplos data-latex=""}
+Considerando os dados de peso do produto (kg) e temperatura ($\degree$C) de 11 reações químicas (adaptado de Charnet et al., 2008, p.195), tem-se:
+$$
+\mathbf{Y} =
+\begin{bmatrix}
+6,6 \\ 7,1 \\ 7,6 \\ \vdots \\ 8,2
+\end{bmatrix}, \qquad \qquad
+\mathbf{X} = 
+\begin{bmatrix}
+1 & 17,5 & 306,3 \\
+1 & 19,0 & 361,0 \\
+1 & 20,5 & 420,3 \\
+\vdots & &\vdots \\
+1 & 32,5 & 1056,3
+\end{bmatrix}  \qquad \mbox{e} \qquad
+\hat{\boldsymbol{\beta}} =
+\begin{bmatrix}
+\hat{\beta}_0 \\ \hat{\beta}_1 \\ \hat{\beta}_2
+\end{bmatrix}.
+$$
+Assim, tem-se:
+$$
+\mathbf{X}'\mathbf{X} = 
+\begin{bmatrix}
+11 & 275,00 & 7122,50  \\
+275,00 & 7122,50 & 34328,10 \\
+7122,50 & 34328,10 & 5234912,3750
+\end{bmatrix} \qquad \mbox{e} \qquad
+\mathbf{X}'\mathbf{Y} = 
+\begin{bmatrix}
+97,50 \\ 2473,50 \\ 64706,70
+\end{bmatrix}.
+$$
+Como solução tem-se:
+$$
+\boldsymbol{\hat{\beta}} = (\mathbf{X'} \mathbf{X})^{-1} \mathbf{X}' \mathbf{Y} =
+\begin{bmatrix}
+86,188351 & -7,036461 & 0,138709 \\
+-7,036461 & 0,579596 & -0,011511 \\
+0,138709 & -0,011511 & 0,000230
+\end{bmatrix}
+\begin{bmatrix}
+97,50 \\ 2473,50 \\ 64706,70
+\end{bmatrix} =
+\begin{bmatrix}
+-25,9204 \\ 2,7369 \\ -0,0658
+\end{bmatrix},
+$$
+ou seja, $\hat{\beta}_0 = -25,9204$,  $\hat{\beta}_1 = 2,7369$ e $\hat{\beta}_2 = -0,0658$.
+:::
+
+A seguir é apresentado em script do R para efetuar todas as operações matriciais e a estimação dos parâmetros do MRQ.
+
+```{r,warning=FALSE,message = FALSE, echo=TRUE, eval=FALSE}
+#
+library(readxl)
+#
+#####################
+## Exemplo - Regressao Linear Quadratica
+## Dados de peso do produto e temperatura de 
+## Adaptado de Levine et al. (2016)
+#####################
+rm(list=ls())
+#
+reg2<- read_excel("Dados/Exerc2_p195_CHARNETetal2008_adapt.xlsx")
+#str(reg2)
+#
+(n.reg2<- dim(reg2)[1])
+(Y.reg2<- reg2$Prod)
+(X.reg2<- cbind(rep(1,n.reg2), reg2$Temp, reg2$Temp^2))
+(XlX.reg2<- t(X.reg2) %*% X.reg2)
+(XlY.reg2<- t(X.reg2) %*% Y.reg2)
+#
+solve(XlX.reg2) %*% XlY.reg2 
+# ou
+solve(XlX.reg2, XlY.reg2)
+#
+(lm.reg2<- lm(Prod ~ Temp + I(Temp^2), data=reg2))
+summary(lm.reg2)
+anova(lm.reg2)
+```
+
+
+

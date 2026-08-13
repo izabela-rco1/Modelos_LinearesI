@@ -1,0 +1,685 @@
+---
+title: "Análise de variância (ANOVA) da regressão - teste da falta de ajuste"
+subtitle: "GES119 - Modelos Lineares I <br> Departamento de Estatística - DES <br> Universidade Federal de Lavras - UFLA "
+format:
+  html:
+    theme: [estilo.scss]
+    linkcolor: "#808080" 
+    toc: true
+    code-copy: true
+    code-overflow: wrap
+    mainfont: "Atkinson Hyperlegible"
+    highlight-style: a11y-dark
+    #logo: imagens/logo.png
+    embed-resources: true
+execute:
+  freeze: auto
+  echo: false
+editor: source
+toc-title: "Conteúdo"
+author: 
+  - Izabela R. Cardoso de Oliveira 
+  - Renato Ribeiro de Lima
+lang: pt
+---
+
+::: {.chapterintro data-latex=""}
+Na aula de hoje vamos apresentar a Análise de Variância (ANOVA) da Regressão para o caso de dados com repetições, em que podemos testar o que se chama de falta de ajuste de um modelo de regressão linear. A metodologia será apresentada considerando um exemplo de regressão linear simples e outro de regressão linear múltipla.
+
+Essa aula é baseada nos capítulos 5 e 8 de Charnet et al. (2008) e na apostila _Modelos de Regressão_ (Demétrio e Zocchi, 2011).
+:::
+
+## Introdução
+
+Conforme visto em aulas anteriores, a Análise de Variância da Regressão pode ser definida como uma metodologia com a qual verifica-se, por meio de um teste estatístico, se a variabilidade observada em uma variável dependente ($Y$) é significativamente explicada por $k$ variáveis independentes ou explicativas ($X_i$, com $i=1,2,\ldots,k$). 
+
+Até o momento, ao efetuar a ANOVA da regressão, a variação total dos dados foi decomposta em fontes como _Regressão_ (a variação explicada pelo modelo proposto) e _Erro_ (a variação não explicada ou independente da regressão). Assim, o teste F foi utilizado para verificar se temos evidências de que a variação explicada pelo modelo de regressão proposto é maior do que a independente da regressão. Pode-se observar que nos estudos analisados, para cada valor das $X_i$ variáveis independentes, com $i=1,2,\ldots,k$, tinha-se um único valor de $Y$.
+
+Também foi definido que 
+$$SQErro = SQIndependente \mbox{ } da \mbox{ } Regressão = \displaystyle \sum_{i=1}^n \hat{\varepsilon}_i^2 = \displaystyle \sum_{i=1}^n (y_i - \hat{y}_i)^2 .
+$$
+Portanto, de alguma forma, a $SQErro$ ou o $QMErro = \dfrac{SQErro}{GLErro}$ são dependentes do modelo ajustado, pois no cálculo utiliza-se $\hat{y}_i$. Dessa forma, tem-se que $\hat{\sigma}^2 = QMErro$ é um estimador não-viesado de $\sigma^2$, sob a suposição de que o modelo ajustado é o correto para explicar a variabilidade observada em $Y$.
+
+Conforme demonstrado e ilustrado na Figura 2.10 de Demétrio e Zocchi (2011, p.48), comparando-se os modelos de regressão linear simples e quadrático, caso o modelo não seja o correto tem-se um viés $B_i$ no valor esperado de $Y_i$, ou seja, em $E(Y_i)$. Assim, o $QMErro$ será um estimador viesado de $\sigma^2$, pois $E(QMErro) = \sigma^2 + \dfrac{1}{n-k-1} B_i^2$. Porém, essa comparação e visualização do viés se torna muito difícil se considerarmos modelos mais complexos, como por exemplo modelos de regressão linear múltipla.
+
+Porém, é necessário que se tenha um estimador não-viesado de $\sigma^2$ e que independa do modelo de regressão. Isso é possível, mas é necessário que se tenha mais de um valor de $Y$ para cada valor das $X_i$ variáveis independentes ou pelo menos para algumas variáveis $X_i$. Essa situação se assemelha ao caso de experimentos planejados, quando se têm repetições de valores da variável $Y$, uma vez que _**repetição**_ é um dos princípios básicos da experimentação e é necessária para que se possa estimar a variância devido ao erro experimental ($\sigma^2$).
+
+Nessa situação, em que se têm dados repetidos, é possível efetuar uma ANOVA isolando o que pode ser chamado de _Erro Puro_, além do que definimos como _Independente da Regressão_. Dessa forma, além de obter um estimador não-viesado de $\sigma^2$, dado por $\hat{\sigma}^2 = QMErro Puro$, é possível testar a falta de ajuste do modelo proposto (o que denominamos até o momento de _Independente da Regressão_), ou seja, verificar se o modelo proposto é adequado para descrever como as variáveis explicativas ($X_i$) estão influenciando na variabilidade de $Y$.
+
+## ANOVA para o caso de dados repetidos de $Y$ em diferentes níveis de $X_i$
+
+Inicialmente, considere a situação em que, para cada um de $I$ níveis ou valores de uma variável explicativa $X$ tenham-se $n_i$ dados ou observações da variável $Y$. Assim, para $x_1$ têm-se os valores $y_{11}, y_{12}, \ldots, y_{1n_1}$; para a variável $x_2$ têm-se os valores $y_{21}, y_{22}, \ldots, y_{2n_2}$; e assim por diante, até o nível da variável $X$, ou seja, $x_I$, para a qual têm-se os valores $y_{I1}, y_{I2}, \ldots, y_{In_I}$. 
+
+Esses dados podem ser organizados em uma tabela, para facilitar a visualização, conforme apresentado na @tbl-dados.
+
+| Valores de $X$ |                   Valores de $Y$                   | Totais de $x_i$ | Médias de $x_i$ |
+|:--------------:|:--------------------------------------------------:|:---------------:|:---------------:|
+|      $x_1$     |     $y_{11} \qquad y_{12} \qquad \cdots \qquad y_{1n_1}$    |    $T_1 = y_{1\cdot} = \displaystyle \sum_{j=1}^{n_1} y_{1j}$    |   $\bar{y}_1 = \dfrac{T_1}{n_1}$   |
+|      $x_2$     |     $y_{21} \qquad y_{22} \qquad \cdots \qquad y_{2n_2}$    |    $T_2 = y_{2\cdot} = \displaystyle \sum_{j=1}^{n_2} y_{2j}$    |   $\bar{y}_2 = \dfrac{T_2}{n_2}$   |
+|    $\vdots$    | $\vdots \qquad \quad \vdots \qquad \quad \vdots \qquad \quad \vdots$ |     $\vdots$    |     $\vdots$    |
+|      $x_I$     |     $y_{I1} \qquad y_{I2} \qquad \cdots \qquad y_{In_I}$    |    $T_k = y_{I\cdot} = \displaystyle \sum_{j=1}^{n_I} y_{Ij}$    |   $\bar{y}_I = \dfrac{T_I}{n_I}$   |
+
+: Dados experimentais com repetição {#tbl-dados}
+
+\
+
+Considerando que se tenha um conjunto de dados conforme apresentado na @tbl-dados, pode-se demonstrar que 
+
+$$
+(y_{ij} - \bar{y}) =  (\bar{y}_i - \bar{y}) + (y_{ij} - \bar{y}_i),
+$$ {#eq-desdobr-SQTotal}
+
+em que $y_{ij}$ é o _j-ésimo_ valor observado de $Y$ considerando a _i-ésima_ variável explicativa $X_i$; $\bar{y} = \dfrac{\sum_{i=1}^{k} \sum_{j=1}^{n_i} y_{ij}}{n}$, com $n = \sum_{i=1}^{k} n_i$, é a média geral dos dados observados; e $\bar{y}_i = \dfrac{\sum_{j=1}^{n_i} y_{ij}}{n_i}$ é a média dos $n_i$ valores observados de $Y$, considerando a variável explicativa $X_i$. A partição dada na @eq-desdobr-SQTotal é facilmente visualizada por meio de uma representação gráfica, conforme apresentado por Demétrio e Zocchi (2011, p.49, Figura 2.12).
+
+A partir da @eq-desdobr-SQTotal, pode-se obter a partição da variação total dos dados ou da $SQTotal$, com o objetivo de se construir a tabela da ANOVA, dada por  
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-style:solid;border-width:0px;font-family:Arial, sans-serif;font-size:16px;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:16px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;border-left:none;border-right:none}
+.tg .tg-0pky{border-color:inherit;text-align:center;vertical-align:middle}
+.tg .tg-Lpky{border-color:inherit;text-align:left;vertical-align:middle}
+</style>
+<div style="display: flex; justify-content: center;">
+<table class="tg">
+<thead>
+  <tr>
+    <th style="width: 280px;" class="tg-0pky">FV</th>
+    <th style="width: 100px;" class="tg-0pky">GL</th>
+    <th style="width: 150px;" class="tg-0pky">SQ</th>
+    <th style="width: 150px;" class="tg-0pky">QM</th>
+    <th style="width: 100px;" class="tg-0pky">F</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td class="tg-Lpky">Entre níveis de $X$ (Tratamentos)</td>
+    <td class="tg-0pky">I-1</td>
+    <td class="tg-0pky">SQTrat</td>
+    <td class="tg-0pky">QMTrat</td>
+    <td class="tg-0pky">Fc</td>
+  </tr>
+  <tr>
+    <td class="tg-Lpky">Erro Puro</td>
+    <td class="tg-0pky">n-I</td>
+    <td class="tg-0pky">SQErroPuro</td>
+    <td class="tg-0pky">QMErroPuro</td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <th class="tg-Lpky">Total</th>
+    <th class="tg-0pky">n-1</th>
+    <th class="tg-0pky">SQTotal</th>
+    <th class="tg-0pky"></th>
+    <th class="tg-0pky"></th>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<!--
+:::{#tbl-ANOVA}
+```{=html}
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-style:solid;border-width:0px;font-family:Arial, sans-serif;font-size:16px;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:16px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;border-left:none;border-right:none}
+.tg .tg-0pky{border-color:inherit;text-align:center;vertical-align:middle}
+.tg .tg-Lpky{border-color:inherit;text-align:left;vertical-align:middle}
+</style>
+<div style="display: flex; justify-content: center;">
+<table class="tg">
+  <caption>
+  <span data-qmd="Tabela da ANOVA (dados repetidos)"></span>
+  </caption>
+<thead>
+  <tr>
+    <th style="width: 50px;" class="tg-0pky">FV</th>
+    <th style="width: 50px;" class="tg-0pky">GL</th>
+    <th style="width: 100px;" class="tg-0pky">SQ</th>
+    <th style="width: 50px;" class="tg-0pky">QM</th>
+    <th style="width: 50px;" class="tg-0pky">F</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td class="tg-Lpky">Regressão</td>
+    <td class="tg-0pky">1</td>
+    <td class="tg-0pky">SQReg</td>
+    <td class="tg-0pky">QMReg</td>
+    <td class="tg-0pky">Fc</td>
+  </tr>
+  <tr>
+    <td class="tg-Lpky">Erro</td>
+    <td class="tg-0pky">n-2</td>
+    <td class="tg-0pky">SQErro</td>
+    <td class="tg-0pky">QMErro</td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <th class="tg-Lpky">Total</th>
+    <th class="tg-0pky">n-1</th>
+    <th class="tg-0pky">SQTotal</th>
+    <th class="tg-0pky"></th>
+    <th class="tg-0pky"></th>
+  </tr>
+</tbody>
+</table>
+</div>
+```
+:::
+-->
+
+\
+
+A partição da $SQTotal = SQTrat + SQErroPuro$ é demonstrada a seguir.
+
+$$
+\begin{array}{rcl}
+(y_{ij} - \bar{y}) & = &  (\bar{y}_i - \bar{y}) + (y_{ij} - \bar{y}_i) \\
+\displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i}(y_{ij} - \bar{y})^2 & = &  \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} \left[ (\bar{y}_i - \bar{y}) + (y_{ij} - \bar{y}_i) \right]^2 \\
+\displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i}(y_{ij} - \bar{y})^2 & = &  \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\bar{y}_i - \bar{y})^2 + \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (y_{ij} - \bar{y}_i)^2 + 2 \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\bar{y}_i - \bar{y}) (y_{ij} - \bar{y}_i)
+\end{array}
+$$
+
+Pode-se demonstrar que 
+$$
+2 \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\bar{y}_i - \bar{y}) (y_{ij} - \bar{y}_i) = 0
+$$
+e, assim,
+$$
+\begin{array}{rcccc}
+\displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i}(y_{ij} - \bar{y})^2 & = &  \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\bar{y}_i - \bar{y})^2 & + & \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (y_{ij} - \bar{y}_i)^2 \\
+SQTotal & = & SQTrat & + & SQErroPuro.
+\end{array}
+$$
+
+Essa partição é equivalente à de um experimento instalado segundo um delineamento inteiramente casualizado (DIC), com $I$ tratamentos e $n_i$ repetições em cada tratamento $i$, com $i=1,2,\ldots,I$. Nesse caso, o modelo é dado por
+
+$$
+y_{ij} = \mu + \alpha_i + e_{ij},
+$$
+em que $y_{ij}$ é o valor observado na _j-ésima_ repetição do _i-ésimo_ tratamento (ou nível da variável explicativa $X$); $\mu$ é uma constante; $\alpha_i$ é o efeito do _i-ésimo_ tratamento; e $e_{ij}$ é o erro aleatório associado a cada observação $y_{ij}$, tal que $e_{ij} \sim N(0,\sigma^2)$. Assim, tem-se um estimador não-viesado de $\sigma^2$ e que independe do modelo de regressão, dado por $\hat{\sigma}^2 = QMErroPuro$.
+
+::: {.important data-latex=""}
+Vale lembrar que as fórmulas apresentadas para o cálculo das somas de quadrados Total, de Tratamento e do Erro (_Erro Puro_) são equivalentes às fórmulas usadas na obtenção da ANOVA, em cursos de Estatística Experimental, como será mostrado a seguir.
+
+- $SQTotal = \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i}(y_{ij} - \bar{y})^2 =  \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} y_{ij}^2 - \dfrac{\left( \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} y_{ij} \right)^2}{n}$; ou de forma simplificada: 
+$$SQTotal = \displaystyle \sum_{ij}(y_{ij} - \bar{y})^2 =  \displaystyle \sum_{ij} y_{ij}^2 - \dfrac{\left( \displaystyle \sum_{ij} y_{ij} \right)^2}{n} = \displaystyle \sum_{ij} y_{ij}^2 - C,
+$$ em que $C$ é chamada de _correção_;
+
+- $SQTrat = \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\bar{y}_i - \bar{y})^2 = \displaystyle \sum_{i=1}^{k} n_i (\bar{y}_i - \bar{y})^2 = \displaystyle \sum_{i=1}^{k} \dfrac{T_i}{n_i} - \dfrac{\left( \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} y_{ij} \right)^2}{n}$; ou de forma simplificada: 
+$$SQTrat = \displaystyle \sum_{i} \dfrac{T_i}{n_i} - \dfrac{\left( \displaystyle \sum_{ij} y_{ij} \right)^2}{n} = \displaystyle \sum_{i=1}^{k} \dfrac{T_i}{n_i} - C;$$
+
+
+- $SQErroPuro = \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (y_{ij} - \bar{y}_i)^2 = SQTotal - SQTrat$.
+:::
+
+### ANOVA incluindo o teste F para a falta de ajuste
+
+Conforme definido anteriormente, na ANOVA da Regressão tem-se o objetivo de avaliar, por meio do teste F, se a variabilidade observada em uma variável dependente ($Y$) é significativamente explicada por $k$ variáveis independentes ou explicativas ($X_i$, com $i=1,2,\ldots,k$). Portanto, tem-se de maneira geral, um modelo de regressão linear com $k+1$ parâmetros.
+
+Nos casos em que se tenha mais de uma observação de $Y$ para diferentes níveis (ou valores) de uma mesma variável $X$ ou para diferentes combinações de valores de várias variáveis explicativas $X_i$, ou seja, quando se têm dados repetidos, a variabilidade ou variação observada em $Y$, devido ao efeito dos diferentes níveis ou variáveis explicativas, é quantificada pelo que denominamos anteriormente de **_Soma de quadrados entre níveis de X_** ou de **_Soma de Quadrados de Tratamentos_**. Portanto, deve-se desdobrar essa fonte de variação em duas partes: uma explicada pelo modelo de regressão ajustado, chamada de **_Regressão_**; e outra devido ao que não foi explicado pelo modelo proposto, que chamamos de **_Falta de Ajuste_**. Dessa forma, têm-se que a _SQTrat_, apresentada na tabela da ANOVA definida a partir da @eq-desdobr-SQTotal, pode ser desdobrada em outras duas fontes de variação, ou seja,
+$$
+SQTrat = SQRegressão + SQFalta \mbox{ } de \mbox{ } Ajuste.
+$$ {#eq-desdobr-SQTrat}
+
+
+O desdobramento da $SQTrat$, conforme definido na @eq-desdobr-SQTrat, pode ser demonstrado mais facilmente, partindo da representação gráfica apresentada por Demétrio e Zocchi (2011, p.49, Figura 2.12). Pode-se observar nessa representação gráfica que:
+$$
+(\bar{y}_i - \bar{y}) = (\hat{y}_i - \bar{y}) + (\bar{y}_i - \hat{y}_i),
+$$
+em que $\bar{y}_i$ é a média observada dos $n_i$ valores observados de $Y$, associados a um valor específico da variável explicativa $X$ ou a uma combinação de valores específicos de todas as variáveis $X_i's$, no caso de um modelo de regressão múltipla; $\bar{y}$ é a média geral dos dados observados; e $\hat{y}_i$ é o valor predito para a variável $Y$, considerando um valor específico da variável $X$ ou uma combinação de valores específicos de todas as variáveis $X_i's$, no caso de um modelo de regressão múltipla.
+
+A partição da $SQTrat = SQRegressão + SQFalta \mbox{ } de \mbox{ } Ajuste$ é demonstrada a seguir.
+
+$$
+\begin{array}{rcl}
+(\bar{y}_i - \bar{y}) & = & (\hat{y}_i - \bar{y}) + (\bar{y}_i - \hat{y}_i) \\
+\displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i}(\bar{y}_i - \bar{y})^2 & = &  \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} \left[ (\hat{y}_i - \bar{y}) + (\bar{y}_i - \hat{y}_i) \right]^2 \\
+\displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i}(\bar{y}_i - \bar{y})^2 & = &  \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\hat{y}_i - \bar{y})^2 + \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\bar{y}_i - \hat{y}_i)^2 + 2 \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\hat{y}_i - \bar{y}) (\bar{y}_i - \hat{y}_i) \\
+\displaystyle \sum_{i=1}^{k} n_i (\bar{y}_i - \bar{y})^2 & = &  \displaystyle \sum_{i=1}^{k} n_i (\hat{y}_i - \bar{y})^2 + \displaystyle \sum_{i=1}^{k} n_i (\bar{y}_i - \hat{y}_i)^2 + 2 \displaystyle \sum_{i=1}^{k} n_i (\hat{y}_i - \bar{y}) (\bar{y}_i - \hat{y}_i)
+\end{array}
+$$
+
+Pode-se demonstrar que 
+$$
+2 \displaystyle \sum_{i=1}^{k} n_i (\hat{y}_i - \bar{y}) (\bar{y}_i - \hat{y}_i) = 0
+$$
+e, assim,
+$$
+\begin{array}{rcccc}
+\displaystyle \sum_{i=1}^{k} n_i (\bar{y}_i - \bar{y})^2 & = &  \displaystyle \sum_{i=1}^{k} n_i (\hat{y}_i - \bar{y})^2 & + &  \displaystyle \sum_{i=1}^{k} n_i (\bar{y}_i - \hat{y}_i)^2 \\
+SQTrat & = & SQRegressão & + & SQFalta \mbox{ } de \mbox{ } Ajuste.
+\end{array}
+$$
+
+Neste caso, não temos uma forma geral mais explícita para o cálculo da $SQRegressão$, pois ela é dependente do modelo de regressão ajustado. Porém, tem-se a forma geral já apresentada para a $SQTrat$ e, assim, a forma mais fácil para se obter a $SQFalta \mbox{ } de \mbox{ } Ajuste$ é por diferença, ou seja,
+$$
+SQFalta \mbox{ } de \mbox{ } Ajuste = SQTrat - SQRegressão
+$$
+
+Considerando essa última partição, tem-se a seguinte tabela da ANOVA:
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-style:solid;border-width:0px;font-family:Arial, sans-serif;font-size:16px;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:16px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;border-left:none;border-right:none}
+.tg .tg-0pky{border-color:inherit;text-align:center;vertical-align:middle}
+.tg .tg-Lpky{border-color:inherit;text-align:left;vertical-align:middle}
+</style>
+<div style="display: flex; justify-content: center;">
+<table class="tg">
+<thead>
+  <tr>
+    <th style="width: 280px;" class="tg-0pky">FV</th>
+    <th style="width: 100px;" class="tg-0pky">GL</th>
+    <th style="width: 150px;" class="tg-0pky">SQ</th>
+    <th style="width: 150px;" class="tg-0pky">QM</th>
+    <th style="width: 100px;" class="tg-0pky">F</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td class="tg-Lpky">Regressão</td>
+    <td class="tg-0pky">k</td>
+    <td class="tg-0pky">SQRegressão</td>
+    <td class="tg-0pky">QMRegressão</td>
+    <td class="tg-0pky">Fc$_{Reg}$</td>
+  </tr>
+  <tr>
+    <td style="border-bottom: 1px solid black;" class="tg-Lpky">Falta de Ajuste</td>
+    <td style="border-bottom: 1px solid black;" class="tg-0pky">I-k-1</td>
+    <td style="border-bottom: 1px solid black;" class="tg-0pky">SQFalta de Ajuste</td>
+    <td style="border-bottom: 1px solid black;" class="tg-0pky">QMFalta de Ajuste</td>
+    <td style="border-bottom: 1px solid black;" class="tg-0pky">Fc$_{Faltaj}$</td>
+  </tr>
+  <tr>
+    <td class="tg-Lpky">(Entre níveis de $X$ - Tratamentos)</td>
+    <td class="tg-0pky">(I-1)</td>
+    <td class="tg-0pky">(SQTrat)</td>
+    <td class="tg-0pky">QMTrat</td>
+    <td class="tg-0pky">Fc$_{Trat}$</td>
+  </tr>
+  <tr>
+    <td class="tg-Lpky">Erro Puro</td>
+    <td class="tg-0pky">n-I</td>
+    <td class="tg-0pky">SQErroPuro</td>
+    <td class="tg-0pky">QMErroPuro</td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <th class="tg-Lpky">Total</th>
+    <th class="tg-0pky">n-1</th>
+    <th class="tg-0pky">SQTotal</th>
+    <th class="tg-0pky"></th>
+    <th class="tg-0pky"></th>
+  </tr>
+</tbody>
+</table>
+</div>
+
+\
+
+### Coeficiente de determinação ($R^2$)
+
+Conforme já definido em aula anterior, o coeficiente de determinação ($R^2$) indica a proporção da variabilidade nos $y_i's$ observados que é explicada pelo modelo de regressão considerado. No caso de se ter dados repetidos de $Y$, a variabilidade nos $y_i's$ causada pelos diferentes valores de uma única variável explicativa $X$ ou de várias variáveis exolicativas $X_i's$, é dado pela **_Soma de Quadrados de Tratamentos (SQTrat)_**. Portanto, a maneira correta de se calcular o $R^2$ nesse caso é:
+$$
+R^2 = \dfrac{SQRegressão}{SQTrat}.
+$$
+
+A interpretação do $R^2$ continua sendo mesma, bem como os comentários a seu respeito continuam valendo. 
+
+::: {.algebra data-latex=""}
+A representação matricial das fórmulas das $SQ$ para a situação em que se têm dados repetidos de $Y$ não será apresentada, pois depende de algumas adaptações na notação utilizada até o momento. Além disso, é necessário que se considere a teoria de modelos lineares de posto incompleto (modelos de delineamentos), o que não é parte do conteúdo dessa disciplina. Esse assunto específico será tratado na disciplina GES122 - Modelos Lineares II. 
+:::
+
+\
+
+## Exemplos
+
+Para facilitar o entendimento da ANOVA da regressão com o teste para a _Falta de Ajuste_, utilizaremos dois exemplos, que estão apresentados a seguir. Esses exemplos serão resolvidos apenas com o R e os scripts, com comentários e explicações, para a realização das análises e correções necessárias está disponibilizado após cada exemplo.
+
+::: {.tip data-latex=""}
+Para estudar e fixar os conteúdos apresentados, faça esses dois exercícios a mão e confira com os resultados obtidos com o uso do R.
+:::
+
+### Exemplo 1
+
+::: {.data data-latex=""}
+A _Hovenia dulcis_}_ mais conhecida como Uva-do-Japão, pertencente à família Rhamnaceae, ocorre naturalmente na China, Japão e Coréia. No sul do Brasil, ela é largamente difundida pelo cultivo em pequenos talhões ou de forma isolada (Carvalho, 1994). Segundo esse mesmo autor, a _Hovenia dulcis_ além de frutífera, apresenta ótimas perspectivas como madeira, sendo que a indústria madeireira e moveleira da região de Caxias do Sul – RS, já vem executando plantios em pequena escala. Um estudo foi desenvolvido com o objetivo de avaliar os efeitos causados pela utilização de diferentes doses de vermicomposto (húmus) e seus reflexos no crescimento de mudas de _Hovenia dulcis_. O vermicomposto é o nome que se dá à ação das minhocas em um composto orgânico, transformando-o em húmus, que apresenta inúmeras vantagens quando usado como substrato. As mudas foram produzidas em recipientes de polipropileno (tubete), de seção circular e forma cônica, com um volume de 185 cm$^3$ de substrato. A semeadura foi manual direta, sendo semeadas três sementes por recipiente. Decorridos quinze dias após a germinação, foram retiradas as mudas em excesso, deixando uma muda por recipiente. O delineamento experimental utilizado foi o delineamento inteiramente casualizado (DIC) com cinco tratamentos e quatro repetições. Foram consideradas úteis trinta plantas por parcela. Os tratamentos foram: T1. testemunha (sem-vermicomposto), T2. com 10% de vermicomposto, T3. com 20% de vermicomposto, T4. com 30% de vermicomposto e T5. com 40% de vermicomposto do volume total do tubete. Após 90 dias da semeadura, foram avaliados os parâmetros: diâmetro do colo, altura da parte aérea, massa seca de raízes, massa seca da parte aérea e massa seca total. Os diâmetros médios das 30 mudas de cada parcela, em mm, estão apresentados na Tabela 1. (<font size="2">Adaptado de VOGEL, L.M.; SCHUMACHER, M.V.; BARICHELO, L.R.; OLIVEIRA, L.S.; CALDEIRA, M.V.W. **Ciência Florestal**, Santa Maria, v.11, n.1, p.21-27, 2001</font>)
+
+|        Tratamentos       | Rep. 1 | Rep. 2 | Rep. 3 | Rep. 4 |
+|:------------------------:|:------:|:------:|:------:|:------:|
+| T1. 0% de vermicomposto  |  0,95  |  1,25  |  0,85  |  1,15  |
+| T2. 10% de vermicomposto |  1,37  |  1,57  |  1,27  |  1,67  |
+| T3. 20% de vermicomposto |  1,61  |  1,77  |  2,03  |  2,19  |
+| T4. 30% de vermicomposto |  2,22  |  2,32  |  2,52  |  2,62  |
+| T5. 40% de vermicomposto |  2,87  |  3,03  |  2,85  |  3,05  |
+:::
+
+Obtenha a ANOVA da regressão e aplique o teste F para _Regressão_ e _Falta de Ajuste_, considerando o modelo linear de regressão simples, dado por:
+$$
+y_{i} = \beta_{0} + \beta_{1}x_{i} + \varepsilon_{i},
+$$
+
+em que $y_i$ é o i-ésimo valor observado do diâmetro médio das mudas, $x_i$ é o i-ésimo valor da % de vermicomposto, $\beta_0$ e $\beta_1$ são os parâmetros do modelo e $\varepsilon_{i}$ é o erro aleatório associado à observação $y_i$, sendo estes independentes e identicamente distribuídos, com $\varepsilon_{i} \sim (0,\sigma^2)$.
+
+A seguir é apresentado um script do R para a realização das análises do Exemplo 1.
+
+```{r,warning=FALSE,message = FALSE, echo=TRUE, eval=FALSE}
+#####################
+## GES119 - Modelos Lineares I
+## - Analise de regressão quando se 
+##    tem dados com repeticoes
+## - Teste para falta de ajuste
+#####################
+library(readxl)
+library(tidyverse)
+##
+## EXEMPLO 1: Modelo de regressao linear simples
+##
+rm(list = ls())
+#
+#dados1<- read_excel("Dados/Dados_Exemplo1_Falta_Ajust.xlsx")
+#str(dados1)
+##
+dados1.med<- dados1 |>
+  group_by(Vermicomp) |>
+  summarize(Diam.med = mean(Diam))
+str(dados1.med)
+#
+## 1a ANALISE:
+## Ajuste do modelo linear simples - dados medios
+#
+reg1.med<- lm(Diam.med ~ Vermicomp, data = dados1.med)
+anova(reg1.med)
+summary(reg1.med)
+#
+## 2a ANALISE:
+## Ajuste do modelo linear simples - dados com repeticoes
+## ** ANALISE ERRADA **
+##  Equacao estimada correta, mas inferencias erradas, pois
+##  considera-se o QMErro errado
+##  Aqui a SQErro = SQErro puro + SQFalta de ajuste
+##  (relacao valida para GL tambem)
+#
+reg1.errada<- lm(Diam ~ Vermicomp, data = dados1)
+anova(reg1.errada)
+summary(reg1.errada)
+#
+## 3a ANALISE:
+## Ajuste do modelo linear simples - dados com repeticoes
+## ** ANALISE PARCIALMENTE CORRETA **
+##  Equacao estimada incorreta e teste F da ANOVA correto, pois
+##  considera-se o QMErro puro
+##  Porem, os resultados do teste t para os parametros
+##  e o R^2 estao errados, pois as estimativas estao incorretas
+##  Portanto, nao se deve considerar os resultados da funcao summary()
+##  Aqui tem-se SQErro puro e SQFalta de ajuste separadas
+##  (vale para GL tambem)
+##
+##  As correcoes do R^2 e dos testes t serao mostrados 
+##  mais a frente
+#
+dados1$Faltajuste<- as.factor(dados1$Vermicomp)
+reg1.correta<- lm(Diam ~ Vermicomp + Faltajuste, data = dados1)
+reg1.correta<- lm(Diam ~ Vermicomp + Faltajuste, data = dados1)
+anova(reg1.correta)
+#summary(reg1.correta)
+#
+## Comparacao das tres ANOVA's
+anova(reg1.med)
+anova(reg1.errada)
+anova(reg1.correta)
+#
+## 4a ANALISE:
+## ANOVA dos dados experimentais
+an1<- lm(Diam ~ as.factor(Vermicomp), data = dados1)
+anova(an1)
+## Correcao do R^2 na análise correta
+(SQTratamento <- 9.0250+0.0289)
+(R2<- round(9.0250/SQTratamento, 4))
+#
+## Correcao dos testes t para os parametros do modelo
+#
+## Da 1a ANALISE tem-se estimativas corretas, mas inferencias
+## incorretas, pois os erros padroes estao errados, pois o
+## QMErro esta errado (QMIndependente da Regressao). 
+## Deve-se usar o QMErroPuro, obtido na 3a ANALISE
+#
+## Uma opcao para corrigir seria utilizar o "Std. Error" da analise
+## errada e multiplica-lo pela raiz quadrada da razao 
+## QMErroPuro/QMIndep Regressao, como mostrado a seguir:
+#
+(summ.reg1.errada<-summary(reg1.errada))
+(an.reg1.errada<- anova(reg1.errada))
+(an.reg1.correta<- anova(reg1.correta))
+(GL.correto<- an.reg1.correta[3,1])
+(QMErroPuro<- an.reg1.correta[3,3])
+(QMIndepReg<- an.reg1.errada[2,3])
+t.reg1.correta<- summ.reg1.errada$coefficients
+t.reg1.correta[,2]<- t.reg1.correta[,2] * sqrt(QMErroPuro/QMIndepReg)
+t.reg1.correta[,3]<- round(t.reg1.correta[,1]/t.reg1.correta[,2],4)
+t.reg1.correta[,4]<- 2*(1-pt(abs(t.reg1.correta[,3]), GL.correto))
+t.reg1.correta
+summ.reg1.errada
+#
+## SQ calculadas a partir das definicoes apresentadas
+## no material de aula
+(yi.bar<- dados1.med$Diam.med)
+(y.bar<- mean(dados1$Diam))
+(n.rep<- length(unique(dados1$Rep)))
+(SQTrat<- n.rep * sum((yi.bar-y.bar)^2))
+(SQReg<- n.rep * sum((predict(reg1.med)-y.bar)^2))
+(SQFaltaj<- n.rep * sum((yi.bar-predict(reg1.med))^2))
+## Comparando com os resultados da 3a ANALISE
+an.reg1.correta
+```
+
+\
+
+### Exemplo 2
+
+::: {.data data-latex=""}
+Um experimento para avaliar a porcentagem de xilose em bagaço de cana-de-açúcar com 50% de umidade foi realizado no delineamento inteiramente casualizado com 24 tratamentos e 2 repetições. Os tratamentos foram dispostos no esquema fatorial 4x6 sendo 4 níveis de tempo (minutos) e 6 níveis de % de H$_2$SO$_4$. Os dados das médias das repetições foram:
+
+| Tratamentos | X1  | X2   | Rep. 1 | Rep. 2 |
+|-------------|-----|------|--------|--------|
+| 1           | 30  | 0,25 |  0,00  |  0,00  |
+| 2           | 30  | 0,50 |  1,21  |  1,71  |
+| 3           | 30  | 0,75 |  2,67  |  3,50  |
+| 4           | 30  | 1,00 |  3,28  |  2,74  |
+| 5           | 30  | 1,25 |  6,28  |  6,56  |
+| 6           | 30  | 1,50 |  6,83  |  6,87  |
+| 7           | 60  | 0,25 |  1,35  |  1,51  |
+| 8           | 60  | 0,50 |  4,73  |  5,00  |
+| 9           | 60  | 0,75 |  7,33  |  7,18  |
+| 10          | 60  | 1,00 |  7,18  |  8,01  |
+| 11          | 60  | 1,25 |  8,32  |  7,39  |
+| 12          | 60  | 1,50 |  9,77  |  9,20  |
+| 13          | 90  | 0,25 |  1,89  |  1,89  |
+| 14          | 90  | 0,50 |  5,90  |  6,44  |
+| 15          | 90  | 0,75 |  7,72  |  8,33  |
+| 16          | 90  | 1,00 |  8,21  |  8,26  |
+| 17          | 90  | 1,25 |  9,73  |  9,03  |
+| 18          | 90  | 1,50 |  8,86  |  9,53  |
+| 19          | 120 | 0,25 |  3,00  |  3,23  |
+| 20          | 120 | 0,50 |  7,25  |  6,94  |
+| 21          | 120 | 0,75 |  8,06  |  8,27  |
+| 22          | 120 | 1,00 |  8,88  |  8,14  |
+| 23          | 120 | 1,25 |  8,15  |  8,85  |
+| 24          | 120 | 1,50 |  8,20  |  8,54  |
+:::
+
+Pode-se realizar o download dos dados utilizando o link:
+
+::: columns
+::: {.column width="35%"}
+
+```{r,warning=FALSE,message = FALSE, echo=FALSE}
+library(downloadthis)
+library(readxl)
+
+dados.m <- read_excel("Dados/Ex_Reg_Multipla.xlsx")
+
+dados.m %>%
+    download_this(
+    output_name = "dados_reg_mult",
+    output_extension = ".xlsx",
+    button_label = "Download dos dados",
+    button_type = "primary",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
+```
+:::
+
+\ 
+
+Obtenha a ANOVA da regressão e aplique o teste F para _Regressão_ e _Falta de Ajuste_, considerando o modelo de superfície de resposta de segunda ordem, dado por:
+$$
+y_i = \beta_{0} + \beta_{1}x_{1i} + \beta_{2}x_{2i} + \beta_{3}x_{1i}^2 + \beta_{4}x_{2i}^2 + \beta_{5}x_{1i}x_{2i} + \varepsilon_i,
+$$
+
+em que $y_i$ é o i-ésimo valor observado da porcentagem de xilose em bagaço de cana-de-açúcar com 50% de umidade; $x_1$ é o i-ésimo valor do tempo, em minutos; $x_2$ é o i-ésimo valor da % de H$_2$SO$_4$; $\beta_0$, $\beta_1$, $\beta_2$, $\beta_3$,  $\beta_4$ e  $\beta_5$ são os parâmetros do modelo e $\varepsilon_{i}$ é o erro aleatório associado à observação $y_i$, sendo estes independentes e identicamente distribuídos, com $\varepsilon_{i} \sim (0,\sigma^2)$.
+
+A seguir é apresentado um script do R para a realização das análises do Exemplo 2.
+
+```{r,warning=FALSE,message = FALSE, echo=TRUE, eval=FALSE}
+##
+## EXEMPLO 2: Modelo de regressao linear multipla
+##
+rm(list = ls())
+#
+dados2<- read_excel("Dados/Ex_Reg_Multipla.xlsx")
+dados2$X1.2<- dados2$X1^2
+dados2$X2.2<- dados2$X2^2
+dados2$X1X2<- dados2$X1 * dados2$X2
+str(dados2)
+##
+dados2.med<- dados2 |>
+  group_by(Tratamentos, X1, X2, X1.2, X2.2, X1X2) |>
+  summarize(Xilose.med = mean(Xilose))
+dados2.med
+#
+## 1a ANALISE:
+##  Ajuste do modelo de regressao linear multipla 
+##  Dados medios
+#
+reg2beta0.med<- lm(Xilose.med ~ 1, data = dados2.med)
+reg2.med<- lm(Xilose.med ~ X1 + X2 + X1.2 + X2.2 + X1X2, data = dados2.med)
+summary(reg2.med)
+(anreg2.med<- anova(reg2.med))
+anova(reg2beta0.med, reg2.med)
+(SQReg.reg2.med<- sum(anreg2.med[1:5,2]))
+(GLReg.reg2.med<- length(anreg2.med[1:5,2]))
+(QMReg.reg2.med<- SQReg.reg2.med/GLReg.reg2.med)
+(F.reg2.med<- QMReg.reg2.med/anreg2.med[6,3])
+(valorp.reg2.med<- 1-pf(F.reg2.med, 
+                        GLReg.reg2.med, anreg2.med[6,1]))
+data.frame(FV = c("Regressao", "Erro"),
+           GL = c(GLReg.reg2.med, anreg2.med[6,1]),
+           SQ = c(SQReg.reg2.med, anreg2.med[6,2]),
+           QM = c(QMReg.reg2.med, anreg2.med[6,3]),
+           Fc = c(F.reg2.med, NA),
+           Valor.p = c(valorp.reg2.med, NA))
+#
+## 2a ANALISE:
+## Ajuste do modelo linear simples - dados com repeticoes
+## ** ANALISE ERRADA **
+##  Equacao estimada correta, mas inferencias erradas, pois
+##  considera-se o GLErro, SQErro errados e, consequentemente,
+##  QMErro errado
+##  Aqui a SQErro = SQErro puro + SQFalta de ajustamento
+##  (relacao valida para GL tambem)
+#
+reg2beta0.errada<- lm(Xilose ~ 1, data = dados2)
+reg2.errada<- lm(Xilose ~ X1 + X2 + X1.2 + X2.2 + X1X2, data = dados2)
+anova(reg2.errada)
+anova(reg2beta0.errada, reg2.errada)
+summary(reg2.errada)
+#
+## 3a ANALISE:
+## Ajuste do modelo linear simples - dados com repeticoes
+## ** ANALISE PARCIALMENTE CORRETA **
+##  Equacao estimada incorreta e teste F da ANOVA correto, pois
+##  considera-se o QMErro puro
+##  Porem, os resultados do teste t para os parametros
+##  e o R^2 estao errados, pois as estimativas estao incorretas
+##  Portanto, nao se deve considerar os resultados da funcao summary()
+##  Aqui tem-se SQErro puro e SQFalta de ajuste separadas
+##  (vale para GL tambem)
+##
+##  As correcoes do R^2 e dos testes t serao mostrados 
+##  mais a frente
+#
+dados2$Faltajuste<- as.factor(dados2$Tratamentos)
+reg2.correta<- lm(Xilose ~ X1 + X2 + X1.2 + X2.2 + X1X2 + 
+                    Faltajuste, data = dados2)
+(anreg2.correta<- anova(reg2.correta))
+(SQReg.reg2.correta<- sum(anreg2.correta[1:5,2]))
+(GLReg.reg2.correta<- length(anreg2.correta[1:5,2]))
+(QMReg.reg2.correta<- SQReg.reg2.correta/GLReg.reg2.correta)
+(F.reg2.correta<- QMReg.reg2.correta/anreg2.correta[7,3])
+(valorp.reg2.correta<- 1-pf(F.reg2.correta, 
+                        GLReg.reg2.correta, anreg2.correta[7,1]))
+data.frame(FV = c("Regressao", "Erro"),
+           GL = c(GLReg.reg2.correta, anreg2.correta[6,1]),
+           SQ = c(SQReg.reg2.correta, anreg2.correta[6,2]),
+           QM = c(QMReg.reg2.correta, anreg2.correta[6,3]),
+           Fc = c(F.reg2.correta, NA),
+           Valor.p = c(valorp.reg2.correta, NA))
+#
+## Comparacao das tres ANOVA's
+#
+anova(reg2.med)
+anova(reg2.errada)
+anova(reg2.correta)
+#
+## 4a ANALISE:
+## ANOVA dos dados experimentais
+an2<- lm(Xilose ~ as.factor(Tratamentos), data = dados2)
+(an2.exp<- anova(an2))
+#
+## Correcao do R^2 na análise correta
+(SQTrat <- an2.exp[1,2])
+(R2<- round(SQReg.reg2.correta/SQTrat, 4))
+#
+## Correcao dos testes t para os parametros do modelo
+#
+## Da 1a ANALISE tem-se estimativas corretas, mas inferencias
+## incorretas, pois os erros padroes estao errados, pois o
+## QMErro esta errado (QMIndependente da Regressao). 
+## Deve-se usar o QMErroPuro, obtido na 3a ANALISE
+#
+## Uma opcao para corrigir seria utilizar o "Std. Error" da analise
+## errada e multiplica-lo pela raiz quadrada da razao 
+## QMErroPuro/QMIndep Regressao, como mostrado a seguir:
+#
+(summ.reg2.errada<-summary(reg2.errada))
+(an.reg2.errada<- anova(reg2.errada))
+(an.reg2.correta<- anova(reg2.correta))
+(GL.correto<- an.reg2.correta[7,1])
+(QMErroPuro<- an.reg2.correta[7,3])
+(QMIndepReg<- an.reg2.errada[6,3])
+t.reg2.correta<- summ.reg2.errada$coefficients
+t.reg2.correta[,2]<- t.reg2.correta[,2] * sqrt(QMErroPuro/QMIndepReg)
+t.reg2.correta[,3]<- round(t.reg2.correta[,1]/t.reg2.correta[,2],4)
+t.reg2.correta[,4]<- 2*(1-pt(abs(t.reg2.correta[,3]), GL.correto))
+t.reg2.correta
+summ.reg2.errada
+#
+## SQ calculadas a partir das definicoes apresentadas
+## no material de aula
+(yi.bar<- dados2.med$Xilose.med)
+(y.bar<- mean(dados2$Xilose))
+(n.rep<- length(unique(dados2$Rep)))
+(SQTrat<- n.rep * sum((yi.bar-y.bar)^2))
+(SQReg<- n.rep * sum((predict(reg2.med)-y.bar)^2))
+(SQFaltaj<- n.rep * sum((yi.bar-predict(reg2.med))^2))
+## Comparando com os resultados da 3a ANALISE
+an.reg2.correta
+sum(an.reg2.correta[1:6,2]); SQTrat
+sum(an.reg2.correta[1:5,2]); SQReg
+an.reg2.correta[6,2]; SQFaltaj
+```
+
+

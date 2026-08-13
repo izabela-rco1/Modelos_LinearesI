@@ -1,0 +1,19 @@
+# Arquivos de sessão e histórico do R
+
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Pastas de compilação do Quarto
+/.quarto/
+_book/
+_freeze/
+
+# Bases de dados e dados
+
+*.csv
+*.xlsx
+*.xls
+*.rds
+Dados/

@@ -1,0 +1,470 @@
+---
+title: "Métodos de seleção de variáveis"
+---
+
+::: {.chapterintro data-latex=""}
+Na aula de hoje vamos apresentar os principais métodos de seleção de variáveis (explicativas ou regressoras) no ajuste de um modelo linear de regressão (MLR). Inicialmente será apresentada a definição de modelos nulo, minimal, maximal e saturado. Posteriormente serão apresentados os critérios que podem ser utilizados na seleção de variáveis, bem como os métodos mais comuns.
+
+Essa aula é baseada no **Capítulo 6 - Métodos de Seleção de Variáveis** da apostila _Modelos de Regressão_ (Demétrio e Zocchi, 2011), no **Capítulo 9 - Building the Regression Model I: Model Selection and Validation** do livro _Applied Linear Statistical Models_ (Kutner et al., 2005) e no **Capítulo 11 - Seleção de Variáveis Regressoras** do livro _Análise de Modelos de Regressão Linear com Aplicações_ (Charnet et al., 2008).
+:::
+
+## Introdução
+
+Conforme visto em aulas anteriores, um modelo de regressão linear (MRL) pode ser representado por
+$$
+y_i = \beta_{0} + \beta_{1}x_{1i} + \beta_{2}x_{2i} + \ldots + \beta_{k}x_{ki} + \varepsilon_i,
+$$ {#eq-mrlm}
+
+em que $y_i$ é o i-ésimo valor observado da variável resposta, com $i=1,2,\ldots,n$; $\beta_{0}, \beta_{1}, \ldots, \beta_{k}$ são os $(k+1)$ parâmetros no modelo; $x_{1i}, x_{2i}, \dots, x_{ki}$ são os valores conhecidos das $k$ variáveis explicativas, associados à i-ésima observação $y_i$; e $\varepsilon_i$ é o erro aleatório associado à observação $y_i$, sendo estes independentes e identicamente distribuídos, com $\varepsilon_{i} \sim (0,\sigma^2)$.
+
+Nessa situação, em que se têm $n$ observações, podem ser ajustados diferentes modelos lineares de regressão, com uma única condição: o modelo pode ter no máximo $n$ parâmetros. Vale ressaltar que, caso seja ajustado um modelo com $n$ parâmetros, não será possível realizar inferências sobre os parâmetros do modelo, pois a estimativa de $\sigma^2$ será 0 (zero), ou seja, teremos $\hat{\sigma}^2 = QMErro = 0$.
+
+Assim, considerando $M_1$, $M_2$, $\ldots$, $M_m$ uma sequência de $m$ modelos encaixados com $p_1$, $p_2$, $\ldots$, $p_m$ parâmetros, respectivamente, tal que $1 \leq p_1 < p_2 < \ldots < p_m \leq n$, tem-se que:
+$$
+SQErro_1 \geq SQErro_2 \geq \ldots \geq SQErro_m \geq 0. 
+$$
+
+::: {.important data-latex=""}
+Modelos lineares são ditos encaixados, quando um modelo mais simples (com menos parâmetros) é parte de um modelo mais mais complexo (com mais parâmetros). 
+
+Para exemplificar, considere os modelos polinomiais de primeiro, segundo e terceiro grau, dados por:
+
+- $M_1$: $y_i = \beta_0 + \beta_1 x_i + e_i$;
+- $M_2$: $y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + e_i$;
+- $M_3$: $y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \beta_3 x_i^3 + e_i$.
+
+Dessa forma, $M_1$ está encaixado $M_2$, que por sua vez está encaixado em $M_3$. Pode-se dizer que $M_1$ está encaixado em $M_3$, mas como têm-se inclusão de dois novos parâmetros em $M_3$, o processo de inferência pode não ser o desejado.
+:::
+
+No ajuste de um modelo linear de regressão, como o definido na  @eq-mrlm, têm-se $k$ variáveis explicativas e, consequentemente, $(k+1)$ parâmetros a serem estimados. Conforme definido anteriormente, o número de parâmetros do modelo tem que ser menor ou igual ao número de observações, ou seja, $(k+1) \leq n$. Portanto, podem ser ajustados modelos com diferentes números de parâmetros, ou seja, modelos mais complexos ou menos complexos, desde que o número de parâmetros não ultrapasse o número de observações. 
+
+Modelos mais complexos ou com muitas variáveis explicativas podem explicar bem o comportamento da variável resposta ($Y$), mas podem ser difíceis de interpretar. Modelos com poucas variáveis explicativas podem ser fáceis de interpretar, mas nem sempre explicam satisfatoriamente o comportamento de $Y$. Portanto, deve-se utilizar um modelo parcimonioso, ou seja, um modelo intermediário, mas que explique satisfatoriamente o comportamento de $Y$.
+
+## Tipos básicos de modelos
+
+Dentre os modelos passíveis de serem ajustados, podem ser definidos quatro modelos, os quais são classificados, conforme apresentado por Demétrio e Zocchi (2011), em quatro tipos: modelo nulo, modelo saturado, modelo minimal e modelo maximal, os quais estão definidos a seguir:
+
+- **Modelo nulo:** é aquele que contém um único parâmetro, que representa um mesmo valor para todas as observações. Portanto, esse modelo contém apenas a constante e toda a variação nos valores de $Y$ é atribuída apenas ao componente aleatório (acaso) do modelo. Este é dado por:
+$$
+y_i = \beta_0 + \varepsilon_i ;
+$$
+
+- **Modelo saturado:** é modelo que corresponde ao outro extremo, ou seja, aquele que contém $n$ parâmetros, em que $n$ é o número de observações. Ele atribui toda a variação nos valores de $Y$ ao componente sistemático e, portanto, ajusta-se perfeitamente, reproduzindo os próprios dados. COm esse modelo, não é possível estimar $\sigma^2$. Esse modelo e os demais serão ilustrados no exemplo a seguir. 
+
+- **Modelo minimal:** corresponde ao modelo que contém os parâmetros que são obrigatórios no modelo, além da constante. 
+
+- **Modelo maximal:** corresponde a um modelo que contém mais parâmetros que o modelo minimal. Este é considerado o modelo mais complexo possível, que faça sentido na explicação da variação dos valores de $Y$ e que permita estimar $\sigma^2$.
+
+De acordo com Demétrio e Zocchi (2011), na prática, o modelo nulo é simples demais e o modelo saturado não é informativo, pois não resume os dados, mas simplesmente os repete. Geralmente, o modelo mais parcimonioso e adequado, que explique satisfatoriamente a variação em $Y$, se encontra entre os modelos encaixados, do minimal ao maximal.
+
+A seguir será considerado um exemplo para ilustrar os tipos de modelos apresentados.
+
+### Exemplo de MRLM - Superfície de Resposta
+
+::: {.data data-latex=""}
+Considere o exemplo utilizado na aula sobre **_ANOVA da Regressão_**, no qual tem-se um experimento para avaliar a porcentagem de xilose em bagaço de cana-de-açúcar com 50% de umidade. O experimento foi realizado segundo um delineamento inteiramente casualizado com 24 tratamentos e 2 repetições. Os tratamentos foram dispostos no esquema fatorial 4x6 sendo 4 níveis de tempo (minutos) - $X1$, e 6 níveis de % de H$_2$SO$_4$ - $X2$. Nessa aula serão considerados as médias das repetições, ou seja, como se fosse dados obtido sem repetição. Assim, tem-se:
+
+| Tratamentos | X1  | X2   | Xilose.m |
+|-------------|-----|------|----------|
+| 1           | 30  | 0,25 | 0,00     |
+| 2           | 30  | 0,50 | 1,46     |
+| 3           | 30  | 0,75 | 3,09     |
+| 4           | 30  | 1,00 | 3,01     |
+| 5           | 30  | 1,25 | 6,42     |
+| 6           | 30  | 1,50 | 6,85     |
+| 7           | 60  | 0,25 | 1,43     |
+| 8           | 60  | 0,50 | 4,87     |
+| 9           | 60  | 0,75 | 7,26     |
+| 10          | 60  | 1,00 | 7,60     |
+| 11          | 60  | 1,25 | 7,86     |
+| 12          | 60  | 1,50 | 9,49     |
+| 13          | 90  | 0,25 | 1,89     |
+| 14          | 90  | 0,50 | 6,17     |
+| 15          | 90  | 0,75 | 8,03     |
+| 16          | 90  | 1,00 | 8,24     |
+| 17          | 90  | 1,25 | 9,38     |
+| 18          | 90  | 1,50 | 9,20     |
+| 19          | 120 | 0,25 | 3,12     |
+| 20          | 120 | 0,50 | 7,10     |
+| 21          | 120 | 0,75 | 8,17     |
+| 22          | 120 | 1,00 | 8,51     |
+| 23          | 120 | 1,25 | 8,50     |
+| 24          | 120 | 1,50 | 8,37     |
+:::
+
+
+
+::: columns
+::: {.column width="35%"}
+
+```{r,warning=FALSE,message = FALSE, echo=FALSE}
+#library(downloadthis)
+library(readxl)
+
+dados.m <- read_excel("Dados/Ex_Reg_Multipla_medias.xlsx")
+
+#dados.m %>%
+#    download_this(
+#    output_name = "dados.m",
+#    output_extension = ".xlsx",
+#    button_label = "Download dos dados",
+#    button_type = "primary",
+#    has_icon = TRUE,
+#    icon = "fa fa-save"
+#  )
+```
+:::
+
+::: {.column width="65%"}
+
+:::
+:::
+
+\ \
+
+Neste exemplo podem ser considerados os seguintes modelos:
+
+- **Modelo nulo:** aquele que contém apenas a constante, ou seja: 
+$$
+y_i = \beta_0 + \varepsilon_i ;
+$$
+
+- **Modelo minimal:** vamos considerar que o modelo mais simples é aquele que contém apenas a variável $X2$, ou seja, o efeito de 1$^o$ grau da % de H$_2$SO$_4$. Assim, tem-se:
+$$
+y_i = \beta_{0} + \beta_{1}x_{2i} + \varepsilon_i ;
+$$
+
+- **Modelo maximal:** vamos definir como sendo o modelo geralmente considerado nos ajustes de superfícies de resposta, ou seja:
+$$
+y_i = \beta_{0} + \beta_{1}x_{1i} + \beta_{2}x_{2i} + \beta_{3}x_{1i}^2 + \beta_{4}x_{2i}^2 + \beta_{5}x_{1i}x_{2i} + \varepsilon_i;
+$$
+
+- **Modelo saturado:** como temos $n=24$ observações, esse modelo corresponde ao modelo com 24 parâmetros, ou seja:
+$$
+\begin{array}{rcl}
+y_i & = & \beta_{0} + \beta_{1}x_{1i} + \beta_{2}x_{1i}^2 + \beta_{3}x_{1i}^3 + \\
+& & + \beta_{4}x_{2i} + \beta_{5}x_{2i}^2 + \beta_{6}x_{2i}^3 + \beta_{7}x_{2i}^4 + \beta_{8}x_{2i}^5 + \\
+& & + \beta_{9}x_{1i}x_{2i} + \beta_{10}x_{1i}x_{2i}^2 + \beta_{11}x_{1i}x_{2i}^3 + \beta_{12}x_{1i}x_{2i}^4 + \beta_{13}x_{1i}x_{2i}^5 + \\
+& & + \beta_{14}x_{1i}^2x_{2i} + \beta_{15}x_{1i}^2x_{2i}^2 + \beta_{16}x_{1i}^2x_{2i}^3 + \beta_{17}x_{1i}^2x_{2i}^4 + \beta_{18}x_{1i}^2x_{2i}^5 + \\
+& & + \beta_{19}x_{1i}^3x_{2i} + \beta_{20}x_{1i}^3x_{2i}^2 + \beta_{21}x_{1i}^3x_{2i}^3 + \beta_{22}x_{1i}^3x_{2i}^4 + \beta_{23}x_{1i}^3x_{2i}^5 + \varepsilon_i;
+\end{array}
+$$
+
+A seguir tem-se um script do R para ilustrar o ajuste dos modelos nulo, minimal, maximal e saturado, considerando os dados do exemplo 2.1.
+
+```{r,warning=FALSE,message = FALSE, echo=TRUE, eval=FALSE}
+#####################
+## GES119 - Modelos Lineares I
+## - Seleção de variaveis
+#####################
+library(readxl)
+##
+## EXEMPLO: Modelo de regressao linear multipla
+## - Exemplo da apostila de Regazzi (2010), considerando medias
+## - Definicao de modelos nulo, minimal, maximal e saturado
+## - Metodos de selecao de variaveis: backward, forward e stepwise
+##
+rm(list = ls())
+#
+dados.med<- read_excel("Dados/Ex_Reg_Multipla_medias.xlsx")
+dados.med
+#
+#################
+## Definicao de modelos nulo, minimal, maximal e saturado
+#################
+#
+## Criacao de todas as variaveis explicativas do 
+## modelo saturado
+dados.med$X12<- dados.med$X1^2
+dados.med$X13<- dados.med$X1^3
+dados.med$X22<- dados.med$X2^2
+dados.med$X23<- dados.med$X2^3
+dados.med$X24<- dados.med$X2^4
+dados.med$X25<- dados.med$X2^5
+dados.med$X1.X2<- dados.med$X1 * dados.med$X2
+dados.med$X1.X22<- dados.med$X1 * dados.med$X22
+dados.med$X1.X23<- dados.med$X1 * dados.med$X23
+dados.med$X1.X24<- dados.med$X1 * dados.med$X24
+dados.med$X1.X25<- dados.med$X1 * dados.med$X25
+dados.med$X12.X2<- dados.med$X12 * dados.med$X2
+dados.med$X12.X22<- dados.med$X12 * dados.med$X22
+dados.med$X12.X23<- dados.med$X12 * dados.med$X23
+dados.med$X12.X24<- dados.med$X12 * dados.med$X24
+dados.med$X12.X25<- dados.med$X12 * dados.med$X25
+dados.med$X13.X2<- dados.med$X13 * dados.med$X2
+dados.med$X13.X22<- dados.med$X13 * dados.med$X22
+dados.med$X13.X23<- dados.med$X13 * dados.med$X23
+dados.med$X13.X24<- dados.med$X13 * dados.med$X24
+dados.med$X13.X25<- dados.med$X13 * dados.med$X25
+names(dados.med)
+#
+## Ajuste do modelo nulo
+m.nulo<- lm(Xilose.m ~ 1, data=dados.med)
+summary(m.nulo)
+mean(dados.med$Xilose.m)
+anova(m.nulo)
+(SQTotal<- sum((dados.med$Xilose.m - mean(dados.med$Xilose.m))^2))
+cbind(dados.med$Xilose.m, predict(m.nulo))
+#
+## Ajuste do modelo saturado
+m.sat<- lm(Xilose.m ~ X1 + X12 + X13 +
+             X2 + X22 + X23 + X24 + X25 +
+              X1.X2 +  X1.X22 +  X1.X23 +  X1.X24 +  X1.X25 +
+             X12.X2 + X12.X22 + X12.X23 + X12.X24 + X12.X25 +
+             X13.X2 + X13.X22 + X13.X23 + X13.X24 + X13.X25, 
+           data = dados.med)
+summary(m.sat)
+anova(m.sat)
+cbind(dados.med$Xilose.m, round(predict(m.sat),3))
+#
+## Ajuste do modelo minimal
+m.min<- lm(Xilose.m ~ X2, data = dados.med)
+summary(m.min)
+anova(m.min)
+anova(m.nulo, m.min)
+anova(m.min, m.sat)
+#
+## Ajuste do modelo maximal
+m.max<- lm(Xilose.m ~ X1 + X2 + X12 + X22 + X1.X2, 
+           data = dados.med)
+summary(m.max)
+anova(m.max)
+anova(m.nulo, m.max)
+anova(m.max, m.sat)
+#
+```
+
+## Métricas ou critérios utilizados na seleção de variáveis
+
+Diferentes métricas ou critérios podem ser utilizados na seleção de variáveis explicativas para compor um modelo considerado mais adequado para descrever a variação na variável dependente $Y$. Dentre estes podem ser citados: estatística $F$, coeficiente de determinação ($R^2$), coeficiente de determinação ajustado ($\bar{R}^2$), estatística $C_p$ de Mallows, critério de informação de Akaike ($AIC$), critério de informação de Bayes ($BIC$), critério da soma de quadrados de predição ($PRESS$), dentre outros (Demétrio e Zocchi, 2011; Kutner et al., 2005; Li et al., 2025).
+
+::: aside
+DEMÉTRIO, C.G.B; ZOCCHI, S.S. **Modelos de Regressão**. Piracicaba: ESALQ, 2011. Apostila.
+
+KUTNER, M. H.; NACHTSHEIM, C. J.; NETER, J.; LI, W. **Applied Linear Statistical Models**. 5ed. New York: McGraw-Hill/Irwin, 2005.
+
+LI, J; HU, K; LU, X; LIU W; JULIE ZHU, L. **StepReg: Stepwise   Regression Analysis**, 2025. doi:10.32614/CRAN.package.StepReg   <https://doi.org/10.32614/CRAN.package.StepReg>, R package version 1.6.1, <https://CRAN.R-project.org/package=StepReg>.
+:::
+
+A seguir serão definidos alguns critérios, exatamente como Demétrio e Zocchi (2011) detalham e destacam.
+
+### Teste F
+
+A comparação entre dois modelos $M_1$ e $M_2$, com $p_1$ e $p_2$ parâmetros respectivamente, tal que $p_1 < p_2$, pode ser feita
+usando-se:
+$$
+F = \dfrac{SQErro_1 − SQErro_2}{(p_2 − p_1) QMErro}
+$$
+em que $QMErro$ é uma estimativa de $\sigma^2$, em geral, obtida a partir do modelo maximal ou alguma estimativa da variância do erro puro, geralmente dada pelo $QMErroPuro$. Essa estatística $F$ geralmente é utilizada nos métodos de seleção de modelos de regressão, chamados de métodos _passo a passo_.
+
+### Coeficiente de determinação e coeficiente de determinação ajustado
+
+Os coeficientes de determinação e de determinação ajustado são dados conforme definidos em aulas anteriores, respectivamente, por:
+$$
+R^2 = \dfrac{SQReg}{SQTotal} = 1 - \dfrac{SQErro}{SQTotal}
+$$
+e
+$$
+\bar{R}^2 = R^2 - \dfrac{k}{n-k-1} (1-R^2) ,
+$$
+em que $SQReg$ é a soma de quadrados associada ao modelo de regressão com $k+1$ parâmetros, $SQTotal$ é a soma de quadrados total, calculada como a soma dos quadrados dos desvios das $n$ observações em relação à média geral dos valores observados.
+
+Essas métricas são utilizadas geralmente, no método de seleção de variáveis que considera o ajuste de todos os possíveis modelos de regressão. Vale lembrar que essas métricas variam de 0 a 1 e quanto maior seu valor, melhor o ajuste do modelo.
+
+
+### Estatística de Mallows ($C_p$)
+
+Para a seleção de modelos de regressão, Mallows (1973) propôs uma estatística baseada na razão entre a $SQErro$ do modelo sob estudo, com $k = p - 1$ variáveis explicativas, e uma estimativa de $\sigma^2$, isto é,
+$$
+C_p = \dfrac{SQErro_{p}}{\hat{\sigma}^2} - (n − 2p),
+$$
+
+::: aside
+MALLOWS, C.L. Some comments on $C_p$. **Technometrics**, v.15, n.4, p.661-675, 1973.
+:::
+em que $SQErro_p$ é a soma de quadrados do erro ou independente da regressão ao considerar $n$ observações da variável dependente $Y$ e um modelo de regressão com $p=k+1$ parâmetros.
+
+Pode-se demonstrar que $C_p$ é um estimador de
+$$ 
+\Gamma_p = E \left( \dfrac{SQErro_p}{\sigma^2} \right) − (n − 2p) \approx (n − p) − (n − 2p) = p.
+$$
+
+Para um modelo com $k = p - 1$ variáveis explicativas selecionadas, valores grandes de $C_p$ indicam modelos com $QMErro$ grandes. Portanto, modelos com menores valores de $C_p$ estão mais bem ajustados aos dados. 
+
+Qualquer modelo com $C_p > p$ é uma indicação de que existe um viés devido a um modelo mal especificado (número insuficiente de variáveis explicativas). Se, por outro lado, $C_p < p$, tem-se que o modelo maximal está superparametrizado, ou seja, contém mais variáveis explicativas que o necessário.
+
+Mallows recomenda que se faça um gráfico de $C_p$ versus $p$ e se escolha, como o melhor modelo, aquele em que o mínimo de $C_p$ se aproxima de $p$. Para facilitar a visualização sugere-se fazer a reta  que passa pelos pontos $(p, p)$. As magnitudes das diferenças da estatística $C_p$ entre o ótimo e a vizinhança do ótimo para cada submodelo, também são de interesse.
+
+### Critério de informação de Akaike ($AIC$)
+ O critério de informação de Akaike é definido por:
+$$
+AIC = −2 log(L) + 2(\mbox{número de parâmetros do modelo ajustado}),
+$$
+em que $L$ é o valor da função de verossimilhança do modelo ajustado.
+
+Quanto menor for o valor de $AIC$, melhor ou mais bem ajustado é o modelo.
+
+### Critério de informação de Bayes ($BIC$)
+ O critério de informação de Bayes é definido por:
+$$
+BIC = −2 log(L) + log(n)(\mbox{número de parâmetros do modelo ajustado}),
+$$
+em que $L$ é o valor da função de verossimilhança do modelo ajustado. 
+
+Assim como no caso do $AIC$, quanto menor for o valor do $BIC$, melhor ou mais bem ajustado é o modelo.
+
+O $BIC$ penaliza mais fortemente modelos com maior número de parâmetros do que o $AIC$. Dessa forma, tende a selecionar modelos com um menor número de parâmetros.
+
+
+## Métodos de seleção de variáveis
+
+### Todas as regressões possíveis
+
+Esse método consiste em ajustar todos os possíveis modelos e, portanto, é muito trabalhoso, principalmente quando se tem um número elevado de variáveis explicativas. Considerando $k$ variáveis explicativas, como definido na @eq-mrlm, tem-se $2^k$ possíveis modelos.
+
+Nesse método, os modelos ajustados são comparados por meio de algum critério, como por exemplo teste $F$, $R^2$, $\bar{R}^2$, $C_p$, $AIC$, $BIC$, dentre outros, e escolhe-se aquele que se mostre melhor que os demais.
+
+Como o número de modelos aumenta com o aumento do número de variáveis explicativas, este procedimento não é viável se o valor de $k$ for elevado. Para contornar esse problema, foram propostos os métodos _passo a passo_, nos quais é ajustado um número menor de modelos. Embora esses métodos não sejam ótimos, eles são bastante eficientes. Aqui apresentaremos os métodos: _backward_, _forward_ e _stepwise_. 
+
+
+### Método _backward_ ("passo atrás")
+
+Nesse método, primeiro ajusta-se o modelo com todas as variáveis de interesse, ou seja, geralmente o modelo maximal. Em seguida são executados passos nos quais uma variável é eliminada de cada vez, obedecendo a algum critério de avaliação do modelo ajustado, podendo utilizar qualquer um dos critérios já mencionados, dentre muitos outros. O processo é finalizado em um passo onde não houver eliminação de alguma variável. O modelo selecionado será aquele composto pelas variáveis restantes.
+
+A seguir são descritos os passos desse método, considerando o critério de Akaike ($AIC$) como exemplo.
+
+- **Passo 1:** ajustar o modelo considerado como um **modelo candidato**, que contenha $k$ variáveis explicativas e calcular o $AIC$ associado a ele. **_OBS.:_** Geralmente, no início do processo, o **modelo candidato** corresponde ao modelo maximal.
+
+- **Passo 2:** ajustar os $k$ **modelos reduzidos**, sendo que em cada um deles é retirada uma das $k$ variáveis explicativas do **modelo candidato**. Para cada um desses $k$ modelos é calculado o seu $AIC$.
+
+- **Passo 3:** comparar os valores de $AIC$ dos **modelos candidato e reduzidos**, tomando-se uma das decisões:
+  (i) se o **modelo candidato** tiver o menor $AIC$, encerra-se o processo e este será o modelo selecionado; ou
+  (ii) se o modelo candidato não tiver o menor $AIC$, considere o **modelo reduzido** com o menor $AIC$ como o novo **modelo candidato** e retorne ao **Passo 1**.
+  
+Os **Passos 1 a 3** são repetidos até que o processo seja encerrado e se tenha um modelo selecionado.
+
+
+### Método _forward_ ("passo a frente")
+
+Nesse método, primeiro ajusta-se o modelo nulo ou o modelo minimal. Em seguida são executados passos nos quais uma variável é acrescentada de cada vez, obedecendo a algum critério de avaliação do modelo ajustado, podendo utilizar qualquer um dos critérios já mencionados, dentre muitos outros. O processo é finalizado em um passo onde não houver inclusão de alguma variável. O modelo selecionado será aquele ao qual não são acrescentadas mais variáveis.
+
+A seguir são descritos os passos desse método, considerando o critério de Akaike ($AIC$) como exemplo.
+
+- **Passo 1:** ajustar o modelo considerado como um **modelo candidato** e calcule o $AIC$ associado a ele. **_OBS.:_** Geralmente, no início do processo, o **modelo candidato** corresponde ao modelo nulo ou ao modelo minimal.
+
+- **Passo 2:** considerando que se tenha $k$ variáveis explicativas, candidatas a serem incluídas no **modelo candidato**, ajustar os $k$ **modelos propostos**, sendo que em cada um deles é acrescentada uma das $k$ variáveis explicativas. Para cada um desses $k$ modelos é calculado o seu $AIC$.
+
+- **Passo 3:** comparar os valores de $AIC$ dos **modelos candidato e propostos**, tomando-se uma das decisões:
+  (i) se o **modelo candidato** tiver o menor $AIC$, encerra-se o processo e este será o modelo selecionado; ou
+  (ii) se o **modelo candidato** não tiver o menor $AIC$, considere o modelo proposto com o menor $AIC$ como o novo **modelo candidato** e retorne ao **Passo 1**.
+  
+Os **Passos 1 a 3** são repetidos até que o processo seja encerrado, ou seja, que não seja incluída variável explicativa ao **modelo candidato**. Este é o modelo selecionado.
+
+
+### Método _stepwise_ ("passo a passo" ou "passo a frente, passo atrás")
+
+Este método consiste em uma mistura dos dois anteriores, ou seja, ocorrerá inclusão e exclusão de variáveis simultaneamente. Pode-se iniciar o processo a partir do modelo mais simples (nulo ou minimal) ou de um modelo mais complexo (geralmente o maximal) e executar os passos de inclusão e exclusão de variáveis, até que seja selecionado um modelo.
+
+A seguir são descritos os passos desse método, iniciando com um modelo mais simples, considerando o critério de Akaike ($AIC$) como exemplo.
+
+- **Passo 1:** ajustar o modelo considerado como um **modelo candidato** e calcule o $AIC$ associado a ele. **_OBS.:_** Geralmente, no início do processo, o **modelo candidato** corresponde ao modelo nulo ou ao modelo minimal.
+
+- **Passo 2:** considere que se tenha $k$ variáveis explicativas, sendo que $k_1$ delas já fazem parte do **modelo candidato** e $k_2$ são candidatas a serem incluídas no **modelo candidato**, tal que $k = k_1 + k_2$. Ajuste os $k_1$ **modelos propostos**, sendo que em cada um deles é retirada uma das $k_1$ variáveis explicativas do **modelo candidato** e ajuste os $k_2$ **modelos propostos**, sendo que em cada um deles é acrescentada uma das $k_2$ variáveis explicativas. Assim, têm-se $k = k_1 + k_2$ **modelos propostos** e, para cada um deles, calcula-se o seu $AIC$.
+
+- **Passo 3:** comparar os valores de $AIC$ do **modelo candidato** e dos $k$ **modelos propostos**, tomando-se uma das decisões:
+  (i) se o **modelo candidato** tiver o menor $AIC$, encerra-se o processo e este será o modelo selecionado; ou
+  (ii) se o **modelo candidato** não tiver o menor $AIC$, considere o **modelo proposto** com o menor $AIC$ como o novo **modelo candidato** e retorne ao **Passo 1**.
+  
+Os **Passos 1 a 3** são repetidos até que o processo seja encerrado, ou seja, que não seja incluída ou excluída qualquer variável explicativa ao **modelo candidato**. Este é o modelo selecionado.
+
+
+## Script do R
+
+A seguir apresenta-se um script do R para ilustrar a aplicação dos métodos _backward_, _forward_ e _stepwise_, utilizando as funções `stepAIC()` do pacote `MASS` e `stepwise()` do pacote `StepReg`.
+
+```{r,warning=FALSE,message = FALSE, echo=TRUE, eval=FALSE}
+#
+#################
+## Metodos de selecao de variaveis
+#################
+?step
+library(MASS)
+?stepAIC
+#
+## Metodos de selecao de variaveis: backward 
+#
+(sel.back<- stepAIC(m.max, scope = list(lower = m.nulo),
+                    direction = "backward"))
+summary(sel.back)
+anova(sel.back)
+#
+## Metodos de selecao de variaveis: forward 
+#
+(sel.forw<- stepAIC(m.nulo, scope = list(upper = m.max),
+                    direction = "forward"))
+summary(sel.forw)
+anova(sel.forw)
+#
+## Metodos de selecao de variaveis: stepwise 
+## Modelo nulo -> Modelo maximal
+#
+(sel1.step<- stepAIC(m.nulo, scope = list(upper = m.max),
+                    direction = "both"))
+summary(sel1.step)
+anova(sel1.step)
+#
+## Modelo maximal -> Modelo nulo
+(sel2.step<- stepAIC(m.max, scope = list(lower = m.nulo),
+                     direction = "both"))
+summary(sel2.step)
+anova(sel2.step)
+##
+################
+## Outras metricas - StepReg package
+################
+#install.packages("StepReg")
+library(StepReg)
+#
+?stepwise
+#
+## Forward
+resp_for<- stepwise(formula = Xilose.m ~ X1 + X2 + X12 + X22 + X1.X2, 
+                 data = dados.med, type = "linear", 
+                 strategy = "forward", 
+                 metric = c("AIC", "CP", "adjRsq"))
+summary(resp_for$forward$AIC)
+anova(resp_for$forward$AIC)
+summary(resp_for$forward$CP)
+anova(resp_for$forward$CP)
+summary(resp_for$forward$adjRsq)
+anova(resp_for$forward$adjRsq)
+report(resp_for, "resp_for_Forward", format = "html")
+#
+## Backward
+resp.back<- stepwise(formula = Xilose.m ~ X1 + X2 + X12 + X22 + X1.X2, 
+                 data = dados.med, type = "linear", 
+                 strategy = "backward",
+                 metric = c("AIC", "CP", "adjRsq"))
+summary(resp.back$backward$AIC)
+anova(resp.back$backward$AIC)
+summary(resp.back$backward$CP)
+anova(resp.back$backward$CP)
+summary(resp.back$backward$adjRsq)
+anova(resp.back$backward$adjRsq)
+report(resp.back, "resp_backward", format = "html")
+#
+## Stewise
+resp.step<- stepwise(formula = Xilose.m ~ X1 + X2 + X12 + X22 + X1.X2, 
+                     data = dados.med, type = "linear", 
+                     strategy = "bidirection",
+                     metric = c("AIC", "CP", "adjRsq"))
+summary(resp.step$bidirection$AIC)
+anova(resp.step$bidirection$AIC)
+summary(resp.step$bidirection$CP)
+anova(resp.step$bidirection$CP)
+summary(resp.step$bidirection$adjRsq)
+anova(resp.step$bidirection$adjRsq)
+report(resp.step, "resp_stepwise", format = "html")
+##
+```
+

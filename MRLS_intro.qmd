@@ -1,0 +1,511 @@
+---
+title: "O modelo de regressão linear simples (MRLS)"
+---
+
+::: {.chapterintro data-latex=""}
+Na aula de hoje vamos conhecer o modelo de regressão linear simples (MRLS). Serão apresentados a forma geral do modelo e sua interpretação, e o método de Mínimos Quadrados (MMQ) para estimação dos parâmetros. 
+
+Essa aula é baseada no capítulo 6 de _Linear Models in Statistics_ (Rencher e Schaalje, 2008), nos capítulos 1 e 2 de Charnet et al. (2008) e no capítulo 7 de [Introduction to Modern Statistics (2e)](https://openintro-ims.netlify.app/)
+:::
+
+
+## Um exemplo: Relação entre altura e DAP de sequoias 
+
+::: {.data data-latex=""}
+(Adaptado de Levine et al., 2016)
+
+Medir a altura de determinadas espécies de árvores pode ser um grande desafio, como é o caso das sequoias gigantes originárias da Califórnia que podem ultrapassar 90 metros. Especialistas entendem que a altura de uma sequoia gigante está relacionada com outras características da árvore, incluindo o diâmetro da árvore na altura do peito de uma pessoa (DAP). A base de dados que utilizaremos a seguir contém a altura (m) e o DAP (cm) para uma amostra de 21 árvores do tipo sequoia.
+:::
+
+::: columns
+::: {.column width="35%"}
+
+```{r,warning=FALSE,message = FALSE, echo=FALSE}
+# eval: !expr knitr::is_html_output()
+
+#library(downloadthis)
+library(readxl)
+
+sequoia <- read_excel("dados/sequoia.xlsx")
+
+#sequoia %>%
+#    download_this(
+#    output_name = "sequoia",
+#    output_extension = ".xlsx",
+#    button_label = "Download dos dados",
+#    button_type = "primary",
+#    has_icon = TRUE,
+#    icon = "fa fa-save"
+#  )
+```
+:::
+
+::: {.column width="65%"}
+
+![Sequoias no Parque Nacional das Sequoias, California. Foto de Jeff Hollett, Domínio público. [flic.kr/p/2rdVxgY](https://flic.kr/p/2rdVxgY) ](imagens/sequoia2.jpg){fig-align="center"}
+:::
+:::
+
+
+:::aside
+LEVINE, D. M., STEPHAN, D. F., SZABAT, K. A. (2016) Estatística - teoria e aplicações usando o Microsoft Excel em Português. Tradução e revisão técnica Teresa Cristina Padilha de Souza. 7 ed. Rio de Janeiro: LTC, 2016.
+:::
+
+Uma maneira de visualizar a relação entre essas duas variáveis é por meio de um gráfico de dispersão.
+
+```{r,warning=FALSE,message = FALSE, echo=TRUE}
+#| label: fig-disp
+#| fig-cap: "Gráfico de dispersão para altura (m) e DAP (cm) de 21 sequoias."
+
+library(ggplot2)
+#sequoia <- read_excel("dados/sequoia.xlsx")
+sequoia$dap_cm <- as.numeric(sequoia$dap_cm)
+sequoia$altura_m <- as.numeric(sequoia$altura_m)
+
+plot1 <- ggplot(sequoia, aes(x = dap_cm, y = altura_m)) +
+  geom_point() +
+  labs(
+    x = "DAP (cm)",
+    y = "Altura (m)"
+  ) +
+  theme_minimal()
+plot1
+```
+
+A relação entre as variáveis não é perfeitamente linear, mas uma linha reta pode ser usada para descrever, ao menos parcialmente, essa associação. Para isso, consideramos DAP como variável explicativa ($x$) e altura da árvore como resposta ($y$). 
+
+```{r,warning=FALSE,message = FALSE, echo=TRUE}
+#| label: fig-disp-line
+#| fig-cap: "Um modelo linear para representar a relação entre altura (m) e DAP (cm) de sequoias."
+
+ggplot(sequoia, aes(x = dap_cm, y = altura_m)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue")+
+  labs(
+    x = "DAP (cm)",
+    y = "Altura (m)"
+  ) +
+  theme_minimal()
+
+```
+
+
+```{r,warning=FALSE,message = FALSE, include=FALSE}
+modelo <- lm(altura_m ~dap_cm, data = sequoia)
+print(modelo$coefficients)
+
+summary(modelo)
+```
+
+
+A equação do modelo linear representado na @fig-disp-line é dada por:
+
+$$
+\hat{y} = 24,01 + 0,32x
+$$
+
+O "chapéu" em $y$ é usado para indicar que isso é uma estimativa. Por exemplo, pela equação podemos fazer a predição de que uma árvore com DAP de 57 cm terá uma altura de:
+
+$$
+\hat{y} = 24,01 + 0,32\times57 = 42,25
+$$
+Essa estimativa pode ser vista como uma média: a equação prevê que árvores com DAP de 57 cm terão uma altura média de 42,25. 
+
+Outras variáveis podem ser consideradas no modelo para a predição da altura das árvores, o que caracterizaria um modelo de regressão linear múltipla. Mas vamos começar nosso estudo pelo caso mais simples, com apenas um preditor, ou seja, compreendendo o Modelo de Regressão Linear Simples.
+
+
+## O Modelo de regressão linear simples
+
+Considere uma variável aleatória $Y$, usualmente denominada variável resposta, e uma variável $X$, que chamaremos de variável explicativa. 
+
+O modelo de regressão linear simples (MRLS) descreve $Y$ como a soma de uma quantidade determinística e uma aleatória. A parte determinística é uma reta em função de X que representa a informação esperada sobre $Y$ dado o conhecimento de $X$. A parte aleatória, chamada erro, representa os inúmeros fatores que podem interferir em $Y$ e provoca uma distorção sobre a parte determinística. Erros positivos e negativos podem ocorrer, mas supomos que a variável erro tem esperança igual a zero. Também supomos que sua variância não depende do valor específico de $X$ e supomos que o modelo de probabilidade do erro é o modelo normal.
+
+O MRLS pode ser escrito, de forma geral, por:
+
+$$
+Y = \beta_{0} + \beta_{1}x + \varepsilon
+$$
+em que $\beta_{0}$, $\beta_{1}$ e $x$ são constantes, $\varepsilon$ é normal com esperança $0$ e variância $\sigma^{2}$, isto é,  $\varepsilon \sim \textrm{N}(0; \sigma^{2})$. 
+
+:::aside
+Charnet et al. (2008) Análise de Modelos de Regressão Linear: com aplicações. Campinas: Editora Unicamp.
+:::
+
+
+**Resultado 1.** Considere o modelo de regressão linear simples com a suposição de normalidade do erro. A distribuição de probabilidade de $Y$, correspondente ao valor prefixado, $x$, de $X$, é:
+
+$$
+Y \sim \textrm{N}(\beta_{0} + \beta_{1}x; \sigma^{2}).
+$$
+Dessa forma, podemos interpretar o parâmetro $\beta_{1}$ como a mudança esperada em $Y$ correspondente à variação de uma unidade em $X$.
+
+
+::: {.exercicios data-latex=""}
+**1.** Prove o **Resultado 1**.
+:::
+
+
+Anteriormente, apresentamos o MRLS como se os parâmetros do modelo fossem conhecidos e as suposições atendidas. Agora, vamos pensar no problema de inferência estatística. Para isso, partimos da definição de uma amostra aleatória que será a base para a estimação do modelo e, após verificação das pressuposições do modelos, o objetivo será fazer inferências para a população geral.
+
+Na obtenção da amostra, podemos considerar duas situações: valores de $X$ prefixados e para estes valores obtenção de observações independentes de $Y$, ou obtenção de uma amostra aleatória ($X$, $Y$) biavariada. Para $n$ observações, o modelo pode ser escrito como:
+
+$$
+y_{i} = \beta_{0} + \beta_{1}x_{i} + \varepsilon_{i}
+$$
+
+Além das pressuposições já apresentadas e considerando o modelo de probabilidade do erro como sendo o modelo normal, acrescentamos a pressuposição de que os erros associados às observações são não correlacionados entre eles, ou seja, $\textrm{Cov}[\varepsilon_{i}, \varepsilon_{j}] = 0$, para todo $i \neq j$, $i, j = 1, \ldots, n$.
+
+
+::: {.tip data-latex=""} 
+Os pressupostos do modelo em *inglês* podem ser lembrados pela mnemônica **LINE** (Çetinkaya-Rundel e Hardin, 2024, seção 24.6):
+
+L: _**linear** model_
+
+I: _**independent** observations_
+
+N: _errors **normally** distributed_ 
+
+E: _**equal** variability_
+
+A linearidade, normalidade e igualdade de variâncias podem ser verificadas por meio de gráficos de resíduos. Um análise do tipo ou delineamento de estudo pode ser feita para avaliar o pressuposto de independência entre as observações.
+:::
+
+
+Após a obtenção da amostra, definimos estimadores para os parâmetros do modelo. Inicialmente, apresentaremos o método de Mínimos Quadrados (MMQ) que é estritamente matemático e não depende das pressuposições apresentadas anteriormente. Entretanto, veremos mais adiante que, se as pressuposições são válidas, os estimadores de $\beta_{0}$ e  $\beta_{1}$ obtidos por esse método possuem propriedades estatísticas interessantes.
+
+
+## Estimação por Mínimos Quadrados
+
+Ao ajustar um MRLS temos o problema de escolher uma reta que se ajusta ao conjunto de $n$ pontos $(x_{1}, y_{1}), (x_{2}, y_{2}), \ldots, (x_{n}, y_{n})$. Para obter as estimativas $\hat{\beta_{0}}$ e  $\hat{\beta_{1}}$ nós usamos o método de mínimos quadrados, que é livre de qualquer pressuposição em relação à distribuição.
+
+
+Por meio dessa abordagem, nós buscamos estimadores $\hat{\beta_{0}}$ e  $\hat{\beta_{1}}$ que minimizam a soma de quadrados dos desvios $y_{i} - \hat{y_i}$ dos $n$ valores observados $y_{i}$ em relação aos seus valores preditos $\hat{y_i} = \hat{\beta_{0}} + \hat{\beta_{1}}x_{i}$, isto é,
+
+$$
+\sum_{i=1}^{n} \hat{\varepsilon_{i}}^2= \sum_{i=1}^{n} = (y_{i} - \hat{y_{i}})^2 = \sum_{i=1}^{n} (y_i - \hat{\beta_0} - \hat{\beta_1} x_i)^2. 
+$$
+<!--
+::: {.important data-latex=""}
+Note que o valor predito $\hat{y_i}$ estima $\textrm{E}(y_{i})$, não $y_{i}$, isto é, $\hat{\beta_0} + \hat{\beta_1} x_i$ estima $\beta_0 + \beta_1 x_i$ e não $\beta_0 + \beta_1 x_i + \varepsilon_{i}$. 
+
+Uma notação mais adequada seria $\hat{\textrm{E}(y_{i})}$, mas $\hat{y_i}$ é usualmente adotado.
+:::
+
+-->
+
+Para encontrar os valores de $\hat{\beta_0}$ e $\hat{\beta_1}$ que minimizam $\sum_{i=1}^{n} \hat{\varepsilon_{i}}^2$, nós derivamos essa equação em relação a $\beta_0$ e $\beta_1$ e igualamos as derivadas a 0.
+
+
+Calculamos as derivadas parciais:
+
+$$
+\frac{\partial}{\partial \beta_0} \sum_{i=1}^{n} (y_i - \beta_0 - \beta_1 x_i)^2
+$$
+e
+
+$$
+\frac{\partial}{\partial \beta_1} \sum_{i=1}^{n} (y_i - \beta_0 - \beta_1 x_i)^2
+$$
+
+Denominando por $\hat{\beta_0}$ e $\hat{\beta_1}$ os valores que minimizam a função, temos o seguinte sistema:
+
+$$
+-2 \sum_{i=1}^{n} (y_i - \hat{\beta_0} - \hat{\beta_1} x_i) = 0
+\quad \text{e} \quad
+-2\sum_{i=1}^{n} (y_i - \hat{\beta_0} - \hat{\beta_1} x_i)x_{i} = 0.
+$$
+ou ainda,
+
+$$
+\sum_{i=1}^{n} y_i - n \hat{\beta_{0}} - \hat{\beta_{1}} \sum_{i=1}^{n} x_i = 0 \tag{3.1}
+$$
+
+e
+
+$$
+\sum_{i=1}^{n} x_i y_i - \hat{\beta_{0}} \sum_{i=1}^{n} x_i - \hat{\beta_{1}} \sum_{i=1}^{n} x_i^2 = 0, \tag{3.2}
+$$
+
+que é denominado **Sistema de Equações Normais** (SEN).
+
+Pela equação (3.1), obtemos:
+
+$$
+n \hat{\beta_{0}} = \sum_{i=1}^{n} y_i - \hat{\beta_{1}} \sum_{i=1}^{n} x_i
+$$
+$$
+\Rightarrow \hat{\beta_0} = \frac{1}{n} \sum_{i=1}^{n} y_i - \hat{\beta_1} \frac{1}{n} \sum_{i=1}^{n} x_i,
+$$
+e substituindo na equação (3.2), temos:
+
+$$
+\sum_{i=1}^{n} x_i y_i - 
+\left( \frac{1}{n} \sum_{i=1}^{n} y_i - \hat{\beta_1} \frac{1}{n} \sum_{i=1}^{n} x_i \right)
+\sum_{i=1}^{n} x_i 
+- \hat{\beta_1} \sum_{i=1}^{n} x_i^2 = 0
+$$
+
+$$
+\Rightarrow \sum_{i=1}^{n} x_i y_i 
+- \frac{1}{n} \sum_{i=1}^{n} y_i \sum_{i=1}^{n} x_i 
++ \hat{\beta_1} \frac{1}{n} \left( \sum_{i=1}^{n} x_i \right)^2 
+- \hat{\beta_1} \sum_{i=1}^{n} x_i^2 = 0
+$$
+
+$$
+\Rightarrow \hat{\beta_1} = 
+\frac{
+\sum_{i=1}^{n} x_i y_i 
+- \frac{1}{n} \sum_{i=1}^{n} y_i \sum_{i=1}^{n} x_i
+}{
+\sum_{i=1}^{n} x_i^2 
+- \frac{1}{n} \left( \sum_{i=1}^{n} x_i \right)^2
+}
+$$
+
+Em resumo:
+
+::: {style="background-color: #e2e0df; padding: 10px;text-align: center"}
+
+$$
+\hat{y_{i}} = \hat{\beta_0} + \hat{\beta_1} x_i
+$$
+
+$$
+\hat{\beta_0} = \frac{1}{n} \sum_{i=1}^{n} y_i - \hat{\beta_1} \frac{1}{n} \sum_{i=1}^{n} x_i
+$$
+
+$$
+\hat{\beta_1} = 
+\frac{
+\sum_{i=1}^{n} x_i y_i 
+- \frac{1}{n} \sum_{i=1}^{n} y_i \sum_{i=1}^{n} x_i
+}{
+\sum_{i=1}^{n} x_i^2 
+- \frac{1}{n} \left( \sum_{i=1}^{n} x_i \right)^2
+}
+$$
+:::
+
+
+### Os resíduos
+
+Sejam $\hat{y_i} = \hat{\beta_0} + \hat{\beta_1}x_{i}$, para $i=1, \ldots, n$ os valores da reta de mínimos quadrados, ajustada ao conjunto de $n$ pares $(x_{1}, y_{1}), (x_{2}, y_{2}), \ldots, (x_{n}, y_{n})$. As quantidades $e_{i} = y_{i} - \hat{y_i}$, para $i=1, \ldots, n$ são denominadas **resíduos**
+
+
+::: {.exercicios data-latex=""}
+**2.** (Charnet et al., 2008) Usando o método de Mínimos Quadrados, encontre um MRLS e os resíduos para os seguintes pares de valores. 
+
+| x | 1 | 1 | 2 | 2 | 3 | 3 |
+|---|---|---|---|---|---|---|
+| y | 1 | 3 | 1 | 3 | 1 | 3 |
+
+
+**3.** (Charnet et al., 2008) Usando o método de Mínimos Quadrados, encontre um MRLS e os resíduos para os seguintes pares de valores. 
+
+| x | 1 | 2 | 2 | 3 | 3 | 4 |
+|---|---|---|---|---|---|---|
+| y | 1 | 1 | 2 | 2 | 3 | 3 |
+:::
+
+
+::: {.singlelab data-latex=""}
+**4.** Obtenha os gráficos de dispersão com os pares de pontos e as retas estimadas nos exercícios 1 e 2.
+:::
+
+
+### Expressões simplificadas
+
+Apresentamos a seguir alguns resultados úteis na simplificação de cálculos de várias expressões. Considerando que $\bar{x} = \frac{1}{n}\sum^{n}_{i=n} x_{i}$, temos:
+
+
+**Resultado 2.**
+
+$$
+\sum_{i=1}^{n}(x_{i} - \bar{x}) = 0
+$$
+
+**Resultado 3.**
+
+$$
+\sum_{i=1}^{n}\bar{y}(x_{i} - \bar{x}) = \sum_{i=1}^{n}(y_{i} - \bar{y})(x_{i} - \bar{x})
+$$
+
+**Resultado 4.**
+
+$$
+\sum_{i=1}^{n}(x_{i} - \bar{x})^2 = \sum_{i=1}^{n}x_{i}^2 - \frac{1}{n} \left(\sum_{i=1}^{n}x_{i}\right)^2 = \sum_{i=1}^{n} x_{i}^{2} - n\bar{x}^2  
+$$
+
+Usando os resultados 2, 3 e 4, podemos reescrever a solução do sistema de equações lineares como no quadro abaixo.
+
+::: {style="background-color: #e2e0df; padding: 10px;text-align: center"}
+
+**Estimadores de mínimos quadrados:**
+
+$$
+\hat{\beta_0} = \bar{y} - \hat{\beta_1}\bar{x}
+$$
+
+
+$$
+\hat{\beta_1} = \frac{\sum_{i=1}^{n}(y_{i} - \bar{y})(x_{i} - \bar{x})}{\sum_{i=1}^{n}(x_{i} - \bar{x})^2} = \frac{\sum_{i=1}^{n}y_{i}(x_{i} - \bar{x})}{\sum_{i=1}^{n}(x_{i} - \bar{x})^2}
+$$
+
+:::
+
+Observando o denominador de $\hat{\beta_1}$, nota-se que a solução (única) do sistema de equações normais existe, desde que os valores de $x_{i}$ não sejam todos iguais.
+
+::: {.exercicios data-latex=""}
+**5.** (Charnet et al., 2008) Usando o conjunto de dados do **Exercício 2**, mostre os Resultados 2, 3 e 4.
+:::
+
+
+### Propriedades do ajuste de mínimos quadrados
+
+**Resultado 5.**
+
+$$
+\sum_{i=1}^{n}y_{i} = \sum_{i=1}^{n}\hat{y_{i}} 
+$$
+
+**Resultado 6.**
+
+$$
+\sum_{i=1}^{n}e_{i} = 0 
+$$
+
+**Resultado 7.**
+
+$$
+\sum_{i=1}^{n}x_{i}e_{i} = 0 
+$$
+
+**Resultado 8.**
+
+$$
+\sum_{i=1}^{n}\hat{y_{i}}e_{i} = 0 
+$$
+
+**Resultado 9.**
+
+*O modelo obtido por mínimos quadrados passa pelo ponto $(\bar{x}, \bar{y})$.*
+
+
+::: {.exercicios data-latex=""}
+**6.** O modelo linear ajustado para os dados de sequoias foi $\hat{y} = 24,01 + 0,32x$. Baseado nessa reta, calcule o resíduo da observação (101,60; 49,99). 
+:::
+
+
+::: {.exercicios data-latex=""}
+**7.** O modelo linear ajustado para os dados de sequoias foi $\hat{y} = 24,01 + 0,32x$. Baseado nessa reta, calcule o resíduo da observação (99,06; 70,87). 
+:::
+
+## Medidas de associação linear
+
+### O coeficiente de correlação
+
+Voltando aos dados de sequoias, na @fig-disp notamos uma relação positiva entre as variáveis, ou seja, o aumento nos valores de DAP parece estar associado ao aumento nos valores de altura das árvores. 
+
+Em muitas situações é de interesse quantificar o grau de associação entre duas variáveis, $X$ e $Y$. Quando ambas as variáveis são aleatórias, uma medida da força de associação **linear** entre elas é o _coeficiente de correlação_.
+
+- A correlacão é sempre um valor entre -1 e 1;
+
+- quanto maior a tendência de uma relação linear positiva, a correlação tem valor mais próximo de 1;
+
+- quanto maior a tendência de uma relação linear negativa, a correlação tem valor mais próximo de -1;
+
+- quando a correlação está próxima de zero não existe relação linear.
+
+
+Com base em uma amostra aleatória $(x_{1}, y_{1}), (x_{2}, y_{2}), \ldots, (x_{n}, y_{n})$ de $(X, Y)$, o coeficiente de correlação amostral pode ser definido da seguinte forma:
+
+$$
+r = \frac{
+\sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y})
+}{
+\sqrt{\sum_{i=1}^{n} (x_i - \bar{x})^2} \;
+\sqrt{\sum_{i=1}^{n} (y_i - \bar{y})^2}
+}
+$$
+
+Podemos definir:
+
+$$
+S_x = \sum_{i=1}^n (x_i - \bar{x})
+$$
+
+$$
+S_y = \sum_{i=1}^n (y_i - \bar{y})
+$$
+
+
+$$
+S_{xy} = \sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})
+$$
+
+Com essa notação, a correlação amostral é dada por:
+
+$$
+r = \frac{S_{xy}}{\sqrt{S^{2}_x S^{2}_y}}
+$$
+
+::: {.important data-latex=""}
+O coeficiente de correlação não possui unidade de medida e não será afetado por uma transformação linear nas unidades de medida das variáveis.
+:::
+
+```{r,warning=FALSE,message = FALSE, echo=FALSE}
+#| label: fig-cor
+#| fig-cap: "Gráficos de dispersão para os dados de sequoias com unidades em metros e centímetros (a) e unidades em pés e polegadas (b). Em ambos os conjuntos de dados, $r=0,85$."
+
+#library(ggplot2)
+library(patchwork)
+#sequoia <- read_excel("dados/sequoia.xlsx")
+sequoia$dap_cm <- as.numeric(sequoia$dap_cm)
+sequoia$altura_m <- as.numeric(sequoia$altura_m)
+sequoia$altura_pes <- as.numeric(sequoia$altura_pes)
+sequoia$dap_polegadas <- as.numeric(sequoia$dap_polegadas)
+
+p3 <- ggplot(sequoia, aes(x = dap_cm, y = altura_m)) +
+  geom_point() +
+  labs(
+    title = "(a)",
+    x = "DAP (cm)",
+    y = "Altura (m)"
+  ) +
+  theme_minimal()
+
+p4 <- ggplot(sequoia, aes(x = dap_polegadas, y = altura_pes)) +
+  geom_point() +
+  labs(
+    title = "(b)",
+    x = "DAP (polegadas)",
+    y = "Altura (pés)"
+  ) +
+  theme_minimal()
+
+p3 + p4
+
+```
+
+
+### O coeficiente de determinação
+
+Enquanto o coeficiente de correlação mede a força da relação linear entre duas variáveis, o **coeficiente de determinação** ($R^{2}$) é usado para medir a força do ajuste de um modelo linear. Ele fornece a proporção da variação em $Y$ que é explicada pelo modelo ou, de forma equivalente, atribuída à regressão em $x$. Em um MRLS, o coeficiente de determinação corresponde exatamente ao **quadrado do coeficiente de correlação**. Como $r$ está entre -1 e 1, o $R^{2}$ estará sempre entre 0 e 1.
+
+
+De forma mais geral, $R^{2}$ pode ser calculado como a razão entre uma medida da variabilidade em torno da reta e uma medida da variabilidade total.
+
+
+::: {.exercicios data-latex=""}
+**8.** Se a correlação calculada entre DAP (cm) e altura (m) foi igual a 0,85, quanto da variação na resposta é explicada pela variável preditora? 
+:::
+
+
+No decorrer do curso, vamos aprofundar nos aspectos inferenciais (estimação e testes para parâmetros) e detalhar assuntos que foram brevemente discutidos nessa aula, como a análise de resíduos. Isso será feito considerando um cenário mais amplo e com suporte em álgebra matricial para contemplar tanto o MRLS quanto o Modelo de Regressão Linear Múltipla (MRLM). 
+
+::: {.home data-latex=""}
+Estude as provas dos Resultados 2 a 9 em Charnet et al. (2008).
+:::
+
+

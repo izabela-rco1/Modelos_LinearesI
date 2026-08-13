@@ -1,0 +1,35 @@
+## Bem-vindos! {.unnumbered}
+
+Este material foi elaborado pelos docentes Izabela Regina Cardoso de Oliveira e Renato Ribeiro de Lima para ministrar a disciplina Modelos Lineares I no curso de Bacharelado em Estatística da Universidade Federal de Lavras (UFLA).
+
+O material foi feito usando o [Quarto](https://quarto.org/) e sua diagramação foi inspirada no livro [Introduction to Modern Statistics](https://openintro-ims.netlify.app/).
+
+Data da versão: 11/08/2026
+
+
+### Como citar
+
+Esse material está disponível gratuitamente. Recomendamos aos(às) leitores(as) que sempre que possível, façam a citação do livro em suas aulas ou trabalhos.
+
+::: {.callout-note icon=false title="Formato em texto (ABNT)"}
+OLIVEIRA, Izabela R. Cardoso de; LIMA, Renato Ribeiro de. **Modelos Lineares: modelos de posto completo**. Lavras: Departamento de Estatística – UFLA, 2026. Disponível em: <https://seu-usuario.github.io/nome-do-repositorio/>. Acesso em: [data de acesso].
+:::
+
+Para salvar a referência em gerenciadores de citação (Zotero, Mendeley, LaTeX):
+
+```bibtex
+@book{oliveira2026modelos,
+  author    = {Oliveira, Izabela R. Cardoso de and Lima, Renato Ribeiro de},
+  title     = {Modelos Lineares: modelos de posto completo},
+  year      = {2026},
+  publisher = {Departamento de Estat{\'i}stica -- UFLA},
+  address   = {Lavras},
+  url       = {[https://seu-usuario.github.io/nome-do-repositorio/](https://seu-usuario.github.io/nome-do-repositorio/)}
+}
+```
+
+### Licença
+
+![Licença CC BY 4.0](https://licensebuttons.net/l/by-nc/4.0/88x31.png) 
+A versão online deste material será sempre gratuita e distribuída sob a [licença CC BY-NC 4.0.](https://creativecommons.org/licenses/by-nc/4.0/)
+

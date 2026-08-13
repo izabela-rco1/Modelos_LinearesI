@@ -1,0 +1,252 @@
+---
+title: "Multicolinearidade"
+---
+
+::: {.chapterintro data-latex=""}
+Nessa aula vamos abordar o conceito de multicolinearidade. Mais especificamente, definiremos o que é e apresentaremos alguns métodos para a detecção de multicolinearidade, com aplicação em alguns exemplos.
+
+Essa aula é baseada no **Capítulo 4** do livro *Análise de Regressão: uma introdução à Econometria* (Hoffmann e Vieira, 1977), **Capítulo 7** e **10** do livro *Applied Linear Statistical Models* (Kutner et al., 2005) e **Capítulo 16** do livro *Applied Regression Analysis* (Draper e Smith, 1998).
+:::
+
+::: aside
+DRAPER, N.R.; SMITH, H. **Applied regression analysis**. 3ed. New York: John Wiley & Sons, 1998.
+
+HOFFMANN, R.; VIEIRA, S. **Análise de Regressão:** uma introdução à Econometria. 2ed. São Paulo: Editora Hucitec, 1977.
+
+KUTNER, M. H.; NACHTSHEIM, C. J.; NETER, J.; LI, W. **Applied Linear Statistical Models**. 5ed. New York: McGraw-Hill/Irwin, 2005.
+:::
+
+## Introdução
+
+O conceito de multicolinearidade está associado à dependência entre colunas da matriz $\mathbf{X}$, de um modelo linear dado por $$
+\mathbf{Y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon}.
+$$ {#eq-mrlmat}
+
+De acordo com Hoffmann e Vieira (1977), no caso de um modelo de regressão linear múltipla, representado matricialmente na @eq-mrlmat, quando existem colunas linearmente dependentes na matriz $\mathbf{X}$, ocorre o que chamamos de multicolinearidade perfeita, ou seja, têm-se variáveis independentes perfeitamente correlacionadas.
+
+Nesse caso, tem-se $$
+|\mathbf{X}'\mathbf{X}| = 0,
+$$ ou seja, o determinante da matrix $\mathbf{X}'\mathbf{X}$ é igual a zero. Portanto, não existe $(\mathbf{X}'\mathbf{X})^{-1}$ e, consequentemente, não é possível obter as estimativas dos parâmetros do modelo, ou seja, $\hat{\boldsymbol{\beta}}$.
+
+Ainda de acordo com Hoffmann e Vieira (1977), geralmente a matriz $\mathbf{X}$ apresenta multicolinearidade elevada e não perfeita. As principais consequências desse fato são:
+
+1.  As variâncias e covariâncias das estimativas dos parâmetros serão muito elevadas, isto é, as estimativas podem ter erros muito grandes e esses erros podem estar altamente correlacionados entre si. A baixa precisão das estimativas torna difícil, ou até impossível, distinguir as influências das diversas variáveis independentes;
+
+2.  Pode-se eliminar variáveis explicativas ou independentes do modelo ajustado, pois os coeficientes não foram estatisticamente diferentes de zero. Na realidade, essas variáveis podem ser importantes, mas a amostra disponível não forneceu evidências suficientes para que sua influência fosse detectada.
+
+3.  As estimativas dos parâmetros variam muito de amostra para amostra e, assim, caso sejam adicionadas novas observações à amostra, pode-se ter muita alteração nas estimativas obtidas.
+
+## Diagnóstico de multicolinearidade
+
+Existem diferentes métodos para a avaliação da existência de multicolinearidade. Basicamente, esses métodos podem ser agrupados de duas formas: métodos informais e métodos formais, os quais serão descritos resumidamente a seguir.
+
+### Métodos informais
+
+De acordo com Kutner et al. (2005), os principais métodos informais para a identificação da presença de multicolinearidade avalia-se:
+
+1.  Ocorrência de grandes mudanças nas estimativas dos parâmetros do modelo de regressão quando uma variável explicativa é adicionada ou desconsiderada ou quando uma observação é alterada ou removida;
+
+2.  Ocorrência de resultados não significativos de testes individuais aplicados aos coeficientes de regressão, quando estes estão relacionados a variáveis explicativas importantes;
+
+3.  Ocorrência de estimativas dos parâmetros do modelo com sinais opostos ao que se espera teoricamente ou devido à experiência *a priori*;
+
+4.  Ocorrência de estimativas muito elevadas, próximas de 1 ou de -1, do coeficiente de correlação linear entre duas variáveis explicativas;
+
+5.  Intervalos de confiança para os parâmetros do modelo de regressão com grande amplitude, o que representa baixa precisão da estimativa, principalmente quando associados a variáveis preditoras importantes.
+
+### Métodos formais
+
+Existem alguns métodos formais para a avaliação de multicolinearidade, mas apresentaremos, resumidamente, apenas o método do **Fator de Inflação da Variância** (*Variance Inflation Factor - VIF*), conforme descrito por Draper e Smith (1998) e Kutner et al. (2005).
+
+O método *VIF* se baseia na precisão das estimativas de mínimos quadrados dos parâmetros do modelo de regressão, ou seja, nas variâncias de $\hat{\beta}_0$, $\hat{\beta}_1$, $\ldots$, $\hat{\beta}_k$, ao considerar um modelo de regressão linear múltipla. Matricialmente, leva-se em consideração os elementos da diagonal da matriz de variâncias e covariâncias de $\hat{\boldsymbol{\beta}}$, definida por $$
+V(\hat{\boldsymbol{\beta}}) = \sigma^2 (\mathbf{X}'\mathbf{X})^{-1}.
+$$ Porém, de acordo com Draper e Smith (1998) e Kutner et al. (2005), no contexto de multicolinearidade, é mais útil se trabalhar com um modelo de regressão linear padronizado, ou seja, considera-se a variável explicativa como desvio em relação à sua média, ao invés de considerar a própria variável.
+
+Considere inicialmente um modelo de regressão linear múltipla, dado por $$
+y_i = \beta_{0} + \beta_{1}x_{1i} + \beta_{2}x_{2i} + \ldots + \beta_{k}x_{ki} + \varepsilon_i,
+$$ {#eq-mrlm}
+
+em que $y_i$ é o *i-ésimo* valor observado da variável resposta, com $i=1,2,\ldots,n$; $\hat{\beta}_0$, $\hat{\beta}_1$, $\hat{\beta}_2$, $\ldots$, $\hat{\beta}_k$ são os $(k+1)$ parâmetros do modelo, sendo os últimos $k$ parâmetros associados às variáveis explicativas $X_{1}, X_{2}, \ldots, X_{k}$; e $\varepsilon_i \sim N(0,\sigma^2)$.
+
+O modelo de regressão padronizado, obtido a partir da @eq-mrlm, é definido por: $$
+y_i = \beta_{0} + \beta_{1}(x_{1i}-\bar{x}_1) + \beta_{2}(x_{2i}-\bar{x}_2) + \ldots + \beta_{k}(x_{ki}-\bar{x}_k) + \varepsilon_i,
+$$ {#eq-mrlmpad} em que $\bar{x}_j$, com $j=1,2,\ldots,k$ correspondem à médias observadas das $k$ variáveis explicativas, respectivamente.
+
+Matricialmente, o modelo dado na @eq-mrlmpad pode ser representado por $$
+\mathbf{Y} = \mathbf{X}^{*} \boldsymbol{\beta}^{*} + \boldsymbol{\varepsilon}^{*}
+$$ e, assim, a matriz de variâncias e covariâncias de $\hat{\boldsymbol{\beta}}^{*}$, é definida por $$
+V(\hat{\boldsymbol{\beta}}^{*}) = (\sigma^{*})^2 (\mathbf{X^{*}}'\mathbf{X^{*}})^{-1} = (\sigma^{*})^2 \mathbf{r}_{XX}^{-1},
+$$ em que $(\sigma^{*})^2$ é a variância residual do modelo dado na @eq-mrlmpad e $\mathbf{r}_{XX}$ é a matriz de correlações lineares simples das variáveis explicativas do modelo dado na @eq-mrlm.
+
+Os elementos da diagonal da matriz $\mathbf{r}_{XX}^{-1}$ são chamados de ***Fator de Inflação da Variância (VIF's)***. Portanto, o $VIF_k$, associado à *k-ésima* variável explicativa, corresponde ao *k-ésimo* elemento da diagonal da matriz $\mathbf{r}_{XX}^{-1}$.
+
+-   **Interpretação do *VIF*:**\
+    Valores de *VIF* próximos de $1$ indicam que não existe dependência entre as variáveis explicativas e, portanto, não existe multicolinearidade. Porém, valores grandes de *VIF* indicam que há uma dependência, mesmo que não muito forte, entre as variáveis explicativas ou entre as colunas na matriz $\mathbf{X}$. De acordo com Kutner et al. (2005), $VIF > 10$ indicam, frequentemente, a existência de multicolinearidade.
+
+No R (R Core Team, 2025), os valores dos *VIF's* podem ser obtidos utilizando a função `vif()`, do pacote `car`.
+
+## Exemplos
+
+Para facilitar o entendimento da multicolinearidade, apresentaremos três exemplos dados por Kutner et al. (2005) nos Capítulos 7: 1. com variáveis explicativas não correlacionadas; 2. com variáveis explicativas correlacionadas perfeitamente, ou seja, correlação igual a 1; 3. com variáveis correlacionadas ou não.
+
+### Exemplo 1: variáveis não correlacionadas
+
+Considere os dados de um pequeno experimento com o objetivo de avaliar o efeito do tamanho da equipe de trabalho ($X_1$) e do nível de pagamento de bônus ($X_2$) sobre a produtividade da equipe ($Y$). As variáveis explicativas $X_1$ e $X_2$ são não correlacionadas, ou seja, $r_{12} = 0$ (Kutner et al, 2005, p.279).
+
+A seguir apresenta-se o *script* do R para reproduzir os resultados apresentados e discutidos no livro.
+
+```{r,warning=FALSE,message = FALSE, echo=TRUE, eval=FALSE}
+########################
+## MULTICOLINEARIDADE
+## EXEMPLOS - KUTNER et al. (2005)
+########################
+library(corrplot)
+library(readxl)
+library(car)
+#
+## EXEMPLO 1 - p. 279
+ex1<- data.frame(x1 = c(4,4,4,4,6,6,6,6),
+                 x2 = c(2,2,3,3,2,2,3,3),
+                 y = c(42,39,48,51,49,53,61,60))
+ex1
+(corr.ex1<- cor(ex1))
+corrplot(corr.ex1, method = "number")
+corrplot(corr.ex1, method = "ellipse")
+#
+regm.ex1<- lm(y ~ x1 + x2, data = ex1)
+summary(regm.ex1)
+anova(regm.ex1)
+#
+regx1.ex1<- lm(y ~ x1, data = ex1)
+summary(regx1.ex1)
+anova(regx1.ex1)
+#
+regx2.ex1<- lm(y ~ x2, data = ex1)
+summary(regx2.ex1)
+anova(regx2.ex1)
+#
+## VIF's
+vif(regm.ex1)
+```
+
+\
+
+### Exemplo 2: variáveis correlacionadas perfeitamente
+
+Considere os dados fictícios com o objetivo de avaliar o efeito de duas variáveis explicativas ($X_1$ e $X_2$) sobre uma variável resposta ($Y$). As variáveis explicativas $X_1$ e $X_2$ são perfeitamente correlacionadas, ou seja, $r_{12} = 1$ (Kutner et al, 2005, p.281).
+
+A seguir apresenta-se o *script* do R para reproduzir os resultados apresentados e discutidos no livro.
+
+```{r,warning=FALSE,message = FALSE, echo=TRUE, eval=FALSE}
+# 
+## EXEMPLO 2 - p. 281
+#
+rm(list = ls())
+#
+ex2<- data.frame(x1 = c(2,8,6,10),
+                 x2 = c(6,9,8,10),
+                 y = c(23,83,63,103))
+ex2
+(corr.ex2<- cor(ex2))
+corrplot(corr.ex2, method = "number")
+corrplot(corr.ex2, method = "ellipse")
+#
+regm.ex2<- lm(y ~ x1 + x2, data = ex2)
+summary(regm.ex2)
+anova(regm.ex2)
+#
+## VIF's
+vif(regm.ex2)
+(matcorr.X<- cor(ex2)[1:2,1:2])
+(imatcorr.X<- solve(matcorr.X))
+det(matcorr.X)
+```
+
+\
+
+### Exemplo 3: variáveis correlacionadas ou não
+
+Considere os dados de um um estudo com o objetivo de relacionar a quantidade de gordura corporal ($Y$) e algumas possíveis variáveis explicativas, considerando uma amostra de 20 mulheres saudáveis, com idade de 25 a 34 anos. Três possíveis variáveis explicativas foram inicialmente consideradas, as quais são: a espessura da dobra cutânea no tríceps ($X_1$), a circunferência da coxa ($X_2$) e a circunferência do braço ($X_3$) (Kutner et al, 2005, p.256).
+
+
+:::: columns
+::: {.column width="35%"}
+```{r,warning=FALSE,message = FALSE, echo=FALSE}
+#library(downloadthis)
+library(readxl)
+
+dados <- read_excel("Dados/Kutner_Example_Table7_1.xlsx")
+
+#dados %>%
+#    download_this(
+#    output_name = "Kutner_Example_Table7_1",
+#    output_extension = ".xlsx",
+#    button_label = "Download dos dados",
+#    button_type = "primary",
+#    has_icon = TRUE,
+#    icon = "fa fa-save"
+#  )
+```
+:::
+
+\
+A seguir apresenta-se o *script* do R para reproduzir os resultados apresentados e discutidos no livro (Cap. 7, págs. 283-288 e Cap. 10, págs. 407-410).
+
+```{r,warning=FALSE,message = FALSE, echo=TRUE, eval=FALSE}
+# 
+## EXEMPLO 3 - p. 283
+#
+rm(list = ls())
+#
+ex3<- read_excel("Kutner_Example_Table7_1.xlsx")
+str(ex3)
+plot(ex3)
+(corr.ex3<- cor(ex3))
+corrplot(corr.ex3, method = "number")
+corrplot(corr.ex3, method = "ellipse")
+#
+## y = f(x1)
+(regx1.ex3<- lm(y ~ x1, data = ex3))
+summary(regx1.ex3)
+anova(regx1.ex3)
+#
+## y = f(x2)
+(regx2.ex3<- lm(y ~ x2, data = ex3))
+summary(regx2.ex3)
+anova(regx2.ex3)
+#
+## y = f(x1,x2)
+(regx1x2.ex3<- lm(y ~ x1 + x2, data = ex3))
+summary(regx1x2.ex3)
+anova(regx1x2.ex3)
+#
+## y = f(x1,x2)
+(regm.ex3<- lm(y ~ x1 + x2 + x3, data = ex3))
+summary(regm.ex3)
+anova(regm.ex3)
+#
+## x3 = f(x1,x2)
+(regx3.fx1x2.ex3<- lm(x3 ~ x1 + x2, data = ex3))
+summary(regx3.fx1x2.ex3)
+#
+## Multicolinearidade
+(resp.vif<- vif(regm.ex3))
+#
+## Matriz de correlacoes
+(matcorr.X<- cor(ex3)[1:3,1:3])
+(imatcorr.X<- solve(matcorr.X))
+resp.vif
+#
+## y = f(x1,x3)
+(regx1x3.ex3<- lm(y ~ x1 + x3, data = ex3))
+summary(regx1x3.ex3)
+anova(regx1x3.ex3)
+vif(regx1x3.ex3)
+#
+## y = f(x1,x3)
+(regx2x3.ex3<- lm(y ~ x2 + x3, data = ex3))
+summary(regx2x3.ex3)
+anova(regx2x3.ex3)
+vif(regx2x3.ex3)
+```
+

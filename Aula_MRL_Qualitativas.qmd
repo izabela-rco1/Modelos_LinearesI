@@ -1,0 +1,577 @@
+---
+title: "Modelos de regressão para preditores qualitativos"
+---
+
+::: {.chapterintro data-latex=""}
+Hoje veremos como variáveis qualitativas podem ser inseridas como variáveis explicativas em modelos de regressão linear. Iniciamos o estudo pelo caso mais simples, de uma variável qualitativa com duas categorias, e apresentamos a generalização para variáveis nominais com mais categorias. O caso da interação entre variáveis qualitativas e quantitativas também é ilustrado. Finalmente, questões práticas importantes sobre o uso de variáveis indicadoras também são discutidas.
+
+Essa aula é baseada no Capítulo 8 de Kutner et al. (2008) e no Capítulo 10 de Charnet et. al. (2008).
+:::
+
+## Introdução
+
+Ao trabalhar com modelos de regressão, sejam eles simples ou múltiplos, pode ser de interesse incorporar uma ou mais variáveis qualitativas (categorizadas) para explicar a variação em $Y$. Exemplos de variáveis desse tipo são gênero, nível de escolaridade (ensino médio, técnico, universitário, mestrado e doutorado), status de compra (comprado, não comprado) e grau de incapacidade (não incapacitado, parcialmente incapacitado, totalmente incapacitado). 
+
+Como será visto, para que uma variável qualitativa seja usada em um modelo de regressão, devemos criar indicadores quantitativos para as suas categorias. Para compreender essa técnica, vamos utilizar o exemplo apresentado por Kutner et al. (2008). 
+
+
+
+::: {.data data-latex=""}
+**Exemplo: Inovação no mercado de seguros** 
+
+Em um estudo sobre inovação na indústria de seguros, um economista desejava relacionar a rapidez com que uma determinada inovação é adotada ($Y$) com o tamanho da empresa de seguros ($X_1$) e com o tipo de empresa. A variável resposta é medida pelo número de meses decorridos entre o momento em que a primeira empresa adotou a inovação e o momento em que a empresa em questão a adotou.  
+
+A primeira variável preditora, **tamanho da empresa**, é quantitativa e medida pelo montante total de ativos da empresa. A segunda variável preditora, **tipo de empresa**, é qualitativa e composta por duas categorias: **companhias de capital aberto** (*stock companies*) e **companhias mútuas** (*mutual companies*)[$^1$](https://www.investopedia.com/articles/personal-finance/011916/mutual-vs-publically-traded-insurance-companies.asp).
+
+:::aside
+[Diferença entre companhias de capital aberto e mútuas](https://www.investopedia.com/articles/personal-finance/011916/mutual-vs-publically-traded-insurance-companies.asp)
+:::
+
+Suponha que um economista estudou 10 companhias mútuas e 10 de capital aberto. Os dados são mostrados a seguir.
+
+
+| Empresa, $i$ | Número de meses decorridos ($y_{i}$) | Tamanho da empresa (milhões de dólares) ($x_{1i}$) | Tipo da empresa |
+|:----:|:-----------------------------:|:--------------------------------:|:--------------:|
+| 1  | 17 | 151 | Mutual |
+| 2  | 26 | 92 | Mutual |
+| 3  | 21 | 175 | Mutual |
+| 4  | 30 | 31 | Mutual |
+| 5  | 22 | 104  | Mutual |
+| 6  | 0 | 277 | Mutual |
+| 7  | 12  | 210 | Mutual |
+| 8  | 19 | 120 | Mutual |
+| 9  | 4 | 290 | Mutual |
+| 10 | 16 | 238 | Mutual |
+| 11 | 28 | 164 | Stock  |
+| 12 | 15 | 272  | Stock  |
+| 13 | 11 | 295 | Stock  |
+| 14 | 38 | 68  | Stock  |
+| 15 | 31 | 85 | Stock  |
+| 16 | 21 | 224 | Stock  |
+| 17 | 20 | 166 | Stock  |
+| 18 | 13 | 305 | Stock  |
+| 19 | 30 | 124 | Stock  |
+| 20 | 14 | 246 | Stock  |
+
+
+:::
+
+```{r, echo=FALSE}
+#library(downloadthis)
+
+  empresa = 1:20
+  y = c(17, 26, 21, 30, 22, 0, 12, 19, 4, 16,
+       28, 15, 11, 38, 31, 21, 20, 13, 30, 14)
+  
+  x1 = c(151, 92, 175, 31, 104, 277, 210, 120, 290, 238,
+        164, 272, 295, 68, 85, 224, 166, 305, 124, 246)
+  
+  tipo = c(rep("Mutual", 10), rep("Stock", 10))
+  
+  seguro <- data.frame(empresa = empresa, y=y, x1 = x1, tipo = tipo)
+
+
+#seguro %>%
+#    download_this(
+#    output_name = "seguro",
+#    output_extension = ".xlsx",
+#    button_label = "Download dos dados",
+#    button_type = "primary",
+#    has_icon = TRUE,
+#    icon = "fa fa-save"
+#  )
+```
+
+
+## Variável explicativa qualitativa com duas categorias
+
+Existem várias formas de identificar quantitativamente as classes de uma variável qualitativa. Usaremos variáveis indicadoras que assumem os valores 0 e 1, pois são fáceis de usar e amplamente empregadas.
+
+No exemplo da inovação no mercado de seguros, em que a variável explicativa qualitativa possui duas categorias, podemos definir duas variáveis indicadoras, $X_2$ e $X_3$, da seguinte forma:
+
+$$
+X_2 =
+\begin{cases}
+1, & \text{se for uma empresa com ações (stock company)} \\
+0, & \text{caso contrário}
+\end{cases}
+$$
+$$
+X_3 =
+\begin{cases}
+1, & \text{se for uma empresa mútua (mutual company)} \\
+0, & \text{caso contrário}
+\end{cases}
+$$
+
+Um modelo de primeira ordem seria, então, o seguinte:
+
+$$
+y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i} + \varepsilon_i
+$$
+
+Essa abordagem de definir uma variável indicadora para cada classe da variável qualitativa leva a dificuldades computacionais. Para ilustrar, considere uma versão reduzida dos dados apresentados, com $n = 4$ observações. Suponha que as duas primeiras sejam companhias de ações (para as quais $X_2 = 1$ e $X_3 = 0$) e as duas últimas sejam companhias mútuas (para as quais $X_2 = 0$ e $X_3 = 1$). A matriz $\mathbf{X}$ seria então:
+
+
+$$
+\mathbf{X} =
+\begin{bmatrix}
+1 & X_{11} & 1 & 0 \\
+1 & X_{21} & 1 & 0 \\
+1 & X_{31} & 0 & 1 \\
+1 & X_{41} & 0 & 1
+\end{bmatrix}
+$$
+
+Note que a primeira coluna é igual à soma das colunas $X_2$ e $X_3$, o que implica que as colunas são linearmente dependentes.  Isso afeta a matriz $\mathbf{X}'\mathbf{X}$ de forma que:
+
+$$
+\mathbf{X}'\mathbf{X} =
+\begin{bmatrix}
+4 & \sum X_{1i} & 2 & 2 \\
+\sum X_{1i} & \sum X_{1i}^2 & \sum_{i=1}^2 X_{1i} & \sum_{i=3}^4 X_{1i} \\
+2 & \sum_{i=1}^2 X_{1i} & 2 & 0 \\
+2 & \sum_{i=3}^4 X_{1i} & 0 & 2
+\end{bmatrix}
+$$
+
+Veja que a primeira coluna é a soma das duas últimas e isso faz com que $\mathbf{X}'\mathbf{X}$ não tenha inversa. Portanto, não é possível obter estimadores únicos para os coeficientes de regressão.
+
+Uma maneira simples de contornar essa dificuldade é eliminar uma das variáveis indicadoras. Nesse exemplo, podemos remover $X_3$, o que facilita a interpretação dos parâmetros e elimina o problema de dependência linear.
+
+::: {.important data-latex=""}
+Uma regra geral é que uma variável qualitativa com  $c$  categorias será representada por $c-1$ variáveis indicadoras.
+:::
+
+::: {.tip data-latex=""}
+As variáveis indicadoras também são chamadas de *variáveis dummy* ou *variáveis binárias*. O termo “binário” faz referência ao sistema numérico que contém apenas 0 e 1.
+:::
+
+### Interpretação dos coeficientes
+
+Voltando ao exemplo sobre inovação no mercado de seguros, suponha que eliminemos $X_3$ do modelo. Nesse caso, temos:
+
+$$
+y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \varepsilon_i \tag{1}
+$$
+em que:
+
+$$
+X_1 = \text{tamanho da empresa (em milhões de dólares)} 
+$$
+
+e
+
+$$
+X_2 =
+\begin{cases}
+1, & \text{se for uma empresa com ações (stock company)} \\
+0, & \text{se for uma empresa mútua (mutual company)}
+\end{cases}
+$$
+
+O valor esperado do tempo decorrido é:
+
+$$
+E(Y) = \beta_0 + \beta_1 x_1 + \beta_2 x_2 
+$$
+
+Para interpretar os coeficientes, considere primeiro o caso de uma companhia mútua ($X_2 = 0$):
+
+$$
+E(Y) = \beta_0 + \beta_1 x_1 
+$$
+
+Assim, para companhias mútuas, a reta de resposta tem intercepto $\beta_0$ e inclinação $\beta_1$.
+
+Para uma empresa com ações ($X_2 = 1$):
+
+$$
+E(Y) = \beta_0 + \beta_1 x_1 + \beta_2 \times 1 = (\beta_0 + \beta_2) + \beta_1 x_1
+$$
+
+Essa também é uma reta, com a mesma inclinação $\beta_1$, mas intercepto igual a $\beta_0 + \beta_2$.
+
+Note que o tempo médio até que a inovação seja adotada, $E(Y)$ é uma função linear do tamanho da empresa ($X_{1}$), com inclinação comum ($\beta_1$) a ambos os tipos de empresa. 
+
+O parâmetro $\beta_2$ mede o efeito diferencial do tipo de empresa — quanto maior (ou menor) é a reta do tempo médio de adoção para as companhias com ações em comparação à reta para as companhias mútuas, para qualquer valor de $X_1$ especificado. Aqui, podemos dizer que a função resposta de referência é a das empresas mútuas. 
+
+
+### Aplicação usando o R
+
+Vamos ajustar o modelo proposto na seção anterior. No R, quando criamos a variável qualitativa como um fator, a variável indicadora é criada automaticamente.
+
+
+```{r}
+seguro$tipo <- factor(seguro$tipo, levels = c("Mutual", "Stock"))
+modelo <- lm(y ~ x1 + tipo, data = seguro)
+modelo
+
+anova(modelo)
+```
+
+O modelo de regressão ajustado é dado por:
+
+$$
+\hat{y} = 33,8741 - 0,1017 x_{1} + 8,0555x_{2}
+$$
+e os resultados da ANOVA mostram que as variáveis explicativas são importantes para explicar $Y$.
+
+```{r}
+summary(modelo)
+```
+
+Suponha que o interesse está no efeito do tipo da empresa ($X_{2}$) no tempo decorrido para a implantação da inovação. Um intervalo de confiança a 95\% para $\beta_{2}$ pode ser obtido. Para isso, usamos $t_{0,975,17} = 2,110$ e os resultados da função `summary()`. O intervalo de confiança é $8,0555 \pm 2,110(1,45911)$, que é:
+
+$$
+4,98 \leq \beta_{2} \leq 11,13
+$$
+
+Com 95\% de confiança, concluímos que empresas de capital aberto (_stock_) tendem a adotar a inovação em torno de 5 a 11 meses mais tarde, em média, que empresas do tipo mútuas, independente do tamanho da empresa.
+
+A figura a seguir contém o modelo ajustado para cada tipo de empresa e os valores observados.
+
+```{r}
+#| label: fig-seguro
+#| fig-cap: "Relação entre tamanho da empresa e tempo até a inovação ser adotada, por tipo de empresa"
+#| fig-width: 6
+#| fig-height: 4
+
+library(ggplot2)
+
+ggplot(seguro, aes(x = x1, y = y, color = tipo, shape = tipo)) +
+  geom_point(size = 3) +
+  geom_abline(intercept = 33.874069, slope = -0.101742, color = "blue", linetype = "solid") +  # Mutual
+  geom_abline(intercept = 33.874069 + 8.055469, slope = -0.101742, color = "red", linetype = "solid") +  # Stock
+  scale_color_manual(values = c("blue", "red")) +
+  labs(x = "Tamanho da empresa (milhões de dolares)",
+       y = "Meses até inovação") +
+  theme_minimal(base_size = 13)
+```
+
+
+::: {.important data-latex=""}
+Uma pergunta que pode surgir é "por que não ajustar modelos de regressão separados para cada tipo de empresa?". Há duas razões para se fazer o ajuste de apenas um modelo com a variável indicadora. Como o modelo assume mesma inclinação e a mesma variância para cada tipo de empresa, a inclinação comum é melhor estimada combinando os dados de ambos os tipos de empresas. Além disso, outras inferências, como para $\beta_{0}$ e $\beta_{2}$ podem ser feitas de forma mais precisa a partir de um modelo já que haverá mais graus de liberdade associados ao QM do erro. 
+:::
+
+## Variável explicativa qualitativa com mais de duas categorias
+
+Se a variável qualitativa possui mais de duas categorias, são necessárias variáveis indicadoras adicionais no modelo de regressão. Considere, por exemplo, a regresão de uma variável $Y$ em $X_{1}$ (quantitativa) e outra variável explicativa do tipo qualitativa (digamos $M$) com quatro categorias (M$_{1}$, M$_{2}$, M$_{3}$, M$_{4}$). Nesse caso, são necessárias três variáveis indicadoras, que podem ser definidas da seguinte maneira:
+
+
+$$
+X_2 =
+\begin{cases}
+1, & \text{se a categoria for igual a M}_{1} \\
+0, & \text{caso contrário}
+\end{cases}
+$$
+
+$$
+X_3 =
+\begin{cases}
+1, & \text{se a categoria for igual a M}_{2} \\
+0, & \text{caso contrário}
+\end{cases}
+$$
+
+$$
+X_4 =
+\begin{cases}
+1, & \text{se a categoria for igual a M}_{3} \\
+0, & \text{caso contrário}
+\end{cases}
+$$
+
+Um modelo de regressão de primeira ordem é:
+
+$$
+y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i} + \beta_4 x_{4i} \varepsilon_i \tag{2}
+$$
+
+Para esse modelo, a entrada dos dados para as variáveis explicativas seria:
+
+| Categoria da variável $M$ | $X_1$  | $X_2$ | $X_3$ | $X_4$ |
+|---------------------------|-----|----|----|----|
+| M$_{1}$                   | $x_{1i}$ | 1  | 0  | 0  |
+| M$_{2}$                   | $x_{1i}$ | 0  | 1  | 0  |
+| M$_{3}$                   | $x_{1i}$ | 0  | 0  | 1  |
+| M$_{4}$                   | $x_{1i}$ | 0  | 0  | 0  |
+
+O valor esperado de $Y$ é:
+
+$$
+E(Y) = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_{3} + \beta_4 x_{4}
+$$
+
+Quando $X_{2} = 0$, $X_{3} = 0$ e $X_{4} = 0$,
+
+$$
+E(Y) = \beta_0 + \beta_1 x_1 
+$$
+
+que se refere à média esperada na categoria M$_{4}$. Para a categoria M$_{1}$, $X_2 = 1$, $X_{3} = 0$ e $X_{4} = 0$. A resposta esperada é:
+
+$$
+E(Y) = \beta_0 + \beta_1 x_1 + \beta_2 \times 1 = (\beta_0 + \beta_2) + \beta_1 x_1
+$$
+
+De forma similar, as respostas esperadas para as categorias M$_{2}$ e M$_{3}$ são dadas, respectivamente, por:
+
+
+$$
+E(Y) = (\beta_0 + \beta_3) + \beta_1 x_1
+$$
+
+e
+
+$$
+E(Y) = (\beta_0 + \beta_4) + \beta_1 x_1
+$$
+O modelo de regressão implica que a regressão de $Y$ em $X_{1}$ é linear, com a mesma inclinação para todos os quatro modelos (categorias). Os coeficientes $\beta_2$, $\beta_3$ e $\beta_4$ indicam, respectivamente, quão maior (ou menor) as funções da resposta para as categorias M$_{1}$, M$_{2}$ e M$_{3}$ são em relação à categoria M$_{4}$, para um certo nível (fixo) de $X_{1}$. Em outras palavras, $\beta_2$, $\beta_3$ e $\beta_4$ medem os efeitos diferenciais das classes da variável qualitativa na "altura" da função, sempre comparando com a situação em que $X_{2} = X_{3} = X_{4} = 0$. 
+
+
+É possível estimar efeitos diferenciais diferentes daqueles que usam a categoria M$_{4}$ como referência. Isso pode ser feito estimando as diferenças entre os coeficientes de regressão. Por exemplo, a diferença $\beta_4 - \beta_3$ mede quão mais alta (ou mais baixa) é a função da resposta na categoria M$_{3}$ se comparada com a função da resposta para a categoria M$_{2}$, para qualquer nível de $X_{1}$. O estimador pontual dessa quantidade é $\hat\beta_4 - \hat\beta_3$ e a variância estimada desse estimador é:
+
+$$
+\hat V(\hat\beta_4 - \hat\beta_3) = \hat V(\hat\beta_4) + \hat V(\hat\beta_3) - 2\widehat{COV}(\hat\beta_4,\hat\beta_3) 
+$$
+
+As variâncias e covariâncias necessárias podem ser obtidas pela matriz de variâncias e covariâncias estimada dos coeficientes de regressão.
+
+
+::: {.tip data-latex=""}
+No R, por padrão, quando se tem uma variável categórica com dois ou mais níveis o primeiro nível **em ordem alfabética** é usado como referência. Esse nível é a categoria "omitida" no modelo. Para escolher outra categoria como referência, uma opção é usar a função `relevel()`.  
+:::
+
+## Interação entre variáveis explicativas qualitativas e quantitativas
+
+Mesmo que uma variável explicativa do modelo seja qualitativa, efeitos de interação ainda podem ser inseridos no modelo da forma usual, incluindo termos de "produto cruzado". Um modelo de regressão de primeira ordem com um termo de interação para o exemplo de empresas de seguros seria:
+
+$$
+y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{1i}x_{2i} + \varepsilon_i 
+$$
+
+O valor esperado do tempo decorrido é:
+
+$$
+E(Y) = \beta_0 + \beta_1 x_1 + \beta_2 x_2 +  \beta_3 x_{1}x_{2}
+$$
+A interpretação dessa função é mais bem compreendida se examinarmos a natureza dessa função para cada tipo de empresa. Para empresas do tipo mútuas, $X_{2} = 0$ e, então, $X_{1}X_{2} = 0$. A esperança de $Y$ para essa categoria se reduz a:
+
+
+$$
+E(Y) = \beta_0 + \beta_1 x_1
+$$
+
+Para as empresas com ações, $X_{2} = 1$ e, então, $X_{1}X_{2} = X_{1}$. A esperança de $Y$ para essa categoria será:
+
+$$
+E(Y) = \beta_0 + \beta_1 x_1 + \beta_2 (1) + \beta_3 x_1
+$$
+ou
+
+$$
+E(Y) = (\beta_0 + \beta_2) + (\beta_1 + \beta_3) x_1
+$$
+
+Note que $\beta_{2}$ indica quão maior (ou menor) é o intercepto da função de $Y$ para a categoria codificada como 1 em relação àquela codificada como 0. De forma similar, $\beta_{3}$ indica quão maior (ou menor) é a inclinação da função para a categoria codificada como 1 em relação àquela codificada como 0. Nesse caso, assumimos que tanto o intercepto quanto a inclinação diferem para as duas categorias.
+
+
+### Aplicação em R: estudo de interação
+
+Vamos supor que o economista do estudo das seguradoras também esteja interessado nos efeitos de interação entre tamanho e tipo da empresa. Para isso, um modelo inicial a ser considerado é aquele apresentado na seção anterior.
+
+```{r}
+seguro$tipo <- factor(seguro$tipo, levels = c("Mutual", "Stock"))
+modelo2 <- lm(y ~ x1*tipo, data = seguro)
+modelo2
+
+anova(modelo2)
+```
+
+O teste t para a presença do efeito de interação avalia $H_{0}: \beta_{3} = 0$ e $H_{a}: \beta_{3} \neq 0$. O resultado é obtido diretamente pelo comando a seguir e demonstra que o termo de interação pode ser removido do modelo.
+
+
+```{r}
+summary(modelo2)
+```
+
+
+## Algumas considerações sobre o uso de variáveis indicadoras
+
+Kutner et al. (2008) apresentam algumas questões práticas relacionadas ao uso de variáveis indicadoras. Essas questões são apresentadas brevemente a seguir.
+
+
+**Variáveis indicadoras _vs_ códigos atribuídos**
+
+Uma alternativa ao uso de variáveis indicadoras para uma variável qualitativa é empregar códigos numéricos atribuídos.  
+
+Considere, por exemplo, a variável explicativa frequência de uso de produto, que possui três categorias: usuário frequente, usuário ocasional e não usuário. Com o método de códigos atribuídos, uma única variável $X_1$ é usada, atribuindo-se valores a cada categoria, como mostrado na tabela a seguir:
+
+| Classe           | $X_1$ |
+|------------------|-----------|
+| Usuário frequente | 3         |
+| Usuário ocasional | 2         |
+| Não usuário       | 1         |
+
+Os códigos escolhidos são arbitrários e poderiam ser outros conjuntos de números. O modelo de regressão de primeira ordem com esses códigos seria:
+
+$$
+Y_i = \beta_0 + \beta_1 X_{1i} + \varepsilon_i
+$$
+
+A dificuldade básica dessa abordagem é que ela impõe uma métrica artificial às categorias da variável qualitativa, o que pode não ser razoável.  Para ilustrar isso, considere as respostas médias para as três categorias da variável qualitativa:
+
+| Categoria         | $E[Y]$ |
+|-------------------|------|
+| Usuário frequente |  $E[Y] = \beta_{0} + \beta_{1}(3) = \beta_{0} + 3\beta_{1}$    |
+| Usuário ocasional |  $E[Y] = \beta_{0} + \beta_{1}(2) = \beta_{0} + 2\beta_{1}$    |
+| Não usuário       | $E[Y] = \beta_{0} + \beta_{1}(1) = \beta_{0} + \beta_{1}$     |
+
+A implicação disso é:
+
+$$
+E[Y|\text{usuário frequente}] - E[Y|\text{usuário ocasional}] = E[Y|\text{usuário ocasional}] - E[Y|\text{não usuário}] = \beta_{1} 
+$$
+
+Por exemplo, a codificação 1, 2 e 3 implica que a mudança média na resposta entre as categorias é sempre a mesma, o que raramente ocorre na prática. Aqui, a resposta muda da mesma maneira quando se muda de não usuário para usuário ocasional e quando se muda de um usuário ocasional para um frequente.
+
+Em contraste, variáveis indicadoras não fazem suposições sobre o espaçamento entre classes. O modelo usa os dados para estimar os efeitos diferenciais que existem.  
+Para o mesmo exemplo com três classes, poderíamos representar a variável qualitativa com duas variáveis indicadoras, $X_1$ e $X_2$:
+
+
+| Classe           | $X_1$ | $X_2$ |
+|------------------|-----------|-----------|
+| Usuário frequente | 1         | 0         |
+| Usuário ocasional | 0         | 1         |
+| Não usuário       | 0         | 0         |
+
+O modelo de regressão de primeira ordem seria então:
+
+$$
+y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \varepsilon_i
+$$
+
+em que $\beta_{1}$ mede o efeito diferencial:
+
+$$
+E[Y|\text{usuário frequente}] - E[Y|\text{não usuário}] 
+$$
+
+e $\beta_{2}$ mede
+
+$$
+E[Y|\text{usuário ocasional}] - E[Y|\text{não usuário}] 
+$$
+
+Assim, $\beta_1$ e $\beta_2$ medem os efeitos diferenciais de cada grupo em relação à categoria de referência (não usuários).
+
+
+**Variáveis indicadoras _vs_ variáveis quantitativas**
+
+Variáveis indicadoras também podem ser usadas para representar variáveis originalmente quantitativas, ao agrupar seus valores em categorias (por exemplo, faixas etárias).  
+
+Embora isso envolva perda de informação e redução dos graus de liberdade$^2$, pode ser útil quando a relação entre a variável quantitativa e a resposta é complexa ou não linear.
+
+:::aside
+$^2$ Ao categorizar uma variável originalmente quantitativa, parâmetros adicionais são incluídos no modelos, o que leva a uma redução nos graus de liberdade associados ao $QM$ do erro.
+:::
+
+Em grandes amostras, o uso de variáveis indicadoras pode servir como alternativa a ajustes não paramétricos permitindo capturar a forma da relação sem impor uma forma funcional específica.
+
+**Outras codificações para variáveis indicadoras**
+
+Há outras maneiras de codificar variáveis indicadoras. Duas alternativas comuns ao esquema 0/1 são mostradas no exemplo das empresas de seguros (_mutual vs. stock_), em que $Y$ é o tempo decorrido até a adoção da inovação, $X_{1}$ é o tamanho da empresa de seguros.
+
+- **Codificação -1 e 1**:
+
+$$
+X_2 = 
+\begin{cases}
+1, & \text{se for uma empresa com ações (stock)} \\
+-1, & \text{se for uma empresa tipo mútua (mutual)}
+\end{cases}
+$$
+
+O modelo de primeira ordem é:
+
+$$
+Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \varepsilon_i
+$$
+
+O valor esperado da resposta é dado por:
+
+$$
+E[Y] = \beta_0 + \beta_1 X_1 + \beta_2 X_2
+$$
+
+Portanto,
+
+$$
+\begin{aligned}
+E[Y] &= (\beta_0 + \beta_2) + \beta_1 X_1 \quad &\text{para empresas com ações}\\
+E[Y] &= (\beta_0 - \beta_2) + \beta_1 X_1 \quad &\text{para empresas tipo mútuas}
+\end{aligned}
+$$
+
+Nesse caso, $\beta_0$ pode ser interpretado como o intercepto médio, e $\beta_2$ mede o desvio das linhas de regressão de cada tipo em torno desse intercepto médio.
+
+Um teste para verificar se as duas retas são as mesmas para ambos os tipos de empresas envolve $H_{0}: \beta_{2} = 0$ e $H_{a}: \beta_{2} \neq 0$. 
+
+- **Codificação 0/1 sem intercepto**:
+
+Uma segunda alternativa é usar uma variável indicadora 0/1 para cada uma das $c$ categorias da variável qualitativa e remover o intercepto do modelo de regressão.
+
+Para o exemplo de empresas de seguros, o modelo seria:
+
+$$
+Y_i = \beta_1 X_{1i} + \beta_2 X_{2i} + \beta_3 X_{3i} + \varepsilon_i
+$$
+
+em que:
+
+$$
+X_{1i} = \text{tamanho da empresa}, \quad
+X_{2i} = 1 \text{ se stock}, \quad
+X_{3i} = 1 \text{ se mutual}
+$$
+
+Aqui, os valores esperados de $Y$ são:
+
+$$
+\begin{aligned}
+E[Y] &= \beta_2 + \beta_1 X_1 \quad &\text{para empresas com ações}\\
+E[Y] &= \beta_3 + \beta_1 X_1 \quad &\text{para empresas mútuas}
+\end{aligned}
+$$
+
+Um teste para verificar se as duas retas são as mesmas envolveria as hipóteses $H_{0}: \beta_{2} = \beta_{3}$ e $H_{a}: \beta_{2} \neq \beta_{3}$. Esse tipo de teste não pode ser conduzido usando a ideia de somas de quadrados extras (ou redução nas SQ), e requer o ajuste de um modelo completo e outro reduzido. Para mais detalhes, veja a Seção 7.3 de Kutner et al. (2008). 
+
+::: {.home data-latex=""}
+**Adaptado de Charnet et. al. (2008)**
+
+Um experimento com sementes de soja foi feito durante um certo período, no qual as sementes foram submetidas à radiação solar e a dois níveis de ozônio, A e B. Após esse período foram coletados os pesos de cada semente e a quantidade de radiação solar que cada semente recebeu, para cada nível de ozônio. O objetivo era verificar se os pesos das sementes estariam relacionados com a quantidade de radiação recebida por essas sementes. Os dados coletados são apresentados a seguir, nos códigos R.
+
+Usando variáveis indicadoras, faça a análise dos dados usando um MRLM de primeira ordem e com o efeito de interação entre as variáveis explicativas. Faça a análise da aquacidade do modelo e interprete os efeitos estimados.
+
+_Dica: consulte o exemplo de linhas de produção de sabão, da Seção 8.7 de Kutner et al. (2008)._
+:::
+
+```{r}
+# dados de sementes de soja
+```{r}
+  peso <- c(0.7, 2.9, 5.6, 8.7, 12.4, 17.4, 1.3, 4.8, 6.5, 9.4, 12.9, 12.3)
+  
+  rad <- c(118.4, 215.2,283.9, 387.9,451.5,516.6,109.1,199.6,264.2,358.2,413.2,452.5)
+  
+  ozonio <- c(rep("A", 6), rep("B", 6))
+  
+  sementes <- data.frame(ozonio = ozonio, rad=rad, peso = peso)
+
+
+
+
+```
+
+

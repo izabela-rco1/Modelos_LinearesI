@@ -1,0 +1,483 @@
+---
+title: "Formas quadráticas"
+---
+
+::: {.chapterintro data-latex=""}
+Nessa aula vamos definir o que são formas quadráticas, bem como apresentar várias características delas, associando com as somas de quadrados ($SQ$) da análise de variância ($ANOVA$). São definições mais teóricas, mas de extrema importância na generalização da teoria de modelos lineares e inferência estatística.
+
+Essa aula é baseada no capítulo 5 de _Applied Linear Statistical Models_ (Kutner et al., 2008), no capítulo 3 de _Matrix Algebra Useful for Satatistics_ (Searle, 1982)  e nas apostilas: _Modelos de Regressão_ (Demétrio e Zocchi, 2011), _Modelos Lineares I_ (Regazzi, 2010) e _Introdução à Álgebra de Matrizes_ (Morais, Chaves e Toledo, 2001).
+:::
+
+## Introdução  
+
+:::aside
+DEMÉTRIO, C.G.B.; ZOCCHI, S.S. Modelos de regressão. ESALQ, 2011.
+
+MORAIS, A.R.; CHAVES, L.M.; TOLEDO, M.C.R.P. **Introdução à álgebra de matrizes**. Lavras: UFLA/FAEPE, 2001.
+
+REGAZZI, A.J. **Modelos lineares I**. UFV, 2010.
+:::
+
+O estudo das chamadas _**formas quadráticas**_ é fundamental em estudos envolvendo modelos lineares e inferência estatística. Pode-se considerar que ao trabalhar com formas quadráticas, tem-se uma  generalização matricial dos modelos lineares, sejam de posto completo ou incompleto, em termos de inferência estatística.
+
+Inicialmente será definido o que são formas quadráticas, associando-as às somas de quadrados ($SQ$) da análise de variância da regressão. Posteriormente serão apresentadas, de forma sucinta, alguns fatos associados às $SQ$, como independência e distribuição de $SQ$. Com isso, demonstrar-se-á que as estatísticas de teste obtidas na ANOVA são válidas.
+
+## Conceituação
+
+### Definição
+
+Uma função do tipo $Q(\mathbf{x}) = \mathbf{x}'\mathbf{A}\mathbf{x} = \displaystyle \sum_{i=1}^n \sum_{j=1}^{n} a_{ij}x_i x_j$, tal que $a_{ij}$ são constantes reais e $\mathbf{x}$ é um vetor de constantes reais $x_1, x_2, \ldots, x_n$ é definida como uma forma quadrática de $x$.
+
+De acordo com Searle (1982), expressões apresentadas como formas quadráticas do tipo $Q(\mathbf{x}) = \mathbf{x}'\mathbf{A}\mathbf{x} = \displaystyle \sum_{i=1}^n \sum_{j=1}^{n} a_{ij}x_i x_j$ têm muitas aplicações, particularmente na teoria geral de análise de variância em Estatística, sendo que, com uma escolha apropriada da matriz $\mathbf{A}$, qualquer soma de quadrados ($SQ$) pode ser representada como $\mathbf{x}'\mathbf{A}\mathbf{x}$.
+
+:::aside
+SEARLE, S.R. Matrix algebra useful for Statistics. New York: John Wiley & Sons, 1982.
+:::
+
+Como um exemplo comum de forma quadrática associada à ANOVA tem-se:
+$$
+\displaystyle \sum_{i=1}^n y_i^2 =  
+\begin{bmatrix}
+y_1 & y_2 & \cdots & y_n
+\end{bmatrix} 
+\begin{bmatrix}
+y_1 \\ y_2 \\ \vdots \\ y_n
+\end{bmatrix} =
+\mathbf{y}'\mathbf{y} = \mathbf{y}' \mathbf{I} \mathbf{y},
+$$
+ou seja, $Q(\mathbf{y}) = \mathbf{y}' \mathbf{I} \mathbf{y} = SQTotal_\mbox{não corrigida}$, com $\mathbf{A}=\mathbf{I}_n$.
+
+::: {.exemplos data-latex=""}
+A função $Q(\mathbf{x}) = 4x_1^2 + 3x_2^2 + 5x_3^2 - 8x_1 x_3 + 10x_2x_3$ é uma forma quadrática nas variáveis $x_1$, $x_2$ e $x_3$.
+
+Considerando essa forma quadrática matricialmente, ou seja, $Q(\mathbf{x}) = \mathbf{x}'\mathbf{A}\mathbf{x}$, pode-se representar a matriz da forma quadrática $\mathbf{A}$ de várias maneiras diferentes, em função da separação dos termos dos produtos, ou seja, $0x_1 x_ 2 - 8x_1 x_3 + 10x_2x_3$, para formar os termos $a_{12} x_1 x_2$, $a_{13}x_1 x_3$ e $a_{23}x_2x_3$, conforme pode é mostrado a seguir:
+
+- **(i):**
+$$
+\begin{array}{rcl}
+Q(\mathbf{x}) = \mathbf{x}'\mathbf{A}\mathbf{x} & = & 
+\begin{bmatrix} 
+x_1 & x_2 & x_2 
+\end{bmatrix}
+\begin{bmatrix}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23} \\
+a_{31} & a_{32} & a_{33} 
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\ x_2 \\ x_2 
+\end{bmatrix} \\
+& = & 
+\begin{bmatrix} 
+x_1 & x_2 & x_2 
+\end{bmatrix}
+\begin{bmatrix}
+4 & -1 & -2 \\
+1 & 3 & 3 \\
+-6 & 7 & 5 
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\ x_2 \\ x_2 
+\end{bmatrix} \\
+& = & 4x_1^2 + 3x_2^2 + 5x_3^2 - 8x_1 x_3 + 10x_2x_3
+\end{array}
+$$
+
+- **(ii):**
+$$
+\begin{array}{rcl}
+Q(\mathbf{x}) = \mathbf{x}'\mathbf{A}\mathbf{x} & = & 
+\begin{bmatrix} 
+x_1 & x_2 & x_2 
+\end{bmatrix}
+\begin{bmatrix}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23} \\
+a_{31} & a_{32} & a_{33} 
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\ x_2 \\ x_2 
+\end{bmatrix} \\
+& = & 
+\begin{bmatrix} 
+x_1 & x_2 & x_2 
+\end{bmatrix}
+\begin{bmatrix}
+4 & 0 & 2 \\
+0 & 3 & 11 \\
+-10 & -1 & 5 
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\ x_2 \\ x_2 
+\end{bmatrix} \\
+& = & 4x_1^2 + 3x_2^2 + 5x_3^2 - 8x_1 x_3 + 10x_2x_3
+\end{array}
+$$
+:::
+
+Conforme visto no exemplo, se temos uma forma quadrática 
+$Q(\mathbf{x}) = \mathbf{x}'\mathbf{A}\mathbf{x}$, existem infinitas matrizes $\mathbf{B} \ne \mathbf{A}$, tais que $Q(\mathbf{x}) = \mathbf{x}'\mathbf{B}\mathbf{x}$. Porém, existe uma única matriz simétrica $\mathbf{A}$, tal que $Q(\mathbf{x}) = \mathbf{x}'\mathbf{A}\mathbf{x}$. Isso pode ser visto no exemplo apresentado, ou seja,
+$$
+\begin{array}{rcl}
+Q(\mathbf{x}) = \mathbf{x}'\mathbf{A}\mathbf{x} & = & 
+\begin{bmatrix} 
+x_1 & x_2 & x_2 
+\end{bmatrix}
+\begin{bmatrix}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23} \\
+a_{31} & a_{32} & a_{33} 
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\ x_2 \\ x_2 
+\end{bmatrix} \\
+& = & 
+\begin{bmatrix} 
+x_1 & x_2 & x_2 
+\end{bmatrix}
+\begin{bmatrix}
+4 & 0 & -4 \\
+0 & 3 & 5 \\
+-4 & 5 & 5 
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\ x_2 \\ x_2 
+\end{bmatrix} \\
+& = & 4x_1^2 + 3x_2^2 + 5x_3^2 - 8x_1 x_3 + 10x_2x_3
+\end{array}
+$$
+
+Neste caso, a matriz $\mathbf{A}$, denominada de matriz núcleo da forma quadrática, é simétrica e, portanto, unicamente determinada. Essa propriedade é importante, não apenas por ser a matriz $\mathbf{A}$ simétrica, mas por ter uma matriz simétrica propriedades que são úteis no estudo de formas quadráticas, particularmente aquelas associadas com a ANOVA (SEARLE, 1982).
+
+
+## Formas quadráticas e a ANOVA
+
+Conforme mencionado anteriormente, o uso de formas quadráticas é muito importante em estudos envolvendo a ANOVA de modelos lineares, uma vez que todas as somas de quadrados podem ser expressas como formas quadráticas. Assim, pode-se desenvolver, de maneira geral, toda a teoria relacionada à inferência estatística no contexto da ANOVA.
+
+Na apresentação da ANOVA da regressão foi demonstrada a decomposição da soma de quadrados total em duas fontes de variação ortogonais, ou seja,
+
+$$
+SQTotal = SQRegressão + SQErro,
+$$
+em que, $SQTotal$, $SQRegressão$ e $SQErro$ são, respectivamente, as somas de quadrados total, da regressão e do erro ou independente da regressão.
+
+Também foi visto que: 
+
+- $SQTotal = \mathbf{Y}'\mathbf{Y} - \dfrac{1}{n} \mathbf{Y}'\mathbf{J}\mathbf{Y}$; 
+
+- $SQRegressão = \boldsymbol{\hat{\beta}}' \mathbf{X}' \mathbf{Y} - \dfrac{1}{n} \mathbf{Y}'\mathbf{J}\mathbf{Y}$; e 
+
+- $SQErro = \mathbf{Y}'\mathbf{Y} - \boldsymbol{\hat{\beta}}' \mathbf{X}' \mathbf{Y}$, 
+
+em que $\mathbf{Y}$ é o vetor $n \times 1$ de observações; $\mathbf{X}$ é uma matriz $n \times (k+1)$, denominada de matriz de incidência ou de modelo; $\boldsymbol{\hat{\beta}}$ é estimador do vetor $(k+1) \times 1$ de parâmetros do modelo; e $\mathbf{J}$ é uma matriz de 1's, de ordem $n \times n$. 
+
+Ademais,
+
+- $\mathbf{Y}'\mathbf{Y} = \mathbf{Y}' \mathbf{I} \mathbf{Y}$, em que $\mathbf{I}$ é uma matriz identidade de ordem $n$;
+
+- $\boldsymbol{\hat{\beta}}' \mathbf{X}' \mathbf{Y} = \left[ (\mathbf{X'} \mathbf{X})^{-1} \mathbf{X}' \mathbf{Y} \right]' \mathbf{X}' \mathbf{Y} = \mathbf{Y}' \mathbf{X} (\mathbf{X'} \mathbf{X})^{-1} \mathbf{X}' \mathbf{Y} = \mathbf{Y}' \mathbf{H} \mathbf{Y}$, em que $\mathbf{H}$ é denominada de **matriz chapéu** (_**hat matrix**_);
+
+Portanto, tem-se que
+$$
+\begin{array}{rcl}
+SQTotal & = & SQRegressão + SQErro \\
+\left[ \mathbf{Y}'\mathbf{Y} - \dfrac{1}{n} \mathbf{Y}'\mathbf{J}\mathbf{Y} \right] & = & \left[ \boldsymbol{\hat{\beta}}' \mathbf{X}' \mathbf{Y} - \dfrac{1}{n} \mathbf{Y}'\mathbf{J}\mathbf{Y} \right] + \left[ \mathbf{Y}'\mathbf{Y} - \boldsymbol{\hat{\beta}}' \mathbf{X}' \mathbf{Y} \right] \\
+\left[ \mathbf{Y}' \mathbf{I} \mathbf{Y} - \dfrac{1}{n} \mathbf{Y}'\mathbf{J}\mathbf{Y} \right] & = & \left[ \mathbf{Y}' \mathbf{H} \mathbf{Y} - \dfrac{1}{n} \mathbf{Y}'\mathbf{J}\mathbf{Y} \right] + \left[ \mathbf{Y}' \mathbf{I} \mathbf{Y} - \mathbf{Y}' \mathbf{H} \mathbf{Y} \right] \\
+\mathbf{Y}' \left[ \mathbf{I} - \dfrac{1}{n} \mathbf{J} \right] \mathbf{Y} & = &  \mathbf{Y}' \left[ \mathbf{H} - \dfrac{1}{n} \mathbf{J} \right] \mathbf{Y} + \mathbf{Y}' \left[  \mathbf{I} - \mathbf{H} \right] \mathbf{Y}.
+\end{array}
+$$
+
+Assim, pode-se observar que as três $SQ$ são formas quadráticas, definidas anteriormente como $Q(\mathbf{x}) = \mathbf{x}'\mathbf{A}\mathbf{x}$. Nessas $SQ$, o vetor $\mathbf{x}$ corresponde ao vetor $\mathbf{Y}$ e $\mathbf{A}$, a matriz núcleo da forma quadrática, muda de acordo com a $SQ$ considerada, ou seja,
+
+- $SQTotal = \mathbf{Y}' \left[ \mathbf{I} - \dfrac{1}{n} \mathbf{J} \right] \mathbf{Y}$, em que a matriz núcleo da forma quadrática é $\mathbf{A} = \left[ \mathbf{I} - \dfrac{1}{n} \mathbf{J} \right]$;
+
+- $SQRegressão = \mathbf{Y}' \left[ \mathbf{H} - \dfrac{1}{n} \mathbf{J} \right] \mathbf{Y}$, em que a matriz núcleo da forma quadrática é $\mathbf{A} = \left[ \mathbf{H} - \dfrac{1}{n} \mathbf{J} \right]$; e
+
+- $SQErro = \mathbf{Y}' \left[  \mathbf{I} - \mathbf{H} \right] \mathbf{Y}$, em que a matriz núcleo da forma quadrática é $\mathbf{A} = \left[  \mathbf{I} - \mathbf{H} \right]$.
+
+### Tabela da Análise de Variância - ANOVA
+
+Uma vez definida as $SQ$ como formas quadráticas, a tabela da ANOVA pode ser representada da seguinte maneira:
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-style:solid;border-width:0px;font-family:Arial, sans-serif;font-size:16px;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:16px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;border-left:none;border-right:none}
+.tg .tg-0pky{border-color:inherit;text-align:center;vertical-align:middle}
+.tg .tg-Lpky{border-color:inherit;text-align:left;vertical-align:middle}
+</style>
+<div style="display: flex; justify-content: center;">
+<table class="tg"><thead>
+  <tr>
+    <th style="width: 150px;" class="tg-0pky">FV</th>
+    <th style="width: 100px;" class="tg-0pky">GL</th>
+    <th style="width: 120px;" class="tg-0pky">SQ</th>
+    <th style="width: 120px;" class="tg-0pky">QM</th>
+    <th style="width: 100px;" class="tg-0pky">F</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td class="tg-Lpky">Regressão</td>
+    <td class="tg-0pky">$posto(P_2)$</td>
+    <td class="tg-0pky">$\mathbf{Y}'P_2\mathbf{Y}$</td>
+    <td class="tg-0pky">$\dfrac{\mathbf{Y}'P_2\mathbf{Y}}{posto(P_2)}$</td>
+    <td class="tg-0pky">$\dfrac{QMReg}{QMErro}$</td>
+  </tr>
+  <tr>
+    <td class="tg-Lpky">Erro</td>
+    <td class="tg-0pky">$posto(P_3)$</td>
+    <td class="tg-0pky">$\mathbf{Y}'P_3\mathbf{Y}$</td>
+    <td class="tg-0pky">$\dfrac{\mathbf{Y}'P_3\mathbf{Y}}{posto(P_3)}$</td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <th class="tg-Lpky">Total</th>
+    <th class="tg-0pky">$posto(P_1)$</th>
+    <th class="tg-0pky">$\mathbf{Y}'P_1\mathbf{Y}$</th>
+    <th class="tg-0pky"></th>
+    <th class="tg-0pky"></th>
+  </tr>
+</tbody>
+</table>
+</div>
+
+em que:
+
+- $P_1 = \left[ \mathbf{I} - \dfrac{1}{n} \mathbf{J} \right]$, sendo $\mathbf{I}$ uma matriz identidade e $\mathbf{J}$ uma matriz de 1's, ambas de ordem $n \times n$;
+
+- $P_2 = \left[ \mathbf{H} - \dfrac{1}{n} \mathbf{J} \right]$, com $\mathbf{H} = \mathbf{X} (\mathbf{X'} \mathbf{X})^{-1} \mathbf{X}'$; e
+
+- $P_3 = \left[  \mathbf{I} - \mathbf{H} \right]$.
+
+### Exemplo 1
+
+::: {.data data-latex=""}
+Considere o Exemplo 1, vista na aula sobre o teste para falta de ajuste (adaptado de VOGEL, L.M.; SCHUMACHER, M.V.; BARICHELO, L.R.; OLIVEIRA, L.S.; CALDEIRA, M.V.W. **Ciência Florestal**, Santa Maria, v.11, n.1, p.21-27, 2001). Trata-se de dados provenientes de um estudo foi desenvolvido com o objetivo de avaliar os efeitos causados pela utilização de diferentes doses de vermicomposto (húmus) e seus reflexos no crescimento de mudas de _Hovenia dulcis_. O delineamento experimental utilizado foi o delineamento inteiramente casualizado (DIC) com cinco tratamentos (T1. testemunha (sem-vermicomposto), T2. com 10% de vermicomposto, T3. com 20% de vermicomposto, T4. com 30% de vermicomposto e T5. com 40% de vermicomposto do volume total do tubete) e quatro repetições. Para facilitar a ilustração dos conceitos abordados até o momento, serão consideradas apenas as médias dos diâmetros das mudas, em mm, de cada tratamento, dadas por:
+
+| Tratamentos (% vermicomposto) |   0  |  10  |  20  |  30  |  40  |
+|-------------------------------|:----:|:----:|:----:|:----:|:----:|
+| Diâmetro médio das mudas (mm) | 1,05 | 1,47 | 1,90 | 2,42 | 2,95 |
+:::
+
+A seguir é apresentado um script do R para obter as $SQ$, considerando as formas quadráticas definidas.
+
+```{r,warning=FALSE,message = FALSE, echo=TRUE, eval=FALSE}
+#####################
+## GES119 - Modelos Lineares I
+## Aula sobre formas quadraticas
+#####################
+#
+rm(list = ls())
+#
+Vermicomp<- c(0, 10, 20, 30, 40)
+Diam.med<- c(1.05, 1.47, 1.90, 2.42, 2.95)
+#
+## Ajuste do modelo linear simples - dados medios
+#
+reg1.med<- lm(Diam.med ~ Vermicomp)
+(an1<- anova(reg1.med))
+reg1.SQ<- c(an1[1,2], an1[2,2], an1[1,2] + an1[2,2])
+names(reg1.SQ)<- c("SQReg", "SQErro", "SQTotal")
+reg1.SQ
+#
+## Calculo das SQ a partir das formas quadraticas
+#
+(n<- length(Diam.med))
+(Y<- Diam.med)
+(X<- model.matrix(Diam.med ~ Vermicomp))
+(H<- round(X %*% solve(t(X) %*% X) %*% t(X), 4))
+(I<- diag(n))
+(J<- matrix(1, nrow = n, ncol = n))
+(SQTotal<- t(Y) %*% (I - J/n) %*% Y)
+(SQReg<- t(Y) %*% (H - J/n) %*% Y)
+(SQErro<- t(Y) %*% (I - H) %*% Y)
+reg1.SQ
+#
+## GRAUS DE LIBERDADE (rank ou posto) - ANOVA
+qr(A.Total)$rank
+qr(A.Reg)$rank
+qr(A.Erro)$rank
+an1
+```
+
+## Classificação das formas quadráticas
+
+A classificação de uma forma quadrática é importante para facilitar algumas definições e demonstrações que serão apresentadas posteriormente, como por exemplo, na definição das distribuições e independência das $SQ$ e, consequentemente, na definição dos testes F da ANOVA.
+
+Dada uma forma quadrática $Q(\mathbf{x}) = \mathbf{x}' \mathbf{A} \mathbf{x}$, então:
+
+i. $Q(\mathbf{x})$ é positiva definida se e somente se $Q(\mathbf{x}) > 0, \forall \mathbf{x} \ne \phi$, em que $\phi$ é um vetor nulo ou um vetor de zeros.
+
+ii. $Q(\mathbf{x})$ é positiva semi-definida se e somente se $Q(\mathbf{x}) \ge 0$, para $\mathbf{x} \ne \phi$, e existe pelo menos um $\mathbf{x} \ne \phi$ tal que $Q(\mathbf{x}) = 0$.
+
+iii. $Q(\mathbf{x})$ é negativa definida se e somente se $Q(\mathbf{x}) < 0, \forall \mathbf{x} \ne \phi$.
+
+iv. $Q(\mathbf{x})$ é negativa semi-definida se e somente se $Q(\mathbf{x}) \le 0$, para $\mathbf{x} \ne \phi$, e existe pelo menos um $\mathbf{x} \ne \phi$ tal que $Q(\mathbf{x}) = 0$.
+
+v. $Q(\mathbf{x})$ é não definida quando $Q(\mathbf{x})$ muda de sinal conforme a escolha de $\mathbf{x} \ne \phi$.
+
+_**Observação:**_ as formas quadráticas classificadas como em (i) e (ii) são utilizadas em modelos lineares, sejam de posto completo (modelos lineares de regressão) ou de posto incompleto (modelos de delineamentos).
+
+::: {.important data-latex=""}
+EXEMPLOS DE FORMAS QUADRÁTICAS E CLASSIFICAÇÕES
+
+- _**Exemplo 1:**_ $Q(\mathbf{x}) = \mathbf{x}' \mathbf{I} \mathbf{x} = \mathbf{x}'\mathbf{x} = \displaystyle \sum_{i=1}^n x_i^2$, é positiva definida, pois é uma soma de quadrados e $\mathbf{x}'\mathbf{x} = 0 \Leftrightarrow \mathbf{x} = \phi$. 
+
+- _**Exemplo 2:**_ $Q(\mathbf{x}) = \mathbf{x}' \mathbf{J} \mathbf{x} = \left( \displaystyle \sum_{i=1}^n x_i \right)^2$, em que $\mathbf{J}$ é uma matriz de 1's, é positiva semi-definida, pois refere-se a um quadrado, sendo portanto não negativa. No entanto, qualquer vetor $\mathbf{x}$ tal que a soma de seus componentes seja nula, implicará em $Q(\mathbf{x}) = 0$.
+
+- _**Exemplo 3:**_ $Q(\mathbf{x}) = \begin{bmatrix} x_1 & x_2 \end{bmatrix} \begin{bmatrix} 2 & 4 \\ 4 & 2 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}$ é não definida, pois muda de sinal de acordo com a escolha de $\mathbf{x} \ne \phi$. Como exemplos: para $\mathbf{x}' =  \begin{bmatrix} 1 & 1 \end{bmatrix} \Rightarrow Q(\mathbf{x}) = 12$; e para $\mathbf{x}' =  \begin{bmatrix} 1 & -1 \end{bmatrix} \Rightarrow Q(\mathbf{x}) = -4$.
+:::
+
+
+A classificação das formas quadráticas por meio da definição é bem pouco operacional e pode-se tornar muito difícil. Porém, a classificação de uma forma quadrática é a mesma de sua matriz núcleo, ou seja, da matriz $\mathbf{A}$. Existem diferentes maneiras, bem mais diretas, para se classificar a matriz $\mathbf{A}$. Duas delas são:
+
+1. Por meio da diagonalização de $\mathbf{A}$ por meio de operações de congruência;
+
+2. Pela avaliação da matriz 
+
+$$\mathbf{\Lambda} = diag \{ \lambda_1, \lambda_2, \ldots, \lambda_n \} = 
+\begin{bmatrix} 
+\lambda_1 & 0 & 0 & \cdots & 0 \\
+0 & \lambda_2 & 0 & \cdots & 0 \\
+0 & 0 & \lambda_3 & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+0 & 0 & 0 & \cdots & \lambda_n 
+\end{bmatrix},
+$$
+
+a matriz diagonal que exibe as raízes características ou autovalores de $\mathbf{A}$.
+
+### Diagonalização de matrizes simétricas (por congruência)
+
+Consiste na obtenção de uma matriz diagonal $\mathbf{D}$ a partir da matriz simétrica $\mathbf{A}$, por meio de operações elementares (por congruência), ou seja,
+$$
+\begin{bmatrix}
+\mathbf{A} & | & \mathbf{I}
+\end{bmatrix} \sim \cdots \sim  ^\mbox{ por congruência } \sim \cdots \sim
+\begin{bmatrix}
+\mathbf{D} & | & \mathbf{B}'
+\end{bmatrix}.
+$$
+Dessa forma, as matrizes $\mathbf{D}$ e $\mathbf{A}$ são congruentes e $\mathbf{D} = \mathbf{B}'\mathbf{A}\mathbf{B}$, para alguma $\mathbf{B}$ não singular.
+
+A classificação da matriz $\mathbf{D}$ é a mesma de $\mathbf{A}$ e, consequentemente, na forma quadrática.
+
+::: {.algebra data-latex=""}
+**Método de diagonalização por congruência:** as operações elementares feitas nas linhas de $\mathbf{A}$ são também realizadas na matriz $\mathbf{I}$ justaposta à direita de $\mathbf{A}$. Porém, as mesmas operações efetuadas passo a passo nas colunas de $\mathbf{A}$ não são realizadas em $\mathbf{I}$.
+:::
+
+Considerando a forma quadrática $Q(\mathbf{x}) = \mathbf{x}' \mathbf{A} \mathbf{x}$ e a matriz $\mathbf{D}$ dada por:
+$$
+\mathbf{D} =
+\begin{bmatrix}
+d_1 & 0 & \cdots & 0 \\
+0 & d_2 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & d_n
+\end{bmatrix},
+$$
+então:
+
+i. $Q(\mathbf{x})$ é positiva definida $\Leftrightarrow d_i > 0$, $i = 1, 2, \ldots, n$.
+
+ii. $Q(\mathbf{x})$ é positiva semi-definida $\Leftrightarrow d_i \ge 0$, $i = 1, 2, \ldots, n$, com pelo menos um $d_i = 0$.
+
+iii. $Q(\mathbf{x})$ é negativa definida $\Leftrightarrow d_i < 0$, $i = 1, 2, \ldots, n$.
+
+iv. $Q(\mathbf{x})$ é negativa semi-definida $\Leftrightarrow d_i \le 0$, $i = 1, 2, \ldots, n$, com pelo menos um $d_i = 0$.
+
+v. $Q(\mathbf{x})$ é não definida se $d_i$ muda de sinal.
+
+
+::: {.exercicios data-latex=""}
+1. Seja a forma quadrática $Q(\mathbf{x}) = 2x_1^2 + 2x_1x_2 + 2x_2^2$, <!--tem-se a forma matricial:
+$$
+Q(\mathbf{x}) = \mathbf{x}' \mathbf{A} \mathbf{x} = 
+\begin{bmatrix}
+x_1 & x_ 2
+\end{bmatrix}
+\begin{bmatrix}
+2 & 1 \\ 1 & 2
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\ x_2
+\end{bmatrix}.
+$$
+---> mostre que 
+$$
+\mathbf{D} = 
+\begin{bmatrix}
+2 & 0 \\ 0 & 3/2
+\end{bmatrix}
+$$
+e que $Q(\mathbf{x})$ é, portanto, positiva definida.
+
+2. Seja a forma quadrática $Q(\mathbf{x}) = x_1^2 + 6x_1x_2 + x_2^2$
+<!--, tem-se a forma matricial:
+$$
+Q(\mathbf{x}) = \mathbf{x}' \mathbf{A} \mathbf{x} = 
+\begin{bmatrix}
+x_1 & x_ 2
+\end{bmatrix}
+\begin{bmatrix}
+1 & 3 \\ 3 & 1
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\ x_2
+\end{bmatrix}.
+$$
+---> mostre que 
+$$
+\mathbf{D} = 
+\begin{bmatrix}
+1 & 0 \\ 0 & -8
+\end{bmatrix}
+$$
+e que $Q(\mathbf{x})$ é, portanto, não definida.
+:::
+
+\
+
+### Por meio da matriz diagonal dos autovalores de $\mathbf{A}$
+
+**Teorema** (Noble e Daniel, 1977): Seja $\mathbf{A}$ uma matriz $n \times n$, real e simétrica, e a matriz diagonal de raízes características ou autovalores ($\lambda_i$) de $\mathbf{A}$, com $i=1,2,\ldots,n$, dada por:
+
+:::aside
+NOBLE, B.; DANIEL, J.W. **Applied linear algebra**. 3ed. Englewood Cliffs: Prentice-Hall, 1977.
+:::
+
+
+$$
+\Lambda =
+\begin{bmatrix}
+\lambda_1 & 0 & \cdots & 0 \\
+0 & \lambda_2 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & \lambda_n
+\end{bmatrix},
+$$
+então:
+
+i. $\mathbf{A}$ é positiva definida $\Leftrightarrow \lambda_i > 0$, $\forall i$.
+
+ii. $\mathbf{A}$ é positiva semi-definida $\Leftrightarrow \lambda_i \ge 0$, $\forall i$, com pelo menos um $\lambda_i = 0$.
+
+iii. $\mathbf{A}$ é negativa definida $\Leftrightarrow \lambda_i < 0$, $\forall i$.
+
+iv. $\mathbf{A}$ é negativa semi-definida $\Leftrightarrow \lambda_i \le 0$, $\forall i$, com pelo menos um $\lambda_i = 0$.
+
+v. $\mathbf{A}$ é não definida se $\lambda_i$ muda de sinal.
+
+**OBSERVAÇÃO:** nessa disciplina iremos determinar os autovalores de uma matriz apenas utilizando software. Como exemplo, pode-se utilizar a função `eigen()` do R.
+
+::: {.singlelab data-latex=""}
+Classifique as mesmas formas quadráticas apresentadas nos exercícios 1 e 2, utilizando os autovalores associados às matrizes núcleo.
+:::
+
+::: {.home data-latex=""}
+Verifique se as $SQ$ apresentadas em aula são formas quadráticas positivas definidas, positivas semi-definidas, negativas definidas, negativas semi-definidas ou não definidas. Discuta sobre o porquê das classificações obtidas e apresente situações que satisfaçam às classificações apresentadas.
+:::
+
+
+
+

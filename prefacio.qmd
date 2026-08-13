@@ -1,0 +1,10 @@
+## Prefácio {.unnumbered}
+
+Um curso de modelos lineares é de extrema importância na formação de um estatístico e de profissionais de outras áreas, uma vez que seus conceitos são diretamente aplicados à análise de dados. A modelagem de um fenômeno, juntamente com a interpretação de um modelo ajustado e a inferência em relação ao mesmo, é frequentemente utilizada na descrição da relação entre variáveis, seja essa relação de causa e efeito ou não, bem como na identificação de fatores responsáveis pelo comportamento e pela variabilidade de uma variável em estudo.
+
+Este material tem como objetivo apresentar um texto introdutório sobre a teoria de modelos lineares, abordando os modelos de posto completo ou modelos de regressão. Este foi desenvolvido devido à necessidade de se ter um material básico e em português para ser utilizado em cursos de graduação, considerando os aspectos teóricos e apresentando aplicações práticas da teoria, de forma bem didática.
+
+O material contempla a definição de modelos lineares, com foco em modelos de regressão, partindo desde um modelo de regressão linear simples até modelos de regressão múltipla, com desenvolvimentos algébricos e matriciais importantes. Também são abordados temas sobre intervalos de confiança e testes de hipóteses associados a parâmetros do modelo considerado, análise de variância da regressão, análise de resíduos e diagnósticos, multicolinearidade, métodos de seleção de variáveis e uma breve introdução à regressão logística.
+
+Espera-se que, com o suporte desse material, tenha-se conhecimento teórico-prático para descrever os modelos regressão linear utilizando álgebra de matrizes, compreender o processo de estimação aplicados a esses modelos e interpretar corretamente as estimativas e predições obtidas, aplicar os modelos de regressão linear em situações reais utilizando recursos computacionais e explicar o processo de ajuste de modelos de regressão a um conjunto de dados, incluindo as etapas de seleção de variáveis e análise de resíduos.
+

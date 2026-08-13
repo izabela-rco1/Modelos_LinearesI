@@ -1,0 +1,134 @@
+---
+title: "Introdução aos modelos lineares"
+---
+
+::: {.chapterintro data-latex=""}
+Bem-vindos ao curso de Modelos Lineares I! Hoje vamos apresentar uma visão geral sobre essa disciplina, nossos objetivos, recomendações, estrutura das aulas e principais atividades avaliativas. Também apresentaremos uma visão geral sobre os modelos lineares.
+
+Essa aula introdutória é baseada no Capítulo 1 de *Linear Models in Statistics*, de Rencher e Schaalje (2008). Este é um livro clássico sobre assunto, muito usado em cursos de Estatística em nível de graduação e pós-graduação, e será um dos textos de referência do nosso curso. 
+:::
+
+## Por que estudar Modelos Lineares?  
+
+O parágrafo a seguir foi extraído de Rencher e Schaalje (2008), por expressar de forma clara a importância do estudo dos modelos lineares. Mesmo após 17 anos desde a publicação da obra, e apesar dos avanços tecnológicos que hoje possibilitam o uso de modelos computacionalmente mais sofisticados, a compreensão dos modelos lineares continua sendo a base da formação em Estatística.
+
+
+::: {style="text-align: center;"}
+*Apesar da disponibilidade de ferramentas altamente inovadoras em Estatística, a principal ferramenta do estatístico aplicado continua sendo o modelo linear. O modelo linear envolve as propriedades estatísticas mais simples e aparentemente mais restritivas: independência, normalidade, constância da variância e linearidade. No entanto, o modelo e os métodos estatísticos a ele associados são surpreendentemente versáteis e robustos. Mais importante ainda, o domínio do modelo linear é um pré-requisito para trabalhar com ferramentas estatísticas avançadas, pois a maioria dessas ferramentas é uma generalização do modelo linear. O modelo linear é, portanto, central na formação de qualquer estatístico, seja aplicado ou teórico.* - Rencher e Schaalje (2008)
+:::
+
+
+## O Modelo de Regressão Linear Simples (MRLS)
+
+Usaremos uma regressão linear simples para descrever a relação entre duas variáveis. Para uma relação linear, podemos usar um modelo da forma:
+
+$$
+Y = \beta_{0} + \beta_{1}x + \varepsilon,
+$$
+
+em que $Y$ é uma variável *dependente* ou *resposta* e $x$ é uma variável *independente* ou *preditora*. A variável aleatória $\varepsilon$ é o termo do erro no modelo, que reflete as flutuações aleatórias, erros de medidas, ou efeito de fatores fora do nosso controle.
+
+A linearidade do modelo é uma das pressuposições (outras serão apresentadas em breve). 
+
+
+::: {.important data-latex=""}
+Em *Modelo de Regressão Linear Simples*, o termo *simples* indica que há apenas uma variável explicativa. O termo *linear* significa que o modelo é linear nos parâmetros, $\beta_{0}$ e $\beta_{1}$.
+
+Exemplo: O modelo $Y = \beta_{0} + \beta_{1}x^{2} + \varepsilon$ é linear em $\beta_{0}$ e em $\beta_{1}$, enquanto o modelo $Y = \beta_{0} + e^{\beta_{1}x} + \varepsilon$ é não linear.  
+:::
+
+Usando os valores observados de $x$ e $Y$, estimamos $\beta_0$ e $\beta_1$ e fazemos inferências para esses parâmetros, usando intervalos de confiança e testes de hipóteses. Também podemos usar o modelo estimado para prever ou estimar o valor de $Y$ para um determinado valor de $x$. Nesse caso, uma medida de acurácia preditiva também pode ser de interesse.
+
+
+## O Modelo de Regressão Linear Múltipla (MRLM)
+
+Na prática, a variável resposta $Y$ é frequentemente influenciada por mais de uma variável preditora. 
+
+Um modelo linear que relaciona a resposta $Y$ a várias preditoras é dado por:
+
+
+$$
+Y = \beta_{0} + \beta_{1}x_{1} + \beta_{2}x_{2} + \ldots + \beta_{k}x_{k} + \varepsilon, \tag{3.1}
+$$
+em que os parâmetros $\beta_{0}, \beta_{1}, \ldots, \beta_{k}$ são os coeficientes de regressão e $\varepsilon$ é o termo do erro como explicado no MRLS.
+
+::: {.important data-latex=""}
+O modelo (3.1) é linear nos parâmetros $\beta$, mas não necessariamente linear nas variáveis $x$. 
+
+O modelo $Y = \beta_{0} + \beta_{1}x_{1} + \beta_{2}x_{1}^2 + \beta_{3}x_{2} + \beta_{4}\sin x_{2} + \varepsilon$ é designado como *modelo linear*.
+:::
+
+Esses modelos teóricos tentam representar o mecanismo gerador dos dados, fornecendo aproximações úteis da relação existente entre as variáveis. Essas relações podem ser associativas ou causais, a depender de como os dados foram gerados.
+
+
+Os modelos de regressão são úteis para$^1$:
+
+1. **Predição.** As estimativas dos parâmetros individuais $\beta_0, \beta_1, \ldots, \beta_k$ são menos importantes para previsão do que a influência geral das variáveis $x$ sobre $Y$. No entanto, boas estimativas são necessárias para obter um bom desempenho preditivo.  
+
+2. **Descrição ou Explicação dos Dados.** O analista pode usar o modelo estimado para resumir ou descrever os dados observados.  
+
+3. **Estimativa de Parâmetros.** Os valores dos parâmetros estimados podem ter implicações teóricas para um modelo proposto.  
+
+4. **Seleção de Variáveis.** A ênfase está em determinar a importância de cada variável preditora para modelar a variação em $Y$. Os preditores que estão associados a uma parcela importante da variação em $Y$ são mantidos no modelo e aqueles que contribuem pouco são descartados.  
+
+5. **Controle da resposta.** Assume-se uma relação de causa e efeito entre as variáveis $x$ e $Y$. O modelo estimado pode então ser usado para controlar a resposta de um processo, variando as entradas. Por meio de experimentação sistemática, pode ser possível alcançar a resposta ótima.  
+
+:::aside
+$^1$ Rencher e Schaalje (2008). *Linear Models in Statistics*. p.2-3.
+:::
+
+
+::: {.caution data-latex=""}
+Atenção para os objetivos 1 e 5 e a diferença entre associação e causalidade.
+:::
+
+
+## 4. Modelos de Análise de Variância
+
+Nos modelos de análise de variância (ANOVA), estamos interessados em comparar várias populações ou várias condições em um estudo. Modelos de análise de variância podem ser expressos como modelos lineares com restrições nos valores de $x$. Tipicamente, os $x$ são 0s ou 1s.  
+
+Por exemplo, suponha que um pesquisador deseje comparar a média de uma variável $Y$ para quatro tratamentos diferentes. Se $n$ observações forem obtidas para cada tratamento, um modelo para todas as observações pode ser expresso como  
+
+$$
+y_{ij} = \mu_i + \varepsilon_{ij}, \quad i = 1, 2, 3, 4, \quad j = 1, 2, \ldots, n
+$$
+
+em que $\mu_i$ é a média correspondente ao $i$-ésimo tratamento. Uma hipótese de interesse é  
+
+$$
+H_0 : \mu_1 = \mu_2 = \mu_3 = \mu_4
+$$
+
+Então, o modelo acima pode ser expresso de forma alternativa como  
+
+$$
+y_{ij} = \mu + \alpha_i + \varepsilon_{ij}, \quad i = 1, 2, 3, 4, \quad j = 1, 2, \ldots, n
+$$
+
+em que $\alpha_i$ é o efeito do $i$-ésimo tratamento, e a hipótese pode ser expressa como  
+
+$$
+H_0 : \alpha_1 = \alpha_2 = \alpha_3 = \alpha_4
+$$
+
+Suponha agora que o pesquisador também deseje comparar os efeitos de três níveis de um segundo fator, e que $n$ observações sejam obtidas para cada uma das 12 combinações fator1–fator2. Então, o modelo pode ser expresso como  
+
+$$
+y_{ijk} = \mu_{ij} + \varepsilon_{ijk} = \mu + \alpha_i + \beta_j + \gamma_{ij} + \varepsilon_{ijk}
+$$
+
+com  
+
+$$
+i = 1, 2, 3, 4; \quad j = 1, 2, 3; \quad k = 1, 2, \ldots, n
+$$
+
+em que $\mu_{ij}$ é a média para a combinação $ij$ de fator1–fator2, $\alpha_i$ é o efeito do $i$-ésimo nível do fator 1, $\beta_j$ é o efeito do $j$-ésimo nível do fator 2, e $\gamma_{ij}$ é a interação ou efeito conjunto do $i$-ésimo nível do fator 1 com o $j$-ésimo nível do fator 2.
+
+
+Apesar de os modelos de análise de variância serem tratados como um caso especial dos modelos de regressão, eles serão objeto de estudo da disciplina Modelos Lineares II.
+
+Na próxima aula, vamos começar o estudo dos modelos de regressão pelo *Modelo de Regressão Linear Simples*.
+
+
+

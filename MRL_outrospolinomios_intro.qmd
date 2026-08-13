@@ -1,0 +1,208 @@
+---
+title: "Modelos de regressão linear (MRL) - modelos polinomiais"
+---
+
+::: {.chapterintro data-latex=""}
+Na aula de hoje vamos estudar modelos de regressão linear (MRL), considerando polinômios de 2$^o$ grau ou superior. Serão apresentados a forma geral do modelo, sua interpretação e o método de Mínimos Quadrados (MMQ) para estimação dos parâmetros. Além disso, será apresentada a notação ou representação matricial dos MRL. 
+
+Essa aula é baseada no capítulo 7 de _Linear Models in Statistics_ (Rencher e Schaalje, 2008), nos capítulos 1 e 8 de Charnet et al. (2008) e no capítulo 7 de [Introduction to Modern Statistics (2e)](https://openintro-ims.netlify.app/)
+:::
+
+
+## Um exemplo: relação da produção e da temperatura em um certo processo químico 
+
+::: {.data data-latex=""}
+(Adaptado de Charnet et al., 2008, p. 195)
+
+Uma indústria química está interessada em maximizar a sua produção em um certo processo químico. Para isso, obteve os os pesos do produto (y), em kg, considerando diferentes temperaturas (x), em $\degree$C. Nesse tipo de reação química, a quantidade da substância produzida pode aumentar até um certo valor crítico, no qual a quantidade da substância produzida começa a diminuir devido à sua decomposição pelo aumento da temperatura.
+:::
+
+::: columns
+::: {.column width="35%"}
+
+```{r,warning=FALSE,message = FALSE, echo=FALSE}
+#library(downloadthis)
+library(readxl)
+
+dados.quim<- read_excel("dados/Exerc2_p195_CHARNETetal2008_adapt.xlsx")
+
+#dados.quim %>%
+#    download_this(
+#    output_name = "dados.quim",
+#    output_extension = ".xlsx",
+#    button_label = "Download dos dados",
+#    button_type = "primary",
+#    has_icon = TRUE,
+#    icon = "fa fa-save"
+#  )
+```
+:::
+:::
+
+
+Uma maneira de visualizar a relação entre essas duas variáveis é por meio de um gráfico de dispersão.
+
+```{r,warning=FALSE,message = FALSE, echo=TRUE}
+#| label: fig-disp
+#| fig-cap: "Gráfico de dispersão de produção e temperatura."
+
+library(ggplot2)
+dados.quim <- read_excel("dados/Exerc2_p195_CHARNETetal2008_adapt.xlsx")
+#
+plot2 <- ggplot(dados.quim, aes(x = Temp, y = Prod)) +
+  geom_point() +
+  labs(
+    x = expression(paste("Temperatura (", degree*C,")")),
+    y = "Produção (kg)"
+  ) +
+  theme_classic()
+plot2
+```
+
+Ao observar a relação entre as variáveis temperatura e produção na @fig-disp, percebe-se que uma linha reta não é adequada para descrever essa associação. Isso pode ser comprovado ajustando-se a equação da reta, como visto na aula sobre regressão linear simples. A equação da reta ajustada seria dada por:
+
+$$
+\hat{y} = 5,2273 + 0,1454x
+$$
+
+e acrescentando essa reta ajustada ao gráfico de dispersão teremos o gráfico apresentado na @fig-disp-line.
+
+
+```{r,warning=FALSE,message = FALSE, echo=TRUE}
+#| label: fig-disp-line
+#| fig-cap: "Equação de regressão linear simples ajustada para representar a relação entre a produção e a temperatura da reação química."
+
+plot2 + geom_function(fun = function(x) 5.2273 + 0.1454*x)
+
+```
+
+
+```{r,warning=FALSE,message = FALSE, include=FALSE}
+reg1 <- lm(Prod ~ Temp, data = dados.quim)
+print(reg1$coefficients)
+
+summary(reg1)
+```
+
+Como a reta não representa bem a relação entre a temperatura e a produção, temos que tentar ajustar outros modelos. Inicialmente, podemos continuar com um modelo polinomial e ajustar uma equação de 2$^o$ grau, ou seja, uma parábola.
+
+
+## O Modelo de regressão linear de 2$^o$ grau
+
+Considere uma variável aleatória $Y$, usualmente denominada variável resposta, e uma variável $X$, que chamaremos de variável explicativa. 
+
+O modelo de regressão linear de 2$^o$ grau ou quadrático (MRLQ), assim como o modelo de regressão linear simples (MRLS) descreve $Y$ como a soma de uma quantidade determinística e uma aleatória. Porém, a parte determinística é uma parábola em função de $X$, que representa a informação esperada sobre $Y$ dado o conhecimento de $X$. A parte aleatória, chamada erro, representa os inúmeros fatores que podem interferir em $Y$ e provoca uma distorção sobre a parte determinística. 
+
+O MRLQ pode ser escrito, de forma geral, por:
+
+$$
+Y = \beta_{0} + \beta_{1}x + \beta_{2}x^2 + \varepsilon
+$$
+em que $\beta_{0}$, $\beta_{1}$, $\beta_{2}$ e $x$ são constantes, $\varepsilon$ é uma variável aleatória com distribuição normal, com esperança $0$ e variância $\sigma^{2}$, isto é,  $\varepsilon \sim \textrm{N}(0; \sigma^{2})$. 
+
+
+**Resultado 1.** Considerando o modelo de regressão linear quadrático com a suposição de normalidade do erro, a distribuição de probabilidade de $Y$ é dada por:
+
+$$
+Y \sim \textrm{N}(\beta_{0} + \beta_{1}x + \beta_{2}x^2; \sigma^{2}).
+$$
+Os parâmetros $\beta_{0}$, $\beta_{1}$ e $\beta_{2}$ determinam a posição, a forma e a inclinação da parábola, ou seja,
+
+- $\beta_{2}$: define a concavidade da parábola. Se $\beta_{2}>0$, a parábola tem concavidade para cima (forma de U). Se $\beta_{2}<0$, a parábola tem concavidade para baixo (forma de U invertido).
+
+- $\beta_{1}$: seu valor está associado à posição e inclinação da parábola. Se $\beta_{1} = 0$, a parábola está simetricamente posicionada no eixo $y$. Se $\beta_{1}$ e $\beta_{2}$ têm sinais diferentes, o vértice da parábola está à esquerda do eixo $y$. Se $\beta_{1}$ e $\beta_{2}$ têm sinais iguais, o vértice da parábola está à direita do eixo $y$.
+
+- $\beta_{0}$: está associado ao ponto onde a parábola corta o eixo y. Se $\beta_{1}=0$, a parábola passa pela origem (0,0). Se $\beta_{1}>0$, a parábola corta o eixo $y$ acima da origem e se $\beta_{1}<0$, a parábola corta o eixo $y$ abaixo da origem.
+
+Além disso, os valores de $\beta_{1}$ e $\beta_{2}$ estão associados ao ponto crítico (vértice) da parábola, ou seja, determinam ponto de máximo ou mínimo.
+
+### Estimação de $\beta_{0}$, $\beta_{1}$ e $\beta_{2}$
+
+Considerando que se tenha uma amostra aleatória de $n$ observações, o modelo de 2$^o$ grau pode ser escrito como:
+
+$$
+y_i = \beta_{0} + \beta_{1}x_i + \beta_{2}x_i^2 + \varepsilon_i,
+$$
+em que $y_i$ é a i-ésima observação da variável dependente; $x_i$ é o i-ésimo valor da variável explicativa $x$; $\beta_{0}$, $\beta_{1}$ e $\beta_{2}$ são os parâmetros a serem estimados; e $\varepsilon_i$ corresponde ao erro aletório associado à observação $y_i$, sendo os erros independentes e indenticamente distribuídos segundo uma normal com variância $\sigma^2$. Assim, $\varepsilon_i \sim N(0,\sigma^2)$.
+
+Assim como na apresentação do MRLS, utilizaremos o método dos mínimos quadrados na obtenção dos estimadores de $\beta_{0}$, $\beta_{1}$ e $\beta_{2}$. 
+
+Considerando os $n$ valores observados $y_{i}$, o objetivo é obter os estimatores $\hat{\beta}_{0}$, $\hat{\beta}_{1}$ e $\hat{\beta}_{2}$ minizando a soma de quadrados dos erros, dada por
+
+$$
+\sum_{i=1}^{n} \varepsilon_{i}^2= \sum_{i=1}^{n} (y_i - \beta_0 - \beta_1 x_i - \beta_2 x_i^2)^2. 
+$$
+Após a obtenção das derivadas da função $\sum_{i=1}^{n} \varepsilon_{i}^2$ em relação a $\beta_{0}$, $\beta_{1}$ e $\beta_{2}$ e igualando essas três derivadas a zero, obtém-se o seguinte **Sistema de Equações Normais - SEN**:
+
+$$
+\left\{
+\begin{array}{ccc} 
+\sum_{i=1}^{n} y_i & = & n \hat{\beta_{0}} + \hat{\beta_{1}} \sum_{i=1}^{n} x_i + \hat{\beta_{2}} \sum_{i=1}^{n} x_i^2 \\
+\sum_{i=1}^{n} y_i x_i & = & \hat{\beta_{0}} \sum_{i=1}^{n} x_i + \hat{\beta_{1}} \sum_{i=1}^{n} x_i^2 + \hat{\beta_{2}} \sum_{i=1}^{n} x_i^3 \\
+\sum_{i=1}^{n} y_i x_i^2 & = & \hat{\beta_{0}} \sum_{i=1}^{n} x_i^2 + \hat{\beta_{1}} \sum_{i=1}^{n} x_i^3 + \hat{\beta_{2}} \sum_{i=1}^{n} x_i^4
+\end{array}
+\right.
+$$
+
+Solucionando o SEN, que tem três equações, três incógnitas e solução única, obtém-se a equação estimada:
+$$
+\hat{y}_i = \hat{\beta_{0}} + \hat{\beta_{1}}x_i + \hat{\beta_{2}}x_i^2.
+$$
+
+::: {.exercicios data-latex=""}
+**1.** Demonstre a obtenção do SEN referente ao modelo de 2$^o$ grau.
+
+**2.** Obter a equação estimada considerando os dados do exemplo apresentado no item 1.
+
+Resp.: $\hat{y} = -25,9198 + 2,7303x - 0,0517x^2$
+:::
+:::
+
+Considerando a equação estimada tem-se o gráfico apresentado na @fig-disp-quad.
+
+```{r,warning=FALSE,message = FALSE, echo=TRUE}
+#| label: fig-disp-quad
+#| fig-cap: "Equação de regressão linear quadrática ajustada para representar a relação entre a produção e a temperatura da reação química."
+
+plot2 + geom_function(fun = function(x) -25.9198 + 2.7303*x - 0.0517*x^2)
+
+```
+
+
+## Modelos de regressão polinomiais de maiores graus
+
+Se considerarmos modelos polinomiais de 3$^o$ grau ou superior, teremos SEN semelhantes, mas com número de incógnitas e equações cada vez maiores.
+
+Como exemplos, considere os modelos de 3$^o$ e 4$^o$ grau, representados a seguir:
+
+- SEN para o modelo de regressão de 3$^o$ grau:
+$$
+\left\{
+\begin{array}{ccc} 
+\sum_{i=1}^{n} y_i & = & n \hat{\beta_{0}} + \hat{\beta_{1}} \sum_{i=1}^{n} x_i + \hat{\beta_{2}} \sum_{i=1}^{n} x_i^2 + \hat{\beta_{3}} \sum_{i=1}^{n} x_i^3 \\
+\sum_{i=1}^{n} y_i x_i & = & \hat{\beta_{0}} \sum_{i=1}^{n} x_i + \hat{\beta_{1}} \sum_{i=1}^{n} x_i^2 + \hat{\beta_{2}} \sum_{i=1}^{n} x_i^3 + \hat{\beta_{3}} \sum_{i=1}^{n} x_i^4 \\
+\sum_{i=1}^{n} y_i x_i^2 & = & \hat{\beta_{0}} \sum_{i=1}^{n} x_i^2 + \hat{\beta_{1}} \sum_{i=1}^{n} x_i^3 + \hat{\beta_{2}} \sum_{i=1}^{n} x_i^4 + \hat{\beta_{3}} \sum_{i=1}^{n} x_i^5 \\
+\sum_{i=1}^{n} y_i x_i^3 & = & \hat{\beta_{0}} \sum_{i=1}^{n} x_i^3 + \hat{\beta_{1}} \sum_{i=1}^{n} x_i^4 + \hat{\beta_{2}} \sum_{i=1}^{n} x_i^5 + \hat{\beta_{3}} \sum_{i=1}^{n} x_i^6
+\end{array}
+\right.
+$$
+
+- SEN para o modelo de regressão de 4$^o$ grau:
+$$
+\left\{
+\begin{array}{ccc} 
+\sum_{i=1}^{n} y_i & = & n \hat{\beta_{0}} + \hat{\beta_{1}} \sum_{i=1}^{n} x_i + \hat{\beta_{2}} \sum_{i=1}^{n} x_i^2 + \hat{\beta_{3}} \sum_{i=1}^{n} x_i^3 + \hat{\beta_{4}} \sum_{i=1}^{n} x_i^4 \\
+\sum_{i=1}^{n} y_i x_i & = & \hat{\beta_{0}} \sum_{i=1}^{n} x_i + \hat{\beta_{1}} \sum_{i=1}^{n} x_i^2 + \hat{\beta_{2}} \sum_{i=1}^{n} x_i^3 + \hat{\beta_{3}} \sum_{i=1}^{n} x_i^4 + \hat{\beta_{4}} \sum_{i=1}^{n} x_i^5 \\
+\sum_{i=1}^{n} y_i x_i^2 & = & \hat{\beta_{0}} \sum_{i=1}^{n} x_i^2 + \hat{\beta_{1}} \sum_{i=1}^{n} x_i^3 + \hat{\beta_{2}} \sum_{i=1}^{n} x_i^4 + \hat{\beta_{3}} \sum_{i=1}^{n} x_i^5 + \hat{\beta_{4}} \sum_{i=1}^{n} x_i^6 \\
+\sum_{i=1}^{n} y_i x_i^3 & = & \hat{\beta_{0}} \sum_{i=1}^{n} x_i^3 + \hat{\beta_{1}} \sum_{i=1}^{n} x_i^4 + \hat{\beta_{2}} \sum_{i=1}^{n} x_i^5 + \hat{\beta_{3}} \sum_{i=1}^{n} x_i^6 + \hat{\beta_{4}} \sum_{i=1}^{n} x_i^7 \\
+\sum_{i=1}^{n} y_i x_i^4 & = & \hat{\beta_{0}} \sum_{i=1}^{n} x_i^4 + \hat{\beta_{1}} \sum_{i=1}^{n} x_i^5 + \hat{\beta_{2}} \sum_{i=1}^{n} x_i^6 + \hat{\beta_{3}} \sum_{i=1}^{n} x_i^7 + \hat{\beta_{4}} \sum_{i=1}^{n} x_i^8
+\end{array}
+\right.
+$$
+
+Pode-se observar que a complexidade dos SEN's, bem como a obtenção das soluções desses sistemas ou das estimativas dos parâmetros dos modelos, aumentam bastante. 
+
+Porém, existe uma maneira menos trabalhosa e geral para representar e trabalhar com os modelos de regressão linear, dentre os quais estão incluídos os modelos polinomiais. Basta utilizar a representação matricial desses modelos e, assim, teremos uma forma geral para definir os estimadores dos parâmetros. 
+
+Na sequência apresentaremos uma introdução a essa representação matricial, mas para isso é necessário revisar alguns conceitos de álgebra de matrizes, como: definição de vetores e matrizes; soma, subtração e multiplicação de matrizes; matrizes simétricas; matriz identidade; e inversa de uma matriz.
+

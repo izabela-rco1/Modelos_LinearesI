@@ -1,0 +1,63 @@
+project:
+  type: book
+
+book:
+  title: "Modelos Lineares: modelos de posto completo"
+  subtitle: "GES119 - Departamento de Estatística (DES/UFLA)"
+  author: 
+    - "Izabela R. Cardoso de Oliveira"
+    - "Renato Ribeiro de Lima"
+  language: pt
+  chapters:
+    - index.qmd
+    - prefacio.qmd
+    - ML_intro.qmd
+    - MRLS_intro.qmd
+    - MRL_outrospolinomios_intro.qmd
+    - MRLM_matricial_intro.qmd
+    - MRL_estimacao_matricial.qmd
+    - MRL_estimacao.qmd
+    - MRL_ANOVA.qmd
+    - TH_comparacao_modelos.qmd
+    - Formas_quadraticas_aula1.qmd
+    - Residuos_Diagnosticos.qmd
+    - Analise_residuos_Parte2.qmd
+    - Multicolinearidade.qmd
+    - Aula_MRL_Qualitativas.qmd
+    - Metodos_selecao_variaveis.qmd
+    - Regressao_logistica.qmd
+    - Regressao_logistica_ParteII.qmd
+    - Regressao_logistica_ParteIII.qmd
+    - referencias.qmd
+
+bibliography: referencias.bib
+nocite: "@*"
+
+format:
+  html:
+    theme: [estilo.scss]
+    linkcolor: "#808080" 
+    toc: true
+    toc-title: "Conteúdo"
+    code-copy: true
+    code-overflow: wrap
+    mainfont: "Atkinson Hyperlegible"
+    highlight-style: a11y-dark
+  # Configuração para versão em pdf
+  pdf:
+    documentclass: report
+    toc: true
+    toc-title: "Sumário"
+    number-sections: true
+    colorlinks: true
+    geometry:
+      - top=25mm
+      - bottom=25mm
+      - left=20mm
+      - right=20mm
+
+execute:
+  freeze: auto
+  echo: false
+
+editor: source
