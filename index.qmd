@@ -12,7 +12,7 @@ Data da versão: 11/08/2026
 Esse material está disponível gratuitamente. Recomendamos aos(às) leitores(as) que sempre que possível, façam a citação do livro em suas aulas ou trabalhos.
 
 ::: {.callout-note icon=false title="Formato em texto (ABNT)"}
-OLIVEIRA, Izabela R. Cardoso de; LIMA, Renato Ribeiro de. **Modelos Lineares: modelos de posto completo**. Lavras: Departamento de Estatística – UFLA, 2026. Disponível em: <https://seu-usuario.github.io/nome-do-repositorio/>. Acesso em: [data de acesso].
+OLIVEIRA, Izabela R. Cardoso de; LIMA, Renato Ribeiro de. **Modelos Lineares: modelos de posto completo**. Lavras: Departamento de Estatística – UFLA, 2026. Disponível em: <https://izabela-rco1.github.io/Modelos_LinearesI/>. Acesso em: [data de acesso].
 :::
 
 Para salvar a referência em gerenciadores de citação (Zotero, Mendeley, LaTeX):
@@ -24,7 +24,7 @@ Para salvar a referência em gerenciadores de citação (Zotero, Mendeley, LaTeX
   year      = {2026},
   publisher = {Departamento de Estat{\'i}stica -- UFLA},
   address   = {Lavras},
-  url       = {[https://seu-usuario.github.io/nome-do-repositorio/](https://seu-usuario.github.io/nome-do-repositorio/)}
+  url       = {[https://izabela-rco1.github.io/Modelos_LinearesI/](https://izabela-rco1.github.io/Modelos_LinearesI/)}
 }
 ```
 

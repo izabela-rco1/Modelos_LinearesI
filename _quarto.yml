@@ -44,17 +44,17 @@ format:
     mainfont: "Atkinson Hyperlegible"
     highlight-style: a11y-dark
   # Configuração para versão em pdf
-  pdf:
-    documentclass: report
-    toc: true
-    toc-title: "Sumário"
-    number-sections: true
-    colorlinks: true
-    geometry:
-      - top=25mm
-      - bottom=25mm
-      - left=20mm
-      - right=20mm
+#  pdf:
+#    documentclass: report
+#    toc: true
+#    toc-title: "Sumário"
+#    number-sections: true
+#    colorlinks: true
+#    geometry:
+#      - top=25mm
+#      - bottom=25mm
+#      - left=20mm
+#      - right=20mm
 
 execute:
   freeze: auto
