@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>8&nbsp; Testes de hipóteses: Comparação de modelos – Modelos Lineares: modelos de posto completo</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./Formas_quadraticas_aula1.html" rel="next">
+<link href="./MRL_ANOVA.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-26470a742aafa1a1e7b10f54c72c41f3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-578930c7c9073de1ad26189988221688.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./TH_comparacao_modelos.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Testes de hipóteses: Comparação de modelos</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Modelos Lineares: modelos de posto completo</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bem-vindos!</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./prefacio.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefácio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ML_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introdução aos modelos lineares</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRLS_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">O modelo de regressão linear simples (MRLS)</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_outrospolinomios_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelos de regressão linear (MRL) - modelos polinomiais</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRLM_matricial_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modelos de regressão linear múltipla (MRLM) e representação matricial</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_estimacao_matricial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Estimação em modelos de regressão linear (MRL) - representação matricial</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_estimacao.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Estimação em Modelos de Regressão Linear</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_ANOVA.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Análise de variância (ANOVA) da regressão</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./TH_comparacao_modelos.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Testes de hipóteses: Comparação de modelos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Formas_quadraticas_aula1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Formas quadráticas</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Residuos_Diagnosticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Analise_residuos_Parte2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Multicolinearidade.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Multicolinearidade</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Aula_MRL_Qualitativas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Modelos de regressão para preditores qualitativos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Metodos_selecao_variaveis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Métodos de seleção de variáveis</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Regressão logística</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica_ParteII.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Regressão logística: inferência e aplicações</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica_ParteIII.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Regressão logística: seleção de modelos, predição e qualidade do ajuste</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./referencias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referências</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Conteúdo</h2>
+   
+  <ul>
+  <li><a href="#testes-relacionados-aos-coeficientes-de-um-mrl" id="toc-testes-relacionados-aos-coeficientes-de-um-mrl" class="nav-link active" data-scroll-target="#testes-relacionados-aos-coeficientes-de-um-mrl"><span class="header-section-number">8.1</span> Testes relacionados aos coeficientes de um MRL</a>
+  <ul class="collapse">
+  <li><a href="#o-teste-f-global" id="toc-o-teste-f-global" class="nav-link" data-scroll-target="#o-teste-f-global"><span class="header-section-number">8.1.1</span> O teste F global</a></li>
+  <li><a href="#teste-para-um-beta_j-individual" id="toc-teste-para-um-beta_j-individual" class="nav-link" data-scroll-target="#teste-para-um-beta_j-individual"><span class="header-section-number">8.1.2</span> Teste para um <span class="math inline">\(\beta_{j}\)</span> individual</a></li>
+  </ul></li>
+  <li><a href="#reduções-nas-somas-de-quadrados-e-comparação-de-modelos" id="toc-reduções-nas-somas-de-quadrados-e-comparação-de-modelos" class="nav-link" data-scroll-target="#reduções-nas-somas-de-quadrados-e-comparação-de-modelos"><span class="header-section-number">8.2</span> Reduções nas somas de quadrados e comparação de modelos</a></li>
+  <li><a href="#um-exemplo-de-mrlm-usando-r" id="toc-um-exemplo-de-mrlm-usando-r" class="nav-link" data-scroll-target="#um-exemplo-de-mrlm-usando-r"><span class="header-section-number">8.3</span> Um exemplo de MRLM usando R</a>
+  <ul class="collapse">
+  <li><a href="#modelos-marginais" id="toc-modelos-marginais" class="nav-link" data-scroll-target="#modelos-marginais"><span class="header-section-number">8.3.1</span> Modelos marginais</a></li>
+  <li><a href="#modelos-de-regressão-linear-múltipla" id="toc-modelos-de-regressão-linear-múltipla" class="nav-link" data-scroll-target="#modelos-de-regressão-linear-múltipla"><span class="header-section-number">8.3.2</span> Modelos de Regressão Linear Múltipla</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Testes de hipóteses: Comparação de modelos</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapterintro">
+<p>Vamos iniciar essa aula pelo teste F global da ANOVA e pelo teste t que avalia a contribuição de cada parâmetro do modelo. Na sequência, discutiremos sobre a contribuição de variáveis explicativas em um MRLM, o que pode ser visto como um problema de comparação de modelos. Nesse contexto, será importante apresentar o conceito de redução de somas de quadrados (SQ) e apresentar os dois tipos de SQ adotadas na análise de modelos de regressão linear: a sequencial (tipo I) e a parcial (tipo II).</p>
+<p>Essa aula é baseada, principalmente, no capítulo 3 da <a href="https://des.ufla.br/~danielff/meusarquivospdf/RRC0.pdf">Apostila de Recursos Computacionais utilizando o R</a> (Ferreira, 2013), no capítulo 8 de Charnet et al.&nbsp;(2008) e no capítulo 7 de Kutner et al.&nbsp;(2004).</p>
+</div>
+<section id="testes-relacionados-aos-coeficientes-de-um-mrl" class="level2 page-columns page-full" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="testes-relacionados-aos-coeficientes-de-um-mrl"><span class="header-section-number">8.1</span> Testes relacionados aos coeficientes de um MRL</h2>
+<p>Vimos que uma tabela de Análise de Variância (ANOVA) resume quantidades que decorrem da partição da soma de quadrados total (SQ) e graus de liberdade associados à variável resposta <span class="math inline">\(Y\)</span>. Em um primeiro momento, usamos essas quantidades para testar a significância geral do MRL, ou seja, para saber e há uma regressão entre a resposta <span class="math inline">\(Y\)</span> e o conjunto de variáveis expicativas <span class="math inline">\(X\)</span>.</p>
+<section id="o-teste-f-global" class="level3" data-number="8.1.1">
+<h3 data-number="8.1.1" class="anchored" data-anchor-id="o-teste-f-global"><span class="header-section-number">8.1.1</span> O teste F global</h3>
+<p>O <strong>teste F global</strong> da ANOVA avalia se todos os <span class="math inline">\(\beta_{j} =0\)</span>, ou seja,</p>
+<p><span class="math display">\[
+\left\{
+\begin{array}{l}
+H_0: \beta_1 = \beta_2 = \ldots = \beta_k = 0 \\
+H_a: \beta_j \ne 0 \mbox{, para pelo menos um } j \mbox{, com } j = 1,2, \ldots, k
+\end{array} \right.
+\]</span></p>
+<p>e a estatística teste é</p>
+<p><span class="math display">\[
+F_c = \dfrac{QMReg}{QMErro}
+\]</span></p>
+<p>que, sob <span class="math inline">\(H_{0}\)</span>, segue uma distribuição <span class="math inline">\(F(\nu_1 = k; \nu_2 = n-k-1)\)</span>. Grandes valores de <span class="math inline">\(F_{c}\)</span> levam à rejeição de <span class="math inline">\(H_{0}\)</span> a favor de <span class="math inline">\(H_{a}\)</span>.</p>
+</section>
+<section id="teste-para-um-beta_j-individual" class="level3 page-columns page-full" data-number="8.1.2">
+<h3 data-number="8.1.2" class="anchored" data-anchor-id="teste-para-um-beta_j-individual"><span class="header-section-number">8.1.2</span> Teste para um <span class="math inline">\(\beta_{j}\)</span> individual</h3>
+<p>Especialmente em regressão linear múltipla, podemos estar interessados em verificar se a contribuição de uma particular regressora, <span class="math inline">\(X_j\)</span>, <span class="math inline">\(j = 1, 2, 3, \dots, k\)</span>, é significativa ou não<span class="math inline">\(^1\)</span>.</p>
+
+<div class="no-row-height column-margin column-container"><div class="margin-aside">
+<p><span class="math inline">\(^1\)</span> p.&nbsp;185, Charnet et al.&nbsp;(2008)</p>
+</div></div><p>A contribuição de <span class="math inline">\(X_j\)</span> no MRLM é verificada através do teste das seguintes hipóteses:</p>
+<p><span class="math display">\[
+H_0 : \beta_j = 0 \\ \qquad
+H_a : \beta_j \neq 0
+\]</span></p>
+<p>A estatística<span class="math inline">\(^2\)</span> para testarmos as hipóteses acima é</p>
+<p><span class="math display">\[
+T_{\beta_j} = \frac{\hat{\beta}_j}{\sqrt{\widehat{\sigma^2} C_{j+1, j+1}}}
+\]</span></p>
+<p>a qual, sob <span class="math inline">\(H_0\)</span>, tem distribuição <span class="math inline">\(t_{(n-k-1)}\)</span>:</p>
+
+<div class="no-row-height column-margin column-container"><div class="margin-aside">
+<p><span class="math inline">\(^2\)</span> A estatística é a quantidade pivotal vista na aula de estimação (<em>Estimação em Modelos de Regressão Linear</em>). Essa quantidade também foi usada na definição de intervalos de confiaça para <span class="math inline">\(\beta_j\)</span>.</p>
+<p><span class="math display">\[
+\frac{\hat{\beta}_j - \beta_j}{\left( \widehat{\sigma^2} C_{j+1,j+1}
+\right)^{1/2}} \sim t_{(n-k-1)}
+\]</span></p>
+</div></div><p>Na estatística, <span class="math inline">\(C_{j+1,j+1}\)</span> é o <span class="math inline">\((j+1)\)</span>-ésimo elemento da diagonal principal de <span class="math inline">\((\mathbf{X'X})^{-1}\)</span>. O Quadrado Médio do Erro (QME) obtido no ajuste de um MRL e disposto na ANOVA é um estimador de <span class="math inline">\(\sigma^{2}\)</span>, ou seja, é <span class="math inline">\(\widehat{\sigma^2}\)</span>.</p>
+<p>Portanto, para um nível de significância <span class="math inline">\(\alpha\)</span>, rejeitamos a hipótese de que a contribuição da regressora não é significativa (<span class="math inline">\(H_0\)</span>), se</p>
+<p><span class="math display">\[
+|T_{\beta_j}| \geq t_{\left(\frac{\alpha}{2}, n-k-1\right)}.
+\]</span></p>
+<p>Alternativamente, usando o resultado de que a distribuição do quadrado de variável aleatória com distribuição t de Student com <span class="math inline">\(n\)</span> graus de liberdade é uma variável com distribuição F com 1 e <span class="math inline">\(n\)</span> graus de liberdade, rejeitamos <span class="math inline">\(H_0\)</span>, se</p>
+<p><span class="math display">\[
+T_{\beta_j}^2 \geq F_{1,(n-k-1)}(\alpha),
+\]</span></p>
+<p>sendo <span class="math inline">\(F_{1,(n-k-1)}(\alpha)\)</span> o quantil <span class="math inline">\((1 - \alpha)\)</span> de distribuição F com 1 e <span class="math inline">\((n - k - 1)\)</span> graus de liberdade.</p>
+<p>Esse é um <strong>teste F parcial</strong> para verificar se um coeficiente de regressão <span class="math inline">\(\beta_{j}\)</span> em particular é igual a 0. Como ambos os testes t e F são equivalentes, a escolha é feita com base na disponibilidade da informação fornecida pelo recurso computacional utilizado (pelo <em>output</em> do comando ou pacote).</p>
+</section>
+</section>
+<section id="reduções-nas-somas-de-quadrados-e-comparação-de-modelos" class="level2 page-columns page-full" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="reduções-nas-somas-de-quadrados-e-comparação-de-modelos"><span class="header-section-number">8.2</span> Reduções nas somas de quadrados e comparação de modelos</h2>
+<p>O teste da contribuição de uma variável regressora visto na seção anterior corresponde, na essência, a uma comparação entre dois modelos: um <strong>modelo completo</strong>, correpondendo ao modelo com todos os parâmetros, e um <strong>modelo reduzido</strong>.</p>
+<p>Por exemplo:</p>
+<ul>
+<li>Na descrição de uma relação entre duas variáveis em uma situação particular, devemos escolher uma reta ou uma parábola?</li>
+</ul>
+<p><span class="math display">\[
+Y = \beta_0 + \beta_1 x + \varepsilon
+\]</span></p>
+<p>ou</p>
+<p><span class="math display">\[
+Y = \beta_0 + \beta_1 x + \beta_2 x^2 + \varepsilon \, ?
+\]</span></p>
+<p>Ao comparar o modelo completo com um reduzido estamos avaliando se vale a pena acrescentar termos extras na parte sistemática do modelo. Sempre que fazemos isso, aumentamos a <span class="math inline">\(SQReg\)</span> e diminuímos a <span class="math inline">\(SQErro\)</span>, mas resta saber se tal aumento (ou redução) é significativa. Em outras palavras, precisamos verificar se os termos extras contribuem para a melhor descrição da variável <span class="math inline">\(Y\)</span>. Caso contrário, por parcimônia, devemos optar pelo modelo reduzido.</p>
+
+<div class="no-row-height column-margin column-container"><div class="margin-aside">
+<p>p.&nbsp;186 e 187, Charnet et al.&nbsp;(2008)</p>
+</div></div><div class="important">
+<p>Uma soma de quadrados extra mede a redução na soma de quadrados do erro (<span class="math inline">\(SQErro\)</span>) quando uma ou mais variáveis são adicionadas ao modelo de regressão, dado que outras variáveis já estão no modelo. De forma equivalente, podemos ver uma soma de quadrados extra como o aumento na soma de quadrados da regressão (<span class="math inline">\(SQReg\)</span>) quando uma ou mais variáveis explicativas são adicionadas ao modelo de regressão (Kutner et al., 2004).</p>
+<p>Considere um MRL para descrever <span class="math inline">\(Y\)</span> em função de duas variáveis expicativas, <span class="math inline">\(X_{1}\)</span> e <span class="math inline">\(X_{2}\)</span>. Esses autores utilizam a notação <span class="math inline">\(SSR(X_{2}|X_{1})\)</span> para denotar a <em>soma de quadrados extra</em>, calculada por <span class="math inline">\(SSE(X_{1}) - SSE(X_{1}, X_{2})\)</span>. Nesse caso, <span class="math inline">\(SSE(X_{1})\)</span> é a <span class="math inline">\(SQErro\)</span> para o modelo que contém apenas a variável <span class="math inline">\(X_{1}\)</span> e <span class="math inline">\(SSE(X_{1}, X_{2})\)</span> é a <span class="math inline">\(SQErro\)</span> para o modelo que contém as variáveis <span class="math inline">\(X_{1}\)</span> e <span class="math inline">\(X_{2}\)</span>.</p>
+</div>
+<p>Então, temos aqui o problema de definir sub-modelos a partir do modelo completo com <span class="math inline">\((k+1)\)</span> parâmetros. Para isso, podemos definir dois tipos de somas de quadrados: a sequencial (tipo I) e a parcial (tipo II). Para a apresentação desses conceitos, vamos utilizar o material de Ferreira (2013)<span class="math inline">\(^3\)</span> e adotar a sua notação.</p>
+
+<div class="no-row-height column-margin column-container"><div class="margin-aside">
+<p><span class="math inline">\(^3\)</span> Ferreira, D. F. (2013) Recursos Computacionais Utilizando R. p.&nbsp;68-87.</p>
+</div></div><p><strong>Soma de quadrados sequencial</strong></p>
+<p>Consideremos um modelo com <span class="math inline">\(k + 1\)</span> parâmetros. Na soma de quadrados sequencial tomamos o modelo completo e o reduzimos eliminando a variável <span class="math inline">\(k\)</span>. A soma de quadrados do modelo completo é representada por <span class="math inline">\(R(\beta_{0}, \beta_{1}, \ldots, \beta_{k})\)</span> e a do modelo reduzido é <span class="math inline">\(R(\beta_{0}, \beta_{1}, \ldots, \beta_{k-1})\)</span>, cuja notação <span class="math inline">\(R\)</span> indica a redução particular do modelo que está sendo abordado. A diferença da soma de quadrados dos dois modelos é</p>
+<p><span class="math display">\[
+R(\beta_{k} | \beta_{0}, \beta_{1}, \ldots, \beta_{k-1}) = R(\beta_{0}, \beta_{1}, \ldots, \beta_{k}) - R(\beta_{0}, \beta_{1}, \ldots, \beta_{k-1}).
+\]</span> Se, do modelo com <span class="math inline">\(k-1\)</span> variáveis eliminarmos a última e repetirmos este procedimento, teremos a soma de quadrados da <span class="math inline">\((k-1)\)</span>-esima variável ajustada para todas as outras que a precedem. Se fizermos isso repetidas vezes até reduzirmos o modelo ao termo constante apenas, teremos as somas de quadrados de cada variável ajustada para todas as outras que a precedem, ignorando as variáveis que a sucedem.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="imagens/SQ_seq.png" class="img-fluid figure-img"></p>
+<figcaption>Uma ilustração da contribuição de cada variável preditora segundo uma SQ tipo I. Fonte: Notas de aula de Daniel F. Ferreira (DES/UFLA)</figcaption>
+</figure>
+</div>
+<p>Nessa situação, para que a última variável a ser incluída seja considerada significativa, ela precisa fornecer uma explicação adicional sobre a variabilidade de <span class="math inline">\(Y\)</span> que não foi explicada por todas as variáveis anteriores.</p>
+<div class="tip">
+<p>No R, a ANOVA obtida pelo comando <code>stats::anova</code> contém as somas de quadrados do tipo sequencial. Por essa razão, os testes t para as contribuições individuais dos <span class="math inline">\(\beta_{j}\)</span> obtidos no <code>summary()</code> podem ser incoerentes com os resultados pelo comando <code>anova()</code>. Esses testes t são equivalentes aos testes F da ANOVA com as somas de quadrados parciais.</p>
+</div>
+<p><strong>Soma de quadrados parcial</strong></p>
+<p>Para obtermos as somas de quadrados parciais ou do tipo II, partimos do modelo completo e formamos um novo modelo eliminando uma das variáveis. A soma de quadrados do modelo reduzido é comparada com a soma de quadrado do modelo completo e a sua diferença é a soma de quadrados do tipo II. Assim, temos o ajuste de cada variável para todas as outras do modelo. A soma de quadrados na redução refere-se ao que a variável em questão acrescentou de explição sobre a variabilidade de <span class="math inline">\(Y\)</span> que não está sendo explicado simultaneamente por todas as outras variáveis, conforme representado na Figura a seguir.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="imagens/SQparcial.png" class="img-fluid figure-img"></p>
+<figcaption>Uma ilustração da contribuição de cada variável preditora segundo uma SQ tipo II. Fonte: Notas de aula de Daniel F. Ferreira (DES/UFLA)</figcaption>
+</figure>
+</div>
+<div class="tip">
+<p>No R, a ANOVA com somas de quadrados parciais (tipo II) pode ser obtida pelo comando <code>car::Anova</code>. Os quadrados das estatísticas calculadas para os testes t para as contribuições individuais dos <span class="math inline">\(\beta_{j}\)</span> obtidos no <code>summary()</code> equivalem aos testes F dos <span class="math inline">\(\beta_{j}\)</span> da ANOVA parcial.</p>
+</div>
+<p>A Tabela a seguir foi adaptada de Ferreira (2013) e resume bem os tipos de somas de quadrados de um modelo de regressão contendo <span class="math inline">\(k\)</span> variáveis.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 39%">
+<col style="width: 42%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>FV</th>
+<th>SQ Tipo I</th>
+<th>SQ Tipo II</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(X_{1}\)</span></td>
+<td><span class="math inline">\(R(\beta_{1} | \beta_{0})\)</span></td>
+<td><span class="math inline">\(R(\beta_{1} | \beta_{0}, \beta_{2}, \ldots, \beta_{k})\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(X_{2}\)</span></td>
+<td><span class="math inline">\(R(\beta_{2} | \beta_{0}, \beta_{1})\)</span></td>
+<td><span class="math inline">\(R(\beta_{2} | \beta_{0}, \beta_{1}, \ldots, \beta_{k})\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\vdots\)</span></td>
+<td><span class="math inline">\(\vdots\)</span></td>
+<td><span class="math inline">\(\vdots\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(X_{k}\)</span></td>
+<td><span class="math inline">\(R(\beta_{k} | \beta_{0}, \beta_{1}, \ldots, \beta_{k-1})\)</span></td>
+<td><span class="math inline">\(R(\beta_{k} | \beta_{0}, \beta_{1}, \ldots, \beta_{k-1})\)</span></td>
+</tr>
+</tbody>
+</table>
+<div class="tip">
+<p>As somas de quadrados tipo I e tipo II da <span class="math inline">\(k\)</span>-ésima variável são iguais.</p>
+</div>
+<p>Uma forma simples de obter as somas de quadrados do tipo II é baseada no método da inversa de parte da inversa (Searle, 1971 e 1987). Esse método permite a obtenças dessas somas de quadrados sem que seja necessário fazer a redução de modelos. Para a variável <span class="math inline">\(X_{j}\)</span>, a soma de quadrados parcial pode ser calculada por:</p>
+<p><span class="math display">\[
+R(\beta_{j} | \beta_{0}, \ldots \beta_{j-1}, \beta_{j+1}, \ldots, \beta_{k}) = \frac{\hat\beta^2_{j}}{C_{j+1, j+1}},
+\]</span> em que <span class="math inline">\(C_{j+1, j+1}\)</span> é o <span class="math inline">\((j+1)\)</span>-ésimo elemento da diagonal principal de <span class="math inline">\((\mathbf{X'X})^{-1}\)</span>.</p>
+</section>
+<section id="um-exemplo-de-mrlm-usando-r" class="level2" data-number="8.3">
+<h2 data-number="8.3" class="anchored" data-anchor-id="um-exemplo-de-mrlm-usando-r"><span class="header-section-number">8.3</span> Um exemplo de MRLM usando R</h2>
+<div class="data">
+<p>(Adaptado de Kutner et al., 2004)</p>
+<p>Os dados a seguir foram coletados em um estudo sobre a relação entre a quantidade de gordura corporal (<span class="math inline">\(Y\)</span>) e várias possíveis variáveis explicativas, a partir de uma amostra de 20 mulheres saudáveis com idade entre 25 e 34 anos. As variáveis preditoras consideradas são espessura da prega cutânea do tríceps (<span class="math inline">\(X_{1}\)</span>), circunferência da coxa (<span class="math inline">\(X_{2}\)</span>) e circunferência do meio do braço (<span class="math inline">\(X_{3}\)</span>). A gordura corporal para cada uma das 20 pessoas foi obtida por um procedimento caro e incômodo requerindo a imersão da pessoa na água. Então, seria muito útil se um modelo de regressão com algumas ou todas essas variáveis preditoras pudesse fornecer estimativas confiáveis da gordura corporal já que as medidas das preditoras são fáceis de obter.</p>
+</div>
+<section id="modelos-marginais" class="level3" data-number="8.3.1">
+<h3 data-number="8.3.1" class="anchored" data-anchor-id="modelos-marginais"><span class="header-section-number">8.3.1</span> Modelos marginais</h3>
+<p>Inicialmente, vamos ajustar os modelos marginais, ou seja, cada um deles contém apenas uma das variáveis sozinhas. Por meio desses modelos tentamos explicar a variabilidade de <span class="math inline">\(Y\)</span> em função de uma variável preditora, ignorando a existência de outras. Vamos explicar com detalhes alguns resultados relacionados a <span class="math inline">\(X_{1}\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>modelo.x1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(gordura <span class="sc">~</span> esp.triceps, <span class="at">data =</span> dados)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(modelo.x1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = gordura ~ esp.triceps, data = dados)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-6.1195 -2.1904  0.6735  1.9383  3.8523 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  -1.4961     3.3192  -0.451    0.658    
+esp.triceps   0.8572     0.1288   6.656 3.02e-06 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 2.82 on 18 degrees of freedom
+Multiple R-squared:  0.7111,    Adjusted R-squared:  0.695 
+F-statistic:  44.3 on 1 and 18 DF,  p-value: 3.024e-06</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(modelo.x1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Response: gordura
+            Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+esp.triceps  1 352.27  352.27  44.305 3.024e-06 ***
+Residuals   18 143.12    7.95                      
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>modelo.x1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = gordura ~ esp.triceps, data = dados)
+
+Coefficients:
+(Intercept)  esp.triceps  
+    -1.4961       0.8572  </code></pre>
+</div>
+</div>
+<p>Observe que, na saída do comando <code>summary()</code> temos o teste t para o parâmetro associado a <span class="math inline">\(X_{1}\)</span>, que podemos denotar por <span class="math inline">\(\beta_{1}\)</span>. Nesse caso, como temos um MRLS, o quadrado da estatística <span class="math inline">\(t\)</span> calculada equivale ao teste <span class="math inline">\(F\)</span> global, cuja estatística foi igual a 44,30. O mesmo teste aparece no resultado do comando <code>anova()</code>, para o efeito da regressão.</p>
+<p>Veja que o modelo de regressão foi significativo quando consideramos a variável espessura da prega cutânea do tríceps (<span class="math inline">\(X_{1}\)</span>), com as estimativas dos parâmetros <span class="math inline">\(\hat\beta_{0} = -1,4961\)</span> e <span class="math inline">\(\hat\beta_{1} = 0,8572\)</span>. Na sequência, apresentamos os resultados dos modelos marginais para as outras duas variáveis, <span class="math inline">\(X_{2}\)</span> e <span class="math inline">\(X_{3}\)</span>. A interpretação dos comandos é a mesma.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>modelo.x2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(gordura <span class="sc">~</span> circ.coxa, <span class="at">data =</span> dados)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(modelo.x2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = gordura ~ circ.coxa, data = dados)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.4949 -1.5671  0.1241  1.3362  4.4084 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -23.6345     5.6574  -4.178 0.000566 ***
+circ.coxa     0.8565     0.1100   7.786  3.6e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 2.51 on 18 degrees of freedom
+Multiple R-squared:  0.771, Adjusted R-squared:  0.7583 
+F-statistic: 60.62 on 1 and 18 DF,  p-value: 3.6e-07</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(modelo.x2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Response: gordura
+          Df Sum Sq Mean Sq F value  Pr(&gt;F)    
+circ.coxa  1 381.97  381.97  60.617 3.6e-07 ***
+Residuals 18 113.42    6.30                    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>modelo.x2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = gordura ~ circ.coxa, data = dados)
+
+Coefficients:
+(Intercept)    circ.coxa  
+   -23.6345       0.8565  </code></pre>
+</div>
+</div>
+<p>Ao considerar apenas a variável <span class="math inline">\(X_{2}\)</span> também encontramos um efeito significativo da regressão. Por outro lado, a variável <span class="math inline">\(X_{3}\)</span> (circunferência do meio do braço) parece não contribuir para explicar a variabilidade em <span class="math inline">\(Y\)</span>, conforme resultados apresentados a seguir.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>modelo.x3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(gordura <span class="sc">~</span> circ.braco, <span class="at">data =</span> dados)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(modelo.x3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = gordura ~ circ.braco, data = dados)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-8.590 -3.847  1.458  3.561  6.909 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)
+(Intercept)  14.6868     9.0959   1.615    0.124
+circ.braco    0.1994     0.3266   0.611    0.549
+
+Residual standard error: 5.193 on 18 degrees of freedom
+Multiple R-squared:  0.02029,   Adjusted R-squared:  -0.03414 
+F-statistic: 0.3728 on 1 and 18 DF,  p-value: 0.5491</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(modelo.x3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Response: gordura
+           Df Sum Sq Mean Sq F value Pr(&gt;F)
+circ.braco  1  10.05  10.052  0.3728 0.5491
+Residuals  18 485.34  26.963               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>modelo.x3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = gordura ~ circ.braco, data = dados)
+
+Coefficients:
+(Intercept)   circ.braco  
+    14.6868       0.1994  </code></pre>
+</div>
+</div>
+</section>
+<section id="modelos-de-regressão-linear-múltipla" class="level3" data-number="8.3.2">
+<h3 data-number="8.3.2" class="anchored" data-anchor-id="modelos-de-regressão-linear-múltipla"><span class="header-section-number">8.3.2</span> Modelos de Regressão Linear Múltipla</h3>
+<p>Agora, vamos obter um MRLM com as variáveis <span class="math inline">\(X_{1}\)</span> e <span class="math inline">\(X_{2}\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>modelo.x1.x2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(gordura <span class="sc">~</span> esp.triceps <span class="sc">+</span> circ.coxa, <span class="at">data =</span> dados)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(modelo.x1.x2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = gordura ~ esp.triceps + circ.coxa, data = dados)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.9469 -1.8807  0.1678  1.3367  4.0147 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)  
+(Intercept) -19.1742     8.3606  -2.293   0.0348 *
+esp.triceps   0.2224     0.3034   0.733   0.4737  
+circ.coxa     0.6594     0.2912   2.265   0.0369 *
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 2.543 on 17 degrees of freedom
+Multiple R-squared:  0.7781,    Adjusted R-squared:  0.7519 
+F-statistic:  29.8 on 2 and 17 DF,  p-value: 2.774e-06</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(modelo.x1.x2) <span class="co">#tipo I</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Response: gordura
+            Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+esp.triceps  1 352.27  352.27 54.4661 1.075e-06 ***
+circ.coxa    1  33.17   33.17  5.1284    0.0369 *  
+Residuals   17 109.95    6.47                      
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Pelos resultados dos testes t individuais, notamos que a contribuição individual de <span class="math inline">\(X_{1}\)</span> não é significativa. No entanto, quando essa variável é a primeira a ser considerada no modelo, sua contribuição é significativa, assim como a de <span class="math inline">\(X_{2}\)</span>. A redução da SQ do erro com a inclusão da variável <span class="math inline">\(X_{2}\)</span> no modelo foi de 33,17 (385,44 - 352,27).</p>
+<p>Para obter a ANOVA com somas de quadrados do tipo II, vamos usar a função <code>Anova()</code> do pacote <code>car</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Anova</span>(modelo.x1.x2) <span class="co">#tipo II</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Anova Table (Type II tests)
+
+Response: gordura
+             Sum Sq Df F value Pr(&gt;F)  
+esp.triceps   3.473  1  0.5370 0.4737  
+circ.coxa    33.169  1  5.1284 0.0369 *
+Residuals   109.951 17                 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Finalmente, temos a seguir o modelo com as três variáveis explicativas. Mesmo tendo visto que marginalmente as variáveis <span class="math inline">\(X_1\)</span> e <span class="math inline">\(X_2\)</span> contribuem para a explicação sobre a variação de <span class="math inline">\(Y\)</span>, os testes t foram não significativos para esse modelo. Isso quer dizer que, na presença das demais variáveis, nenhuma variável tem uma contribuição significativa.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>modelo.x1.x2.x3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(gordura <span class="sc">~</span> esp.triceps <span class="sc">+</span> circ.coxa <span class="sc">+</span> circ.braco, <span class="at">data =</span> dados)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(modelo.x1.x2.x3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = gordura ~ esp.triceps + circ.coxa + circ.braco, 
+    data = dados)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.7263 -1.6111  0.3923  1.4656  4.1277 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)
+(Intercept)  117.085     99.782   1.173    0.258
+esp.triceps    4.334      3.016   1.437    0.170
+circ.coxa     -2.857      2.582  -1.106    0.285
+circ.braco    -2.186      1.595  -1.370    0.190
+
+Residual standard error: 2.48 on 16 degrees of freedom
+Multiple R-squared:  0.8014,    Adjusted R-squared:  0.7641 
+F-statistic: 21.52 on 3 and 16 DF,  p-value: 7.343e-06</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(modelo.x1.x2.x3) <span class="co">#tipo I</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Response: gordura
+            Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+esp.triceps  1 352.27  352.27 57.2768 1.131e-06 ***
+circ.coxa    1  33.17   33.17  5.3931   0.03373 *  
+circ.braco   1  11.55   11.55  1.8773   0.18956    
+Residuals   16  98.40    6.15                      
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Ao analisar a estrutura de correlação entre as variáveis, notamos uma alta correlação especialmente entre as variáveis <span class="math inline">\(X_{1}\)</span> e <span class="math inline">\(X_{2}\)</span>, o que explica os resultados anteriores. Possivelmente, essas variáveis não necessitariam estar juntas no modelo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(dados)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            esp.triceps circ.coxa circ.braco   gordura
+esp.triceps   1.0000000 0.9238425  0.4577772 0.8432654
+circ.coxa     0.9238425 1.0000000  0.0846675 0.8780896
+circ.braco    0.4577772 0.0846675  1.0000000 0.1424440
+gordura       0.8432654 0.8780896  0.1424440 1.0000000</code></pre>
+</div>
+</div>
+<p>A ANOVA com somas de quadrados do tipo II também é apresentada a seguir. Os testes são equivalentes aos testes t discutidos anteriormente.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Anova</span>(modelo.x1.x2.x3) <span class="co">#tipo II</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Anova Table (Type II tests)
+
+Response: gordura
+            Sum Sq Df F value Pr(&gt;F)
+esp.triceps 12.705  1  2.0657 0.1699
+circ.coxa    7.529  1  1.2242 0.2849
+circ.braco  11.546  1  1.8773 0.1896
+Residuals   98.405 16               </code></pre>
+</div>
+</div>
+<div class="singlelab">
+<p>Considere o modelo para gordura corporal (<span class="math inline">\(Y\)</span>) com as três variáveis preditoras. Faça um novo ajuste de um MRLM e, durante a especificação do modelo (comando <code>lm()</code>, por exemplo), considere uma ordem diferente de entrada das preditoras. Exemplo: <code>Y ~ X2 + X3 + X1</code>. Compare os resultados obtidos pelos dois tipos de somas de quadrados (tipo I e tipo II) e com aqueles obtidos na seção anterior.</p>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-agresti2007introduction" class="csl-entry" role="listitem">
+Agresti, Alan. 2007. <em>An Introduction to Categorical Data Analysis</em>. 2nd ed. Hoboken: John Wiley &amp; Sons.
+</div>
+<div id="ref-agresti2012categorical" class="csl-entry" role="listitem">
+———. 2012. <em>Categorical Data Analysis</em>. 3rd ed. Hoboken, NJ: John Wiley &amp; Sons.
+</div>
+<div id="ref-allison1999logistic" class="csl-entry" role="listitem">
+Allison, Paul D. 1999. <em>Logistic Regression Using the SAS System: Theory and Application</em>. Cary: SAS Institute Inc.
+</div>
+<div id="ref-cetinkaya2023introduction" class="csl-entry" role="listitem">
+Çetinkaya-Rundel, Mine, and Johanna Hardin. 2023. <em>Introduction to Modern Statistics</em>. 2nd ed. OpenIntro Inc. <a href="https://openintro-ims.netlify.app/">https://openintro-ims.netlify.app/</a>.
+</div>
+<div id="ref-charnet2008analise" class="csl-entry" role="listitem">
+Charnet, Reinaldo, Clarice Azevedo de Luna Freire, Eugênia Maria R. Charnet, and Helio Bonvino. 2008. <em>An<span>á</span>lise de Modelos de Regress<span>ã</span>o Linear: Com Aplica<span>ç</span><span>õ</span>es</em>. 2nd ed. Campinas: Editora Unicamp.
+</div>
+<div id="ref-cordeiro2024modelos" class="csl-entry" role="listitem">
+Cordeiro, Gauss M., Clarice G. B. Demétrio, and Rafael A. Moral. 2024. <em>Modelos Lineares Generalizados e Aplica<span>ç</span><span>õ</span>es</em>. S<span>ã</span>o Paulo: Blucher.
+</div>
+<div id="ref-demetrio2011modelos" class="csl-entry" role="listitem">
+Demétrio, Clarice G. B., and S. S. Zocchi. 2011. <em>Modelos de Regress<span>ã</span>o</em>. Piracicaba: ESALQ.
+</div>
+<div id="ref-draper1998applied" class="csl-entry" role="listitem">
+Draper, Norman R., and Harry Smith. 1998. <em>Applied Regression Analysis</em>. 3rd ed. New York: John Wiley &amp; Sons.
+</div>
+<div id="ref-ferreira2013recursos" class="csl-entry" role="listitem">
+Ferreira, Daniel Furtado. 2013. <em>Recursos Computacionais Utilizando r</em>. Lavras.
+</div>
+<div id="ref-hoffmann1977analise" class="csl-entry" role="listitem">
+Hoffmann, Rodolfo, and Sonia Vieira. 1977. <em>An<span>á</span>lise de Regress<span>ã</span>o: Uma Introdu<span>ç</span><span>ã</span>o <span class="nocase">à</span> Econometria</em>. 2nd ed. S<span>ã</span>o Paulo: Editora Hucitec.
+</div>
+<div id="ref-kutner2005applied" class="csl-entry" role="listitem">
+Kutner, Michael H., Christopher J. Nachtsheim, John Neter, and William Li. 2005. <em>Applied Linear Statistical Models</em>. 5th ed. New York: McGraw-Hill/Irwin.
+</div>
+<div id="ref-levine2016estatistica" class="csl-entry" role="listitem">
+Levine, David M., David F. Stephan, and Kathryn A. Szabat. 2016. <em>Estat<span>ı́</span>stica - Teoria e Aplica<span>ç</span><span>õ</span>es Usando o Microsoft Excel Em Portugu<span>ê</span>s</em>. 7th ed. Rio de Janeiro: LTC.
+</div>
+<div id="ref-mallows1973comments" class="csl-entry" role="listitem">
+Mallows, Colin L. 1973. <span>“Some Comments on <span class="math inline">\(C_p\)</span>.”</span> <em>Technometrics</em> 15 (4): 661–75.
+</div>
+<div id="ref-morais2001introducao" class="csl-entry" role="listitem">
+Morais, Augusto Ramalho de, Lı́via Maria Chaves, and Maria Cristina R. P. Toledo. 2001. <em>Introdu<span>ç</span><span>ã</span>o <span class="nocase">à</span> <span class="nocase">á</span>lgebra de Matrizes</em>. Lavras: UFLA/FAEPE.
+</div>
+<div id="ref-noble1977applied" class="csl-entry" role="listitem">
+Noble, Ben, and James W. Daniel. 1977. <em>Applied Linear Algebra</em>. 3rd ed. Englewood Cliffs: Prentice-Hall.
+</div>
+<div id="ref-regazzi2010modelos" class="csl-entry" role="listitem">
+Regazzi, Adair José. 2010. <em>Modelos Lineares i</em>. Vi<span>ç</span>osa: UFV.
+</div>
+<div id="ref-rencher2008linear" class="csl-entry" role="listitem">
+Rencher, Alvin C., and G. Bruce Schaalje. 2008. <em>Linear Models in Statistics</em>. 2nd ed. Hoboken, New Jersey: John Wiley &amp; Sons.
+</div>
+<div id="ref-santos2017curso" class="csl-entry" role="listitem">
+Santos, Reginaldo J. 2017. <em>Um Curso de Geometria Anal<span>ı́</span>tica e <span class="nocase">á</span>lgebra Linear</em>. Belo Horizonte: Imprensa Universit<span>á</span>ria da UFMG.
+</div>
+<div id="ref-searle1982matrix" class="csl-entry" role="listitem">
+Searle, Shayle R. 1982. <em>Matrix Algebra Useful for Statistics</em>. New York: John Wiley &amp; Sons.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./MRL_ANOVA.html" class="pagination-link" aria-label="Análise de variância (ANOVA) da regressão">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Análise de variância (ANOVA) da regressão</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./Formas_quadraticas_aula1.html" class="pagination-link" aria-label="Formas quadráticas">
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Formas quadráticas</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

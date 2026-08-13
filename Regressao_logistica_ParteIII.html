@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>17&nbsp; Regressão logística: seleção de modelos, predição e qualidade do ajuste – Modelos Lineares: modelos de posto completo</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./referencias.html" rel="next">
+<link href="./Regressao_logistica_ParteII.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-26470a742aafa1a1e7b10f54c72c41f3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-578930c7c9073de1ad26189988221688.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Regressao_logistica_ParteIII.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Regressão logística: seleção de modelos, predição e qualidade do ajuste</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Modelos Lineares: modelos de posto completo</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bem-vindos!</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./prefacio.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefácio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ML_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introdução aos modelos lineares</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRLS_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">O modelo de regressão linear simples (MRLS)</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_outrospolinomios_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelos de regressão linear (MRL) - modelos polinomiais</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRLM_matricial_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modelos de regressão linear múltipla (MRLM) e representação matricial</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_estimacao_matricial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Estimação em modelos de regressão linear (MRL) - representação matricial</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_estimacao.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Estimação em Modelos de Regressão Linear</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_ANOVA.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Análise de variância (ANOVA) da regressão</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./TH_comparacao_modelos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Testes de hipóteses: Comparação de modelos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Formas_quadraticas_aula1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Formas quadráticas</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Residuos_Diagnosticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Analise_residuos_Parte2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Multicolinearidade.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Multicolinearidade</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Aula_MRL_Qualitativas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Modelos de regressão para preditores qualitativos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Metodos_selecao_variaveis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Métodos de seleção de variáveis</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Regressão logística</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica_ParteII.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Regressão logística: inferência e aplicações</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica_ParteIII.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Regressão logística: seleção de modelos, predição e qualidade do ajuste</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./referencias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referências</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Conteúdo</h2>
+   
+  <ul>
+  <li><a href="#estratégias-na-seleção-de-modelos" id="toc-estratégias-na-seleção-de-modelos" class="nav-link active" data-scroll-target="#estratégias-na-seleção-de-modelos"><span class="header-section-number">17.1</span> Estratégias na seleção de modelos</a>
+  <ul class="collapse">
+  <li><a href="#métodos-de-seleção-de-variáveis" id="toc-métodos-de-seleção-de-variáveis" class="nav-link" data-scroll-target="#métodos-de-seleção-de-variáveis"><span class="header-section-number">17.1.1</span> Métodos de seleção de variáveis</a></li>
+  <li><a href="#aplicação-usando-o-r" id="toc-aplicação-usando-o-r" class="nav-link" data-scroll-target="#aplicação-usando-o-r"><span class="header-section-number">17.1.2</span> Aplicação usando o R</a></li>
+  </ul></li>
+  <li><a href="#poder-preditivo" id="toc-poder-preditivo" class="nav-link" data-scroll-target="#poder-preditivo"><span class="header-section-number">17.2</span> Poder preditivo</a>
+  <ul class="collapse">
+  <li><a href="#tabelas-de-classificação" id="toc-tabelas-de-classificação" class="nav-link" data-scroll-target="#tabelas-de-classificação"><span class="header-section-number">17.2.1</span> Tabelas de classificação</a></li>
+  <li><a href="#curva-roc-e-auc" id="toc-curva-roc-e-auc" class="nav-link" data-scroll-target="#curva-roc-e-auc"><span class="header-section-number">17.2.2</span> Curva ROC e AUC</a></li>
+  </ul></li>
+  <li><a href="#qualidade-do-ajuste" id="toc-qualidade-do-ajuste" class="nav-link" data-scroll-target="#qualidade-do-ajuste"><span class="header-section-number">17.3</span> Qualidade do ajuste</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Regressão logística: seleção de modelos, predição e qualidade do ajuste</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapterintro">
+<p>Na aula de hoje, finalizamos o assunto de regressão logística apresentando tópicos que são importantes do ponto de vista aplicado: seleção de modelos, avaliação do poder preditivo do modelo escolhido e verificação de sua adequacidade.</p>
+<p>Essa aula é baseada principalmente no <strong>Capítulo 5 - Logistic regression</strong> do livro <em>An introduction to categorical data analysis</em> (Agresti, 2007).</p>
+</div>
+<section id="estratégias-na-seleção-de-modelos" class="level2" data-number="17.1">
+<h2 data-number="17.1" class="anchored" data-anchor-id="estratégias-na-seleção-de-modelos"><span class="header-section-number">17.1</span> Estratégias na seleção de modelos</h2>
+<p>Assim como em regressão linear, na aplicação da regressão logística, é comum encontrarmos o desafio de selecionar as variáveis ou os termos que farão parte do modelo. De forma geral, esse é um problema de seleção de modelos que se torna mais complexo a medida que o número de variáveis regressoras aumenta. Nesses casos, segundo Agresti (2007), há dois objetivos que precisam ser contrabalanceados: <em>o modelo deve ser complexo o suficiente para um bom ajuste aos dados, mas modelos simples são mais fáceis de serem interpretados</em>.</p>
+<p>Um ponto importante a se observar é em relação ao desbalanceamento em <span class="math inline">\(Y\)</span>, que ocorre quando a frequência de <span class="math inline">\(y=1\)</span> ou <span class="math inline">\(y=0\)</span> é relativamente baixa. Isso deve ser observado, pois limita o número de preditores para os quais os efeitos podem ser estimados precisamente. Um guia prático sugere que idealmente deve-se ter pelo menos 10 respostas de cada tipo para todo preditor no modelo. Por exemplo, se <span class="math inline">\(y=1\)</span> em apenas 30 observações em um total de <span class="math inline">\(n = 1000\)</span>, o modelo não deveria ter mais de 3 preditores, apesar da amostra total ser grande (Agresti, 2007 - Seção 5.1.1).</p>
+<p>Esse guia é uma recomendação aproximada. Mesmo que ela não seja atendida, os softwares ainda podem ajustar o modelo e reportar as estimativas. No entanto, as estimativas de verossmilhança podem ser viesadas e as estimativas dos erros padrões podem ser ruins. Também, de forma geral, a medida que o número de preditores aumenta, torna-se mais provável que algumas estimativas de máxima verossimilhança do modelo sejam infinitas.</p>
+<p>Alguns pontos de atenção que vimos em modelos de regressão linear também são válidos para a regressão logística. Por exemplo, modelos com muitos preditores podem apresentar problema de <em>multicolinearidade</em>. Nesses casos, deletar um preditor redundante pode ajudar a reduzir os erros padrões de outros efeitos estimados.</p>
+<p>Quando se trata da inclusão de termos de interação, Agresti (2007) defende o princípio da hierarquia dos modelos, ou seja, não é recomendado usar um modelo com interação mas sem os efeitos principais que formam essa interação. Isso porque, caso os termos de menor ordem não sejam incluídos, a significância estatística e a interpretação prática dos termos de ordem maior dependem de como as variáveis são codificadas. Isso não é desejado. Queremos que o mesmo resultado ocorra independente de como as variáveis foram codificadas.</p>
+<section id="métodos-de-seleção-de-variáveis" class="level3" data-number="17.1.1">
+<h3 data-number="17.1.1" class="anchored" data-anchor-id="métodos-de-seleção-de-variáveis"><span class="header-section-number">17.1.1</span> Métodos de seleção de variáveis</h3>
+<p>Assim como em regressão linear, os métodos <em>forward</em>, <em>backward</em> e <em>stepwise</em> podem ser usados para selecionar ou remover preditores em uma regressão logística.</p>
+<p>Recaptulando, a seleção <em>forward</em> adiciona termos ao modelo de forma sequencial até que nenhuma adição melhore o ajuste. Já a seleção por <em>backward</em> começa com um modelo complexo e, sequencialmente, remove termos. Em um dado passo, o procedimento elimina o termo no modelo com o maior valor-p no teste que verifica se os parâmentros são iguais a zero. Note que é recomendado testar apenas os termos de maior ordem para cada variável. Também, como já discutido, é inapropriado remover um efeito princial se o modelo contem interações envolvendo esse termo. No final, o processo para quando qualquer remoção de termo leva a uma piora significativa no ajuste.</p>
+<p>O método <em>stepwise</em> é conhecido por ser uma mistura dos dois métodos descritos anteriormente. O procedimento é comumente aplicado com o critério de informação de Akaike (AIC), que julga um modelo pela proximidade com que seus valores ajustados tendem a estar dos valores esperados.</p>
+<p>Independente do método de seleção, para variáveis explicativas qualitativas com mais de duas categorias, o processo deve considerar a variável por completo em qualquer etapa em vez de considerar apenas as variáveis indicadoras. Se for o caso, adicione ou remova toda a variável, não apenas uma de suas indicadoras.</p>
+<div class="caution">
+<p>Agresti (2007) enfatiza: os métodos de seleção de variáveis devem ser usados com cautela! Não necessariamente eles irão produzir um modelo que faz sentido. Quando você avalia muitos termos, alguns que não são verdadeiramente importantes podem parecer “impressionantes” meramente devido ao acaso.</p>
+<p>A significância estatística não deve ser o único critério para incluir um termo no modelo. Pode ser aceitável incluir uma variável que é importante do ponto de vista prático e reportar a estimativa do seu efeito mesmo que ele não seja estatisticamente significativo. A sua presença no modelo pode ajudar a reduzir o viés na estimação de outros efeitos, por exemplo.</p>
+</div>
+</section>
+<section id="aplicação-usando-o-r" class="level3" data-number="17.1.2">
+<h3 data-number="17.1.2" class="anchored" data-anchor-id="aplicação-usando-o-r"><span class="header-section-number">17.1.2</span> Aplicação usando o R</h3>
+<p>O conjunto de dados de caranguejo-ferradura possui quatro potenciais preditores:</p>
+<p>C: cor (quatro categorias)</p>
+<p>S: condição da espinha (3 categorias)</p>
+<p>We: peso e</p>
+<p>W: largura da carapaça</p>
+<p>Considere um modelo com todos os efeitos principais, assuma variáveis indicadoras para as três primeiras categorias de cor e para as duas primeiras categorias de condição da espinha. O logit é dado por:</p>
+<p><span class="math display">\[
+\textrm{logit} (\pi_i) =\beta_0 + \beta_1\textrm{we} + \beta_2\textrm{w} + \beta_3c_{1} + \beta_4 c_{2} + \beta_5 c_{3} + \beta_6 s_{1} + \beta_7 s_{2}
+\]</span> Inicialmente, vamos ajustar o modelo completo e avaliar se existe multicolinearidade por meio do VIF (Variance Inflation Factor).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>horseshoe<span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"Dados/horseshoe.xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'car' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: carData</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'carData' was built under R version 4.3.3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Transformar variáveis qualitativas em fatores</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>horseshoe<span class="sc">$</span>color <span class="ot">&lt;-</span> <span class="fu">factor</span>(horseshoe<span class="sc">$</span>color, </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Clara"</span>, <span class="st">"Média"</span>, <span class="st">"Escura"</span>, <span class="st">"Mais escura"</span>))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>horseshoe<span class="sc">$</span>color <span class="ot">&lt;-</span> <span class="fu">relevel</span>(horseshoe<span class="sc">$</span>color, <span class="at">ref =</span> <span class="st">"Mais escura"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>horseshoe<span class="sc">$</span>spine <span class="ot">&lt;-</span> <span class="fu">factor</span>(horseshoe<span class="sc">$</span>spine, <span class="at">levels=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Bons"</span>,<span class="st">"Umbom"</span>,<span class="st">"NenhumBom"</span>)) </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>horseshoe<span class="sc">$</span>spine <span class="ot">&lt;-</span> <span class="fu">relevel</span>(horseshoe<span class="sc">$</span>spine, <span class="at">ref =</span> <span class="st">"NenhumBom"</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Ajuste do modelo</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>modelo_full <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span>  weight <span class="sc">+</span> width <span class="sc">+</span> color <span class="sc">+</span> spine, </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>                   <span class="at">family =</span> binomial, </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>                   <span class="at">data =</span> horseshoe)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular o VIF </span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(modelo_full)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Na sequência, vamos exemplificar o processo de seleção <em>backward</em> de forma manual. Cada comparação será analisada com base no teste da razão de verossimilhança, (por meio da Deviance) e no AIC. Para isso, consideramos algumas das configurações de modelos encaixados apresentadas em Agresti (2007). De forma geral, testamos a hipótese nula de o modelo mais simples é adequado contra a hipótese alternativa de que o ajuste do modelo mais complexo é melhor.</p>
+<div class="exercicios">
+<p>Para melhor compreensão, organize os resultados das próximas análises na tabela a seguir.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 12%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 21%">
+<col style="width: 24%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Modelo</strong></th>
+<th><strong>Preditores</strong></th>
+<th><strong>Deviance</strong></th>
+<th><strong>gl</strong></th>
+<th><strong>AIC</strong></th>
+<th><strong>Modelos comparados</strong></th>
+<th><strong>Diferença na deviance</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>C<span class="math inline">\(*\)</span>S + C<span class="math inline">\(*\)</span>W + S<span class="math inline">\(*\)</span>W</td>
+<td></td>
+<td></td>
+<td></td>
+<td>-</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>C + S + W</td>
+<td></td>
+<td></td>
+<td></td>
+<td>(2)-(1)</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>C + S</td>
+<td></td>
+<td></td>
+<td></td>
+<td>(3)-(2)</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>S + W</td>
+<td></td>
+<td></td>
+<td></td>
+<td>(4)-(2)</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>C + W</td>
+<td></td>
+<td></td>
+<td></td>
+<td>(5)-(2)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Modelos</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>mod_1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> (color <span class="sc">+</span> spine <span class="sc">+</span> width)<span class="sc">^</span><span class="dv">2</span>, </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">family =</span> binomial, <span class="at">data =</span> horseshoe)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>mod_2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> color <span class="sc">+</span> spine <span class="sc">+</span> width, </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                   <span class="at">family =</span> binomial, <span class="at">data =</span> horseshoe)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>mod_3 <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> color <span class="sc">+</span> spine, <span class="at">family =</span> binomial, <span class="at">data =</span> horseshoe) <span class="co"># C + S</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>mod_4 <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> spine <span class="sc">+</span> width, <span class="at">family =</span> binomial, <span class="at">data =</span> horseshoe) <span class="co"># S + W</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>mod_5 <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> color <span class="sc">+</span> width, <span class="at">family =</span> binomial, <span class="at">data =</span> horseshoe) <span class="co"># C + W</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Exemplo: Modelo 1 versus Modelo 2</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(mod_2, mod_1, <span class="at">test =</span> <span class="st">"Chisq"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Finalmente, vamos utilizar a função <code>step()</code> que realiza a seleção automática com base no AIC. Será adotado o método <em>backward</em>, especificado no argumento <code>direction</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>modelo_final <span class="ot">&lt;-</span> <span class="fu">step</span>(modelo_full, <span class="at">direction =</span> <span class="st">"backward"</span>, <span class="at">trace =</span> <span class="dv">1</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(modelo_final)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="tip">
+<p>Uma estratégia que pode ser útil em várias aplicações é o agrupamento de categorias de um preditor qualitativo com o intuito de simplificar o modelo. Temos notado que há uma diferença relevante entre caranguejos “mais escuros” e de outras cores. Agresti (2007) mostra que um modelo mais simples e com um bom ajuste é um que contém as preditoras largura e cor, sendo essa última agrupada em duas categorias: 0 = caranguejos mais escuros e 1 = outras cores.</p>
+</div>
+</section>
+</section>
+<section id="poder-preditivo" class="level2 page-columns page-full" data-number="17.2">
+<h2 data-number="17.2" class="anchored" data-anchor-id="poder-preditivo"><span class="header-section-number">17.2</span> Poder preditivo</h2>
+<section id="tabelas-de-classificação" class="level3 page-columns page-full" data-number="17.2.1">
+<h3 data-number="17.2.1" class="anchored" data-anchor-id="tabelas-de-classificação"><span class="header-section-number">17.2.1</span> Tabelas de classificação</h3>
+<p>Uma tabela de classificação ou matriz de confusão pode ser utilizada para resumir o poder preditivo de uma regressão logística. Ela classifica de forma cruzada o resultado observado <span class="math inline">\(y\)</span> com o valor predito (<span class="math inline">\(\hat{y}=0\)</span> ou <span class="math inline">\(1\)</span>). A predição é <span class="math inline">\(\hat{y}=1\)</span> quando <span class="math inline">\(\hat{\pi_{i}} &gt; \hat{\pi_{0}}\)</span> e <span class="math inline">\(\hat{y}=0\)</span> quando <span class="math inline">\(\hat{\pi_{i}} \leq \hat{\pi_{0}}\)</span>, para algum ponto de corte <span class="math inline">\(\pi_{0}\)</span>. Uma possibilidade é fazer <span class="math inline">\(\pi_{0} = 0,50\)</span>. Outra é fazer com que <span class="math inline">\(\pi_{0}\)</span> seja a proporção de respostas 1 observada na amostra. <!--, que é $\hat{\pi}$ para o modelo contendo apenas o termo de intercepto.--></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 28%">
+<col style="width: 35%">
+<col style="width: 35%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;"><strong>Predito: 0</strong> (<span class="math inline">\(\hat{y}=0\)</span>)</th>
+<th style="text-align: center;"><strong>Predito: 1</strong> (<span class="math inline">\(\hat{y}=1\)</span>)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Observado: 0</strong> (<span class="math inline">\(y=0\)</span>)</td>
+<td style="text-align: center;"><strong>VN</strong> (Verdadeiro Negativo)</td>
+<td style="text-align: center;"><strong>FP</strong> (Falso Positivo)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Observado: 1</strong> (<span class="math inline">\(y=1\)</span>)</td>
+<td style="text-align: center;"><strong>FN</strong> (Falso Negativo)</td>
+<td style="text-align: center;"><strong>VP</strong> (Verdadeiro Positivo)</td>
+</tr>
+</tbody>
+</table>
+<p>Assumindo o modelo que contém largura e cor como preditores, obtemos as tabelas de classificação cruzada a seguir. Para isso, consideramos <span class="math inline">\(\pi_{0} = 0,50\)</span> e <span class="math inline">\(\pi_{0} = 0,642\)</span>.</p>
+<p><span class="math inline">\(\pi_{0} = 0,50:\)</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>modelo_final <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> width <span class="sc">+</span> color, <span class="at">family =</span> binomial, <span class="at">data =</span> horseshoe)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Probabilidades preditas (phat)</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>probs_preditas <span class="ot">&lt;-</span> <span class="fu">predict</span>(modelo_final, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Para pi_0 = 0,50</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>corte_50 <span class="ot">&lt;-</span> <span class="fl">0.50</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Se prob &gt; 0.50, y_hat= 1 , caso contrário 0 </span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>classificacao_50 <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(probs_preditas <span class="sc">&gt;</span> corte_50, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabela (pi_0 = 0,50)</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>tab_50 <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="at">Observado =</span> horseshoe<span class="sc">$</span>y, <span class="at">Predito =</span> classificacao_50)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Tabela de Classificação (Corte = 0,50)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Tabela de Classificação (Corte = 0,50)"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(tab_50)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         Predito
+Observado  0  1
+        0 31 31
+        1 15 96</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\pi_{0} = 0,642:\)</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>corte_media <span class="ot">&lt;-</span> <span class="fu">mean</span>(horseshoe<span class="sc">$</span>y) </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>classificacao_64 <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(probs_preditas <span class="sc">&gt;</span> corte_media, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>tab_64 <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="at">Observado =</span> horseshoe<span class="sc">$</span>y, <span class="at">Predito =</span> classificacao_64)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Tabela de Classificação (Corte ="</span>, <span class="fu">round</span>(corte_media, <span class="dv">3</span>), <span class="st">"):"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Tabela de Classificação (Corte = 0.642 ):"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(tab_64)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         Predito
+Observado  0  1
+        0 43 19
+        1 36 75</code></pre>
+</div>
+</div>
+<p>Algumas medidas úteis na avaliação do poder preditivo são apresentadas abaixo.</p>
+<ul>
+<li><strong>Sensitividade:</strong></li>
+</ul>
+<p><span class="math display">\[
+P(\hat{y}=1|y=1)
+\]</span></p>
+<ul>
+<li><strong>Especificidade:</strong></li>
+</ul>
+<p><span class="math display">\[
+P(\hat{y}=0|y=0)
+\]</span></p>
+<ul>
+<li><strong>Proporção total de classificações corretas:</strong></li>
+</ul>
+<p><span class="math display">\[
+\begin{aligned}
+P(\textrm{classificação correta}) &amp;= P(y=1 \quad\textrm{e}\quad \hat{y}=1) + P(y=0 \quad\textrm{e}\quad \hat{y}=0) \\
+&amp;= P(\hat{y}=1|y=1)P(y=1) + P(\hat{y}=0|y=0)P(y=0)
+\end{aligned}
+\]</span></p>
+<!--
+Por que Agresti (e estatísticos em geral) preferem Sensibilidade e Especificidade?
+Apesar de a acurácia parecer ótima, ela esconde uma armadilha perigosa em dados desbalanceados, conhecida como o "Paradoxo da Acurácia".
+
+Exemplo Prático: Imagine que temos uma doença raríssima que afeta apenas 1% da população.
+
+Se eu criar um modelo "burro" que diz: "Ninguém tem a doença" (chuta 0 para todo mundo).
+
+Ele vai acertar 99% das vezes (os saudáveis).
+
+Acurácia = 99%.
+
+Parece um modelo excelente, certo? Mas ele tem Sensibilidade = 0% (não detectou nenhum doente). Para fins médicos, esse modelo é inútil.
+-->
+<div class="exercicios">
+<p>Calcule a sensitividade, especificidade e proporção total de classificações corretas considerando a tabela com <span class="math inline">\(\pi_{0} = 0,642\)</span>.</p>
+</div>
+
+<div class="no-row-height column-margin column-container"><div class="margin-aside">
+<p>A acurácia de testes diagnósticos é usualmente avaliada por meio da sensitividade e da especificidade. Dado que o paciente tem a doença, a probabilidade do teste diagnóstico ser positivo é chamada sensitividade. Dados que o paciente não tem a doença, a probabilidade do teste ser negativo é chamada especificidade. Quanto maiores os valores de sensitividade e especificidade, melhor é o teste diagnóstico (Agresti, 2007 - Seção 2.1.3).</p>
+</div></div><div class="caution">
+<p>As limitações de uma tabela de classificação cruzada são:</p>
+<ul>
+<li>Ela categoriza valores preditivos contínuos (<span class="math inline">\(\hat{\pi}\)</span>) em binários.</li>
+<li>A escolha de <span class="math inline">\(\pi_{0}\)</span> é arbitrária.</li>
+<li>Os resultados são sensíveis ao número de ocorrências de <span class="math inline">\(y=1\)</span> e <span class="math inline">\(y=0\)</span>.</li>
+</ul>
+</div>
+</section>
+<section id="curva-roc-e-auc" class="level3" data-number="17.2.2">
+<h3 data-number="17.2.2" class="anchored" data-anchor-id="curva-roc-e-auc"><span class="header-section-number">17.2.2</span> Curva ROC e AUC</h3>
+<p>O problema da escolha arbitrária de <span class="math inline">\(\pi_{0}\)</span> pode ser contornado pela análise da curva ROC. Uma curva ROC (<em>Receiver operating characteristic</em>) é um gráfico que relaciona sensitividade como uma função de (1 - especificidade) para possíveis pontos de corte <span class="math inline">\(\pi_{0}\)</span>. Por essa razão, ela é mais informativa que uma tabela de classificação. Segundo Agresti (2007), quando <span class="math inline">\(\pi_{0}\)</span> está próximo de 0, quase todas as predições são <span class="math inline">\(\hat{y} = 1\)</span>; então, a sensitividade é próxima de 1, a especificidade é próxima de 0, e o ponto para (1 - especificidade, sensitividade) tem coordenadas próximas a (1,1). Quando <span class="math inline">\(\pi_{0}\)</span> está próximo de 1, quase todas as predições são <span class="math inline">\(\hat{y} = 0\)</span>; então, a sensitividade é próxima de 0, a especificidade é próxima de 1, e o ponto para (1 - especificidade, sensitividade) tem coordenadas próximas a (0,0).</p>
+<p>A curva ROC usualmente tem um formato côncavo, conectando os pontos (0,0) e (1,1).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pROC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'pROC' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Type 'citation("pROC")' for a citation.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'pROC'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    cov, smooth, var</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Obter as probabilidades preditas no modelo escolhido</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>probs_modelo <span class="ot">&lt;-</span> <span class="fu">predict</span>(modelo_final, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># A função roc calcula sensibilidade e especificidade para todos os cortes</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>roc_obj <span class="ot">&lt;-</span> <span class="fu">roc</span>(<span class="at">response =</span> horseshoe<span class="sc">$</span>y, <span class="at">predictor =</span> probs_modelo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Setting levels: control = 0, case = 1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Setting direction: controls &lt; cases</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular a AUC (Área Sob a Curva)</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>auc_valor <span class="ot">&lt;-</span> <span class="fu">auc</span>(roc_obj)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico da curva ROC </span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co"># legacy.axes = TRUE para que o eixo X seja (1 - Especificidade)</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggroc</span>(roc_obj, <span class="at">legacy.axes =</span> <span class="cn">TRUE</span>, <span class="at">colour =</span> <span class="st">"blue"</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">0</span>, <span class="at">xend =</span> <span class="dv">1</span>, <span class="at">y =</span> <span class="dv">0</span>, <span class="at">yend =</span> <span class="dv">1</span>), </span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"grey"</span>) <span class="sc">+</span> </span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"Curva ROC (AUC ="</span>, <span class="fu">round</span>(auc_valor, <span class="dv">3</span>), <span class="st">")"</span>),</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"1 - Especificidade (Taxa de Falsos Positivos)"</span>,</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Sensitividade (Taxa de Verdadeiros Positivos)"</span>) <span class="sc">+</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in geom_segment(aes(x = 0, xend = 1, y = 0, yend = 1), linetype = "dashed", : All aesthetics have length 1, but the data has 109 rows.
+ℹ Please consider using `annotate()` or provide this layer with data containing
+  a single row.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Regressao_logistica_ParteIII_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>A área sob a curva ROC, denotada por AUC (<em>Area Under the Curve</em>), resume a informação da curva em um único valor numérico, servindo como índice de performance global do modelo.</p>
+<p>A AUC varia de 0,5 a 1,0, de forma que:</p>
+<ul>
+<li><p>AUC = 0,5: O modelo não é melhor que o acaso (linha diagonal tracejada). As predições são aleatórias.</p></li>
+<li><p>0,7 <span class="math inline">\(\leq\)</span> AUC &lt; 0,8: Discriminação aceitável.</p></li>
+<li><p>0,8 <span class="math inline">\(\leq\)</span> AUC &lt; 0,9: Discriminação excelente.</p></li>
+<li><p>AUC = 1,0: Discriminação perfeita (separa perfeitamente os casos <span class="math inline">\(y=1\)</span> dos <span class="math inline">\(y=0\)</span>).</p></li>
+</ul>
+<p>No exemplo acima, a AUC observada é de aproximadamente 0,77, indicando que o modelo baseado na largura e cor tem um poder preditivo razoável a bom.</p>
+</section>
+</section>
+<section id="qualidade-do-ajuste" class="level2" data-number="17.3">
+<h2 data-number="17.3" class="anchored" data-anchor-id="qualidade-do-ajuste"><span class="header-section-number">17.3</span> Qualidade do ajuste</h2>
+<p>Há diferentes maneiras de checar o ajuste de um modelo de regressão. Segundo Agresti (2007), uma maneira é por meio do Teste de Razão de Verossimilhanças para comparação de modelos. Como já vimos, podemos considerar a inclusão de termos de maior grau (quadrático) ou múltiplos preditores. Se modelos mais complexos não se ajustarem melhor (teste não significativo), de certa forma isso fornece um indicativo de que o modelo escolhido é mais adequado.</p>
+<p>Um procedimento mais geral para verificar a qualidade de ajuste (<em>goodness-of-fit</em>) do teste compara o modelo ajustado com os dados observados. Por essa abordagem, os dados propriamente ditos são considerados representantes do ajuste do modelo mais complexo o possível: o modelo saturado, que tem um parâmetro para cada observação.</p>
+<p>Em uma análise da adequacidade, testa-se se todos os parâmetros que estão no modelo saturado, mas não estão no modelo em estudo são iguais a zero. A estatística da razão de verossimilhança para esse teste (<span class="math inline">\(G^{2}\)</span>) é a deviance do modelo. Para grandes amostras, essa estatística de teste tem distribuição qui-quadrado sob a hipótese nula (a estatística correspodente é <span class="math inline">\(\chi^{2}\)</span>).</p>
+<p>Nesse caso, a interpretação é a seguinte:</p>
+<ul>
+<li><p>Hipótese Nula (<span class="math inline">\(H_0\)</span>): O modelo ajustado é bom (não há diferença significativa entre o que o modelo previu e o que observamos).</p></li>
+<li><p>Hipótese Alternativa (<span class="math inline">\(H_a\)</span>): Evidências de falta de ajuste do modelo (o modelo não captura bem o padrão dos dados).</p></li>
+</ul>
+<p>Grandes valores de <span class="math inline">\(G^{2}\)</span> ou de <span class="math inline">\(\chi^{2}\)</span> fornecem evidência de falta de ajuste.</p>
+<p>Um ponto importante é que a validade desses testes depende de como os dados estão estruturados.</p>
+<p><strong>Dados Agrupados:</strong> Quando temos muitas observações para cada perfil (ex: Dados de Ronco ou uma preditora discreta), usamos os testes clássicos de Deviance e Pearson. Se o valor-p for baixo, temos indicativo de falta de ajuste.</p>
+<p><strong>Dados Não Agrupados ou com Preditores Contínuos:</strong> No nosso exemplo dos caranguejos, temos a variável width (largura), que é contínua. Isso faz com que cada caranguejo seja praticamente único (muitos grupos com apenas 1 observação). Neste cenário, as estatísticas de Deviance e Pearson não fazem sentido e, portanto, não devem ser usadas.</p>
+<p>Uma alternativa que pode ser aplicada para dados não agrupados é o teste de Hosmer-Lemeshow, que usa a estatística de Pearson para comparar contagens observadas e ajustadas em um agrupamento “artificial” das observações.</p>
+<p>Na sequência, veremos uma aplicação desse teste aos dados de caranguejos.</p>
+<!--
+Ele ordena as observações baseada nas probabilidades preditas.
+
+Divide os dados em grupos (geralmente 10 grupos ou "decis").
+
+Compara os Sucessos Observados vs. Esperados dentro de cada um desses 10 grupos.
+-->
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ResourceSelection)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'ResourceSelection' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ResourceSelection 0.3-6      2023-06-27</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># g = 10 para dividir em 10 grupos (decis)</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>hl_teste <span class="ot">&lt;-</span> <span class="fu">hoslem.test</span>(modelo_final<span class="sc">$</span>y, <span class="fu">fitted</span>(modelo_final), <span class="at">g =</span> <span class="dv">10</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hl_teste)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Hosmer and Lemeshow goodness of fit (GOF) test
+
+data:  modelo_final$y, fitted(modelo_final)
+X-squared = 4.4581, df = 8, p-value = 0.8136</code></pre>
+</div>
+</div>
+<!--
+Seria bom apresentar um fechamento do assunto (falar de forma geral de resíduos) seguido de um fechamento do curso.
+
+Ideias para o futuro: considerar o livro do kutner para as partes II e III de regressão logística para que esse material fique coerente com a maior parte do curso e mais "dentro" do assunto de modelos lineares.  
+-->
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-agresti2007introduction" class="csl-entry" role="listitem">
+Agresti, Alan. 2007. <em>An Introduction to Categorical Data Analysis</em>. 2nd ed. Hoboken: John Wiley &amp; Sons.
+</div>
+<div id="ref-agresti2012categorical" class="csl-entry" role="listitem">
+———. 2012. <em>Categorical Data Analysis</em>. 3rd ed. Hoboken, NJ: John Wiley &amp; Sons.
+</div>
+<div id="ref-allison1999logistic" class="csl-entry" role="listitem">
+Allison, Paul D. 1999. <em>Logistic Regression Using the SAS System: Theory and Application</em>. Cary: SAS Institute Inc.
+</div>
+<div id="ref-cetinkaya2023introduction" class="csl-entry" role="listitem">
+Çetinkaya-Rundel, Mine, and Johanna Hardin. 2023. <em>Introduction to Modern Statistics</em>. 2nd ed. OpenIntro Inc. <a href="https://openintro-ims.netlify.app/">https://openintro-ims.netlify.app/</a>.
+</div>
+<div id="ref-charnet2008analise" class="csl-entry" role="listitem">
+Charnet, Reinaldo, Clarice Azevedo de Luna Freire, Eugênia Maria R. Charnet, and Helio Bonvino. 2008. <em>An<span>á</span>lise de Modelos de Regress<span>ã</span>o Linear: Com Aplica<span>ç</span><span>õ</span>es</em>. 2nd ed. Campinas: Editora Unicamp.
+</div>
+<div id="ref-cordeiro2024modelos" class="csl-entry" role="listitem">
+Cordeiro, Gauss M., Clarice G. B. Demétrio, and Rafael A. Moral. 2024. <em>Modelos Lineares Generalizados e Aplica<span>ç</span><span>õ</span>es</em>. S<span>ã</span>o Paulo: Blucher.
+</div>
+<div id="ref-demetrio2011modelos" class="csl-entry" role="listitem">
+Demétrio, Clarice G. B., and S. S. Zocchi. 2011. <em>Modelos de Regress<span>ã</span>o</em>. Piracicaba: ESALQ.
+</div>
+<div id="ref-draper1998applied" class="csl-entry" role="listitem">
+Draper, Norman R., and Harry Smith. 1998. <em>Applied Regression Analysis</em>. 3rd ed. New York: John Wiley &amp; Sons.
+</div>
+<div id="ref-ferreira2013recursos" class="csl-entry" role="listitem">
+Ferreira, Daniel Furtado. 2013. <em>Recursos Computacionais Utilizando r</em>. Lavras.
+</div>
+<div id="ref-hoffmann1977analise" class="csl-entry" role="listitem">
+Hoffmann, Rodolfo, and Sonia Vieira. 1977. <em>An<span>á</span>lise de Regress<span>ã</span>o: Uma Introdu<span>ç</span><span>ã</span>o <span class="nocase">à</span> Econometria</em>. 2nd ed. S<span>ã</span>o Paulo: Editora Hucitec.
+</div>
+<div id="ref-kutner2005applied" class="csl-entry" role="listitem">
+Kutner, Michael H., Christopher J. Nachtsheim, John Neter, and William Li. 2005. <em>Applied Linear Statistical Models</em>. 5th ed. New York: McGraw-Hill/Irwin.
+</div>
+<div id="ref-levine2016estatistica" class="csl-entry" role="listitem">
+Levine, David M., David F. Stephan, and Kathryn A. Szabat. 2016. <em>Estat<span>ı́</span>stica - Teoria e Aplica<span>ç</span><span>õ</span>es Usando o Microsoft Excel Em Portugu<span>ê</span>s</em>. 7th ed. Rio de Janeiro: LTC.
+</div>
+<div id="ref-mallows1973comments" class="csl-entry" role="listitem">
+Mallows, Colin L. 1973. <span>“Some Comments on <span class="math inline">\(C_p\)</span>.”</span> <em>Technometrics</em> 15 (4): 661–75.
+</div>
+<div id="ref-morais2001introducao" class="csl-entry" role="listitem">
+Morais, Augusto Ramalho de, Lı́via Maria Chaves, and Maria Cristina R. P. Toledo. 2001. <em>Introdu<span>ç</span><span>ã</span>o <span class="nocase">à</span> <span class="nocase">á</span>lgebra de Matrizes</em>. Lavras: UFLA/FAEPE.
+</div>
+<div id="ref-noble1977applied" class="csl-entry" role="listitem">
+Noble, Ben, and James W. Daniel. 1977. <em>Applied Linear Algebra</em>. 3rd ed. Englewood Cliffs: Prentice-Hall.
+</div>
+<div id="ref-regazzi2010modelos" class="csl-entry" role="listitem">
+Regazzi, Adair José. 2010. <em>Modelos Lineares i</em>. Vi<span>ç</span>osa: UFV.
+</div>
+<div id="ref-rencher2008linear" class="csl-entry" role="listitem">
+Rencher, Alvin C., and G. Bruce Schaalje. 2008. <em>Linear Models in Statistics</em>. 2nd ed. Hoboken, New Jersey: John Wiley &amp; Sons.
+</div>
+<div id="ref-santos2017curso" class="csl-entry" role="listitem">
+Santos, Reginaldo J. 2017. <em>Um Curso de Geometria Anal<span>ı́</span>tica e <span class="nocase">á</span>lgebra Linear</em>. Belo Horizonte: Imprensa Universit<span>á</span>ria da UFMG.
+</div>
+<div id="ref-searle1982matrix" class="csl-entry" role="listitem">
+Searle, Shayle R. 1982. <em>Matrix Algebra Useful for Statistics</em>. New York: John Wiley &amp; Sons.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./Regressao_logistica_ParteII.html" class="pagination-link" aria-label="Regressão logística: inferência e aplicações">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Regressão logística: inferência e aplicações</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./referencias.html" class="pagination-link" aria-label="Referências">
+        <span class="nav-page-text">Referências</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

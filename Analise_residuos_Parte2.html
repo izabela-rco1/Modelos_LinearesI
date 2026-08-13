@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>11&nbsp; Análise de Resíduos e Diagnósticos – Modelos Lineares: modelos de posto completo</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./Multicolinearidade.html" rel="next">
+<link href="./Residuos_Diagnosticos.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-26470a742aafa1a1e7b10f54c72c41f3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-578930c7c9073de1ad26189988221688.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Analise_residuos_Parte2.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Modelos Lineares: modelos de posto completo</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bem-vindos!</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./prefacio.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefácio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ML_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introdução aos modelos lineares</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRLS_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">O modelo de regressão linear simples (MRLS)</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_outrospolinomios_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelos de regressão linear (MRL) - modelos polinomiais</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRLM_matricial_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modelos de regressão linear múltipla (MRLM) e representação matricial</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_estimacao_matricial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Estimação em modelos de regressão linear (MRL) - representação matricial</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_estimacao.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Estimação em Modelos de Regressão Linear</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_ANOVA.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Análise de variância (ANOVA) da regressão</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./TH_comparacao_modelos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Testes de hipóteses: Comparação de modelos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Formas_quadraticas_aula1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Formas quadráticas</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Residuos_Diagnosticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Analise_residuos_Parte2.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Multicolinearidade.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Multicolinearidade</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Aula_MRL_Qualitativas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Modelos de regressão para preditores qualitativos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Metodos_selecao_variaveis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Métodos de seleção de variáveis</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Regressão logística</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica_ParteII.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Regressão logística: inferência e aplicações</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica_ParteIII.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Regressão logística: seleção de modelos, predição e qualidade do ajuste</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./referencias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referências</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Conteúdo</h2>
+   
+  <ul>
+  <li><a href="#exemplos-práticos" id="toc-exemplos-práticos" class="nav-link active" data-scroll-target="#exemplos-práticos"><span class="header-section-number">11.1</span> Exemplos práticos</a></li>
+  <li><a href="#principais-gráficos" id="toc-principais-gráficos" class="nav-link" data-scroll-target="#principais-gráficos"><span class="header-section-number">11.2</span> Principais gráficos</a>
+  <ul class="collapse">
+  <li><a href="#valores-observados-y-vs-variáveis-explicativas-x_j" id="toc-valores-observados-y-vs-variáveis-explicativas-x_j" class="nav-link" data-scroll-target="#valores-observados-y-vs-variáveis-explicativas-x_j"><span class="header-section-number">11.2.1</span> Valores observados (<span class="math inline">\(Y\)</span>) <em>vs</em> variáveis explicativas (<span class="math inline">\(X_{j}\)</span>)</a></li>
+  <li><a href="#variável-explicativa-x_j-vs-variável-explicativa-x_j" id="toc-variável-explicativa-x_j-vs-variável-explicativa-x_j" class="nav-link" data-scroll-target="#variável-explicativa-x_j-vs-variável-explicativa-x_j"><span class="header-section-number">11.2.2</span> Variável explicativa (<span class="math inline">\(X_{j}\)</span>) <em>vs</em> variável explicativa (<span class="math inline">\(X_{j'}\)</span>)</a></li>
+  <li><a href="#resíduos-vs-variáveis-explicativas" id="toc-resíduos-vs-variáveis-explicativas" class="nav-link" data-scroll-target="#resíduos-vs-variáveis-explicativas"><span class="header-section-number">11.2.3</span> Resíduos <em>vs</em> variáveis explicativas</a></li>
+  <li><a href="#resíduos-vs-valores-ajustados" id="toc-resíduos-vs-valores-ajustados" class="nav-link" data-scroll-target="#resíduos-vs-valores-ajustados"><span class="header-section-number">11.2.4</span> Resíduos <em>vs</em> valores ajustados</a></li>
+  <li><a href="#valores-observados-y-ou-resíduos-vs-tempo" id="toc-valores-observados-y-ou-resíduos-vs-tempo" class="nav-link" data-scroll-target="#valores-observados-y-ou-resíduos-vs-tempo"><span class="header-section-number">11.2.5</span> Valores observados (<span class="math inline">\(Y\)</span>) ou resíduos <em>vs</em> tempo</a></li>
+  <li><a href="#gráficos-normal-e-semi-normal-de-probabilidades-normal-plots-e-half-normal-plots" id="toc-gráficos-normal-e-semi-normal-de-probabilidades-normal-plots-e-half-normal-plots" class="nav-link" data-scroll-target="#gráficos-normal-e-semi-normal-de-probabilidades-normal-plots-e-half-normal-plots"><span class="header-section-number">11.2.6</span> Gráficos normal e semi-normal de probabilidades (<em>Normal Plots</em> e <em>Half Normal Plots</em>)</a></li>
+  <li><a href="#gráficos-de-índices" id="toc-gráficos-de-índices" class="nav-link" data-scroll-target="#gráficos-de-índices"><span class="header-section-number">11.2.7</span> Gráficos de índices</a></li>
+  </ul></li>
+  <li><a href="#medidas-corretivas-quando-há-violação-de-pressupostos" id="toc-medidas-corretivas-quando-há-violação-de-pressupostos" class="nav-link" data-scroll-target="#medidas-corretivas-quando-há-violação-de-pressupostos"><span class="header-section-number">11.3</span> Medidas corretivas quando há violação de pressupostos</a></li>
+  <li><a href="#transformações-box-cox2" id="toc-transformações-box-cox2" class="nav-link" data-scroll-target="#transformações-box-cox2"><span class="header-section-number">11.4</span> Transformações Box-Cox<span class="math inline">\(^2\)</span></a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapterintro">
+<p>Nessa aula, vamos apresentar os principais gráficos utilizados para avaliar a adequacidade de um modelo de regressão linear. Depois, traremos algumas estratégias utilizadas quando há violação dos pressupostos, dentre elas a família Box-Cox de transformações.</p>
+<p>Essa aula é baseada no <strong>Capítulo 4 - Análise de Resíduos e Diagnósticos</strong> da apostila Modelos de Regressão (Demétrio e Zocchi, 2011) e no livro Applied Linear Statistical Models (Kutner et al., 2008) (Capítulo 3).</p>
+</div>
+<section id="exemplos-práticos" class="level2" data-number="11.1">
+<h2 data-number="11.1" class="anchored" data-anchor-id="exemplos-práticos"><span class="header-section-number">11.1</span> Exemplos práticos</h2>
+<p>Para melhor compreensão do conteúdo dessa aula, vamos utilizar algumas bases de dados como exemplos. Elas estão descritas na sequência. Ambos os exemplos foram retirados de Demétrio e Zocchi (2011).</p>
+<div class="data">
+<p><strong>Exemplo 1: Fosforo</strong></p>
+<p>Os dados da Tabela a seguir (Snedecor e Cochran, 1967) referem-se a medidas de concentrações de fósforo inorgânico (<span class="math inline">\(X_{1}\)</span>) e fósforo orgânico (<span class="math inline">\(X_{2}\)</span>) no solo e de conteúdo de fósforo (<span class="math inline">\(Y\)</span>) nas plantas crescidas naquele solo. O objetivo desse tipo de experimento é estudar a relação existente entre o conteúdo de fósforo na planta e duas fontes de fósforo no solo.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 12%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 19%">
+<col style="width: 12%">
+<col style="width: 8%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Amostra</th>
+<th><span class="math inline">\(X_{1}\)</span></th>
+<th><span class="math inline">\(X_{2}\)</span></th>
+<th><span class="math inline">\(Y\)</span></th>
+<th>Amostra</th>
+<th><span class="math inline">\(X_{1}\)</span></th>
+<th><span class="math inline">\(X_{2}\)</span></th>
+<th><span class="math inline">\(Y\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>0,4</td>
+<td>53</td>
+<td>64</td>
+<td>10</td>
+<td>12,6</td>
+<td>58</td>
+<td>51</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>0,4</td>
+<td>23</td>
+<td>60</td>
+<td>11</td>
+<td>10,9</td>
+<td>37</td>
+<td>76</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>3,1</td>
+<td>19</td>
+<td>71</td>
+<td>12</td>
+<td>23,1</td>
+<td>46</td>
+<td>96</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>0,6</td>
+<td>34</td>
+<td>61</td>
+<td>13</td>
+<td>23,1</td>
+<td>50</td>
+<td>77</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>4,7</td>
+<td>24</td>
+<td>54</td>
+<td>14</td>
+<td>21,6</td>
+<td>44</td>
+<td>93</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>1,7</td>
+<td>65</td>
+<td>77</td>
+<td>15</td>
+<td>23,1</td>
+<td>56</td>
+<td>95</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>9,4</td>
+<td>44</td>
+<td>81</td>
+<td>16</td>
+<td>1,9</td>
+<td>36</td>
+<td>54</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>10,1</td>
+<td>31</td>
+<td>93</td>
+<td>17</td>
+<td>26,8</td>
+<td>58</td>
+<td>168</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>11,6</td>
+<td>29</td>
+<td>93</td>
+<td>18</td>
+<td>29,9</td>
+<td>51</td>
+<td>99</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="data">
+<p><strong>Exemplo 2: Ratos</strong></p>
+<p>Os dados a seguir referem-se a tempos de sobrevivência de ratos após envenenamento com 3 tipos de venenos e 4 diferentes tratamentos (Box e Cox, 1964).</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Tempo</th>
+<th>Tipo</th>
+<th>Trat.</th>
+<th>Tempo</th>
+<th>Tipo</th>
+<th>Trat.</th>
+<th>Tempo</th>
+<th>Tipo</th>
+<th>Trat.</th>
+<th>Tempo</th>
+<th>Tipo</th>
+<th>Trat.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0,31</td>
+<td>1</td>
+<td>1</td>
+<td>0,45</td>
+<td>1</td>
+<td>1</td>
+<td>0,46</td>
+<td>1</td>
+<td>1</td>
+<td>0,43</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>0,82</td>
+<td>1</td>
+<td>2</td>
+<td>1,10</td>
+<td>1</td>
+<td>2</td>
+<td>0,88</td>
+<td>1</td>
+<td>2</td>
+<td>0,72</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>0,43</td>
+<td>1</td>
+<td>3</td>
+<td>0,45</td>
+<td>1</td>
+<td>3</td>
+<td>0,63</td>
+<td>1</td>
+<td>3</td>
+<td>0,76</td>
+<td>1</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>0,45</td>
+<td>1</td>
+<td>4</td>
+<td>0,71</td>
+<td>1</td>
+<td>4</td>
+<td>0,66</td>
+<td>1</td>
+<td>4</td>
+<td>0,62</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td>0,36</td>
+<td>2</td>
+<td>1</td>
+<td>0,29</td>
+<td>2</td>
+<td>1</td>
+<td>0,4</td>
+<td>2</td>
+<td>1</td>
+<td>0,23</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>0,92</td>
+<td>2</td>
+<td>2</td>
+<td>0,61</td>
+<td>2</td>
+<td>2</td>
+<td>0,49</td>
+<td>2</td>
+<td>2</td>
+<td>1,24</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>0,44</td>
+<td>2</td>
+<td>3</td>
+<td>0,35</td>
+<td>2</td>
+<td>3</td>
+<td>0,31</td>
+<td>2</td>
+<td>3</td>
+<td>0,40</td>
+<td>2</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>0,56</td>
+<td>2</td>
+<td>4</td>
+<td>1,02</td>
+<td>2</td>
+<td>4</td>
+<td>0,71</td>
+<td>2</td>
+<td>4</td>
+<td>0,38</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td>0,22</td>
+<td>3</td>
+<td>1</td>
+<td>0,21</td>
+<td>3</td>
+<td>1</td>
+<td>0,18</td>
+<td>3</td>
+<td>1</td>
+<td>0,23</td>
+<td>3</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>0,30</td>
+<td>3</td>
+<td>2</td>
+<td>0,37</td>
+<td>3</td>
+<td>2</td>
+<td>0,38</td>
+<td>3</td>
+<td>2</td>
+<td>0,29</td>
+<td>3</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>0,23</td>
+<td>3</td>
+<td>3</td>
+<td>0,25</td>
+<td>3</td>
+<td>3</td>
+<td>0,24</td>
+<td>3</td>
+<td>3</td>
+<td>0,22</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>0,30</td>
+<td>3</td>
+<td>4</td>
+<td>0,36</td>
+<td>3</td>
+<td>4</td>
+<td>0,31</td>
+<td>3</td>
+<td>4</td>
+<td>0,33</td>
+<td>3</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="principais-gráficos" class="level2" data-number="11.2">
+<h2 data-number="11.2" class="anchored" data-anchor-id="principais-gráficos"><span class="header-section-number">11.2</span> Principais gráficos</h2>
+<p>Segundo Demétrio e Zocchi (2011), as <strong>técnicas informais</strong> utilizadas na verificação do ajuste de um modelo referem-se à avaliação visual de alguns gráficos. Apesar da subjetividade inerente a muitas análises gráficas, essas visalizações são úteis na identificação de padrões e de pontos atípicos.</p>
+<p>Listamos a seguir os principais tipos de gráficos que podem ser utilizados para avaliar o ajuste de um modelo de regressão linear. Notem que os dois primeiros gráficos da sequência não são feitos com os resíduos do modelo. podendo ser parte de uma análise exploratória dos dados.</p>
+<section id="valores-observados-y-vs-variáveis-explicativas-x_j" class="level3" data-number="11.2.1">
+<h3 data-number="11.2.1" class="anchored" data-anchor-id="valores-observados-y-vs-variáveis-explicativas-x_j"><span class="header-section-number">11.2.1</span> Valores observados (<span class="math inline">\(Y\)</span>) <em>vs</em> variáveis explicativas (<span class="math inline">\(X_{j}\)</span>)</h3>
+<p>Indica a estrutura que pode existir entre a variável dependente e as variáveis explicativas. Pode indicar, também, a presença de heterocedasticidade, pois por meio desse gráfico avaliamos a variabilidade de (<span class="math inline">\(Y\)</span>) em diferentes níveis de (<span class="math inline">\(X_{j}\)</span>).</p>
+<p>No caso de muitas variáveis explicativas, as análises individuais de <span class="math inline">\(Y\)</span> <em>vs</em> <span class="math inline">\(X_{j}\)</span> podem levar uma interpretação enganosa, porque parte da estrutura da variância pode estar associada a outras variáveis. Por isso, o gráfico de resíduos <em>vs</em> valores ajustados é geralmente mais informativo, ja que ele já combina o efeito de todas as covariáveis no modelo.</p>
+<p><strong>Aplicação aos dados do Exemplo 1 - fósforo</strong></p>
+<div id="fig-xyex1" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-xyex1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-xyex1" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-xyex1-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-xyex1-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Analise_residuos_Parte2_files/figure-html/fig-xyex1-1.png" class="img-fluid figure-img" data-ref-parent="fig-xyex1" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-xyex1-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Y vs X1
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-xyex1" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-xyex1-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-xyex1-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Analise_residuos_Parte2_files/figure-html/fig-xyex1-2.png" class="img-fluid figure-img" data-ref-parent="fig-xyex1" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-xyex1-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Y vs X2
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-xyex1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11.1: Valores observados vs variáveis explicativas para o exemplo 1
+</figcaption>
+</figure>
+</div>
+<div class="exercicios">
+<ul>
+<li>O que vocês enxergam na relação entre cada variável explicativa e <span class="math inline">\(Y\)</span>?</li>
+<li>A relação parece linear?</li>
+<li>A variabilidade de <span class="math inline">\(Y\)</span> (espalhamento dos pontos) muda ao longo de <span class="math inline">\(X_{j}\)</span>?</li>
+</ul>
+</div>
+<p><strong>Aplicação aos dados do Exemplo 2 - ratos</strong></p>
+<div id="fig-xyex2" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-xyex2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-xyex2" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-xyex2-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-xyex2-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Analise_residuos_Parte2_files/figure-html/fig-xyex2-1.png" class="img-fluid figure-img" data-ref-parent="fig-xyex2" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-xyex2-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Tempo vs Tipo
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-xyex2" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-xyex2-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-xyex2-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Analise_residuos_Parte2_files/figure-html/fig-xyex2-2.png" class="img-fluid figure-img" data-ref-parent="fig-xyex2" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-xyex2-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Tempo vs Trat.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-xyex2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11.2: Valores observados vs variáveis explicativas para o exemplo 2
+</figcaption>
+</figure>
+</div>
+<div class="exercicios">
+<ul>
+<li>A variabilidade de <span class="math inline">\(Y\)</span> (espalhamento dos pontos) muda ao longo das categorias das variáveis explicativas?</li>
+</ul>
+</div>
+</section>
+<section id="variável-explicativa-x_j-vs-variável-explicativa-x_j" class="level3" data-number="11.2.2">
+<h3 data-number="11.2.2" class="anchored" data-anchor-id="variável-explicativa-x_j-vs-variável-explicativa-x_j"><span class="header-section-number">11.2.2</span> Variável explicativa (<span class="math inline">\(X_{j}\)</span>) <em>vs</em> variável explicativa (<span class="math inline">\(X_{j'}\)</span>)</h3>
+<p>Esse tipo de gráfico pode indicar a estrutura existente entre duas variáveis explicativas, bem como a presença de heterocedasticidade. Porém, como no gráfico anterior, pode levar a uma impressão equivocada quando há muitas variáveis explicativas.</p>
+<p><strong>Aplicação aos dados do Exemplo 1 - fósforo</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-xxex1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-xxex1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Analise_residuos_Parte2_files/figure-html/fig-xxex1-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-xxex1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11.3: Relação entre variáveis explicativas
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="exercicios">
+<ul>
+<li>Há alguma tendência linear clara entre <span class="math inline">\(X_{1}\)</span> e <span class="math inline">\(X_{2}\)</span>?</li>
+<li>Se houvesse uma forte relação, como isso afetaria a regressão?</li>
+</ul>
+</div>
+</section>
+<section id="resíduos-vs-variáveis-explicativas" class="level3" data-number="11.2.3">
+<h3 data-number="11.2.3" class="anchored" data-anchor-id="resíduos-vs-variáveis-explicativas"><span class="header-section-number">11.2.3</span> Resíduos <em>vs</em> variáveis explicativas</h3>
+<p>Pode mostrar se ainda existe uma relação sistemática entre os resíduos e a variável <span class="math inline">\(X_{j}\)</span> já incluída no modelo. O padrão para esse tipo de gráfico é uma distribuição aleatória de média 0 e amplitude constante. Desvios sistemáicos podem indicar que a pressuposição de linearidade está sendo violada. Por exemplo, pode indicar que está faltando um termo de ordem superior (ex: quadrático).</p>
+<p>Como os gráficos anteriores, pode levar a uma impressão equivocada quando há muitas variáveis explicativas.</p>
+<p><strong>Aplicação aos dados do Exemplo 1 - fósforo</strong></p>
+<p>Para essa aplicação, considere o modelo de regressão múltipla:</p>
+<div id="fig-resx" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-resx-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-resx" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-resx-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-resx-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Analise_residuos_Parte2_files/figure-html/fig-resx-1.png" class="img-fluid figure-img" data-ref-parent="fig-resx" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-resx-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Resíduos vs X1
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-resx" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-resx-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-resx-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Analise_residuos_Parte2_files/figure-html/fig-resx-2.png" class="img-fluid figure-img" data-ref-parent="fig-resx" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-resx-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Resíduos vs X2
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-resx-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11.4: Resíduos vs variáveis explicativas
+</figcaption>
+</figure>
+</div>
+<div class="tip">
+<p>Também podem ser feitos gráficos de resíduos <em>vs</em> variáveis que não foram incluídas no modelo. Nesse caso, é possível avaliar se a inclusão de tal variável poderia melhorar o modelo.</p>
+</div>
+<div class="important">
+<p>Na análise de regressão múltipla há algumas alternativas interessantes para os gráficos apresentados até o momento. Os <em>added-variable plots</em> (ou gráficos de variáveis adicionadas) e os <em>Partial Residual Plots</em> permitem o estudo dos efeitos de variáveis explicativas específicas, mas controlando para a influência de outras explicativas. Para mais detalhes, consulte a Seção 4.4 de Demétrio e Zocchi (2011).</p>
+</div>
+</section>
+<section id="resíduos-vs-valores-ajustados" class="level3" data-number="11.2.4">
+<h3 data-number="11.2.4" class="anchored" data-anchor-id="resíduos-vs-valores-ajustados"><span class="header-section-number">11.2.4</span> Resíduos <em>vs</em> valores ajustados</h3>
+<p>Nesse tipo de gráfico, colocamos os valores ajustados (<span class="math inline">\(\hat{y}_i\)</span>) no eixo x e os resíduos (<span class="math inline">\(\hat{\varepsilon}_i = y_i - \hat{y}_i\)</span>) no eixo y. O padrão desejado para esse tipo de gráfico é uma distribuição aleatória de média 0 e amplitude constante.</p>
+<p>Quando há heterocedasticidade, os resíduos “se abrem” ou “se fecham” conforme aumentam os valores ajustados. O padrão típico é o de funil: variância pequena para valores ajustados baixos e grande para altos (ou o contrário).</p>
+<p><strong>Aplicação aos dados do Exemplo 1 - fósforo</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-resyhatex1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-resyhatex1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Analise_residuos_Parte2_files/figure-html/fig-resyhatex1-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-resyhatex1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11.5: Resíduos vs valores ajustados
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="tip">
+<p>Consulte a Seção 7.3 de <a href="https://openintro-ims.netlify.app/model-slr#sec-outliers-in-regression">Introduction to Modern Statistics (2e)</a>. As autoras apresentam diversas situações em que esse tipo de gráfico pode ser usado como uma ferramenta para identificar pontos discrepantes.</p>
+</div>
+</section>
+<section id="valores-observados-y-ou-resíduos-vs-tempo" class="level3" data-number="11.2.5">
+<h3 data-number="11.2.5" class="anchored" data-anchor-id="valores-observados-y-ou-resíduos-vs-tempo"><span class="header-section-number">11.2.5</span> Valores observados (<span class="math inline">\(Y\)</span>) ou resíduos <em>vs</em> tempo</h3>
+<p>Segundo Demétrio e Zocchi (2011), mesmo que tempo nãoo seja uma variável incluída no modelo, gráficos de respostas (<span class="math inline">\(Y\)</span>) ou de resíduos <em>versus</em> tempo devem ser feitos sempre que possível. Eles podem levar à detecção de padrões devido ao tempo ou a alguma variável correlacionada com o tempo.</p>
+<p>Kutner et al.&nbsp;(2008) denominam essas representações de <strong>gráficos de sequência</strong>.</p>
+</section>
+<section id="gráficos-normal-e-semi-normal-de-probabilidades-normal-plots-e-half-normal-plots" class="level3" data-number="11.2.6">
+<h3 data-number="11.2.6" class="anchored" data-anchor-id="gráficos-normal-e-semi-normal-de-probabilidades-normal-plots-e-half-normal-plots"><span class="header-section-number">11.2.6</span> Gráficos normal e semi-normal de probabilidades (<em>Normal Plots</em> e <em>Half Normal Plots</em>)</h3>
+<p>A normalidade dos erros é um dos pressupostos do MRL. Pequenos desvios da normalidade não causam sérios problemas. Por outros lados, grandes desvios são preocupantes. Esse pressuposto pode ser estudado informalmente por meio de vários gráficos como box plot, histograma, gráfico de pontos e gráfico de ramos e folhas dos resíduos. No entanto, o número de observações precisa ser razoavelmente grande para que esses gráficos transmitam uma informação adequada sobre o formato da distribuição dos resíduos.</p>
+<p>Outra ferramenta gráfica interessante é o gráfico de probabilidades normal dos resíduos. Eles permitem a identificação da distribuição originária dos dados e de valores que se destacam no conjunto.</p>
+<p>De maneira geral, ele é um gráfico de quantis ordenados de um conjunto de dados <em>versus</em> os quantis ordenados de outro conjunto de dados. Cada ponto (<span class="math inline">\(x,y\)</span>) refere-se ao quantil de uma distribuição do eixo vertical (<span class="math inline">\(y\)</span>) contra o quantil correspondente de outra distribuição ao longo do eixo horizontal (<span class="math inline">\(x\)</span>). Se as duas distribuições são similares, os pontos situam-se na linha de identidade, <span class="math inline">\(y=x\)</span>.</p>
+<p>Os quantis dos dois conjuntos de dados podem ser observados ou teóricos. Quando os quantis de um banco de dados real são plotados com os quantis correspondentes de uma distribuição teórica (aqui, a normal), o gráfico resultante serve como uma ferramenta visual para verificar o quanto o conjunto de dados pode ser descrito pela distribuição teórica. Por relacionar valores de quantis esse gráfico também recebe o nome de <em>Q-Q plot</em>.</p>
+<p>Seja uma amostra aleatória de tamanho <span class="math inline">\(n\)</span> e as estatísticas de ordem correspondentes aos resíduos do modelo ajustado são <span class="math inline">\(d_{(1)}, d_{(2)}, ... , d_{(i)}, ... , d_{(n)}\)</span>. Se a amostra for proveniente de uma normal, então os valores das estatísticas de ordem e os <span class="math inline">\(Z_i\)</span> correspondentes, obtidos da distribuição normal padrão são linearmente relacionados. Portanto, o gráfico dos valores, <span class="math inline">\(d_{(i)}\)</span> versus <span class="math inline">\(Z_{i}\)</span> deve ser uma reta, aproximadamente.</p>
+<p>De acordo com Demétrio e Zocchi (2011), formatos aproximados comuns que indicam ausência de normalidade são:</p>
+<p>– S: indica distribuições com caudas muito curtas, ou cujos valores estão muito próximos da média,</p>
+<p>– S invertido: indica distribuições com caudas muito longas e, portanto, presença de muitos valores extremos,</p>
+<p>– J e J invertido: indicam distribuições assimétricas, positivas e negativas, respectivamente.</p>
+<p>A construção do gráfico semi-normal de probabilidades (<em>half normal plot</em>) é o resultado do conjunto de pontos obtidos por valores <span class="math inline">\(|d|_{(i)}\)</span> versus <span class="math inline">\(Z_i\)</span> em que <span class="math inline">\(Z_i = \Phi^{-1}\!\left(\frac{i + n - 0,125}{2n + 0,5}\right)\)</span>, em que <span class="math inline">\(\Phi^{-1}(\cdot)\)</span> é a função acumulada da distribuição Normal padrão.</p>
+<p>Na literatura especializada, recomenda-se o uso do gráfico normal de probabilidades para resíduos e o gráfico semi-normal de probabilidades (<em>half normal plot</em>) para medidas positivas como é o caso de <span class="math inline">\(h\)</span> (<em>leverage</em>) e da distância de Cook modificada.</p>
+<p><strong>Aplicação aos dados do Exemplo 1 - fósforo</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-qqplotex1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-qqplotex1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Analise_residuos_Parte2_files/figure-html/fig-qqplotex1-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-qqplotex1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11.6: Gráfico Normal de probabilidades para os resíduos padronizados externamente
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="important">
+<p>Para auxiliar na interpretação do gráfico semi-normal de probabilidades (<em>half normal plot</em>), Atkinson (1985) propôs a adição de um envelope simulado. Este envelope é tal que sob o modelo correto as quantias (resíduos, <em>leverage</em>, distância de Cook etc) obtidas a partir dos dados observados caem dentro do envelope (Demétrio e Zocchi, 2011).</p>
+</div>
+</section>
+<section id="gráficos-de-índices" class="level3" data-number="11.2.7">
+<h3 data-number="11.2.7" class="anchored" data-anchor-id="gráficos-de-índices"><span class="header-section-number">11.2.7</span> Gráficos de índices</h3>
+<p>Servem para localizar observações com resíduo, <span class="math inline">\(h\)</span> (<em>leverage</em>), distância de Cook modificada etc, grandes. No R, alguns gráficos de diagnóstico padrão são gerados com a função <code>plot()</code>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-plotex1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-plotex1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Analise_residuos_Parte2_files/figure-html/fig-plotex1-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-plotex1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11.7: Gráficos de diagnóstico padrão.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Outra função interessante é a <code>influencePlot()</code> do pacote <code>car</code>.</p>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'car' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: carData</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'carData' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in plot.window(...): "id.method" is not a graphical parameter</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in plot.xy(xy, type, ...): "id.method" is not a graphical parameter</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in axis(side = side, at = at, labels = labels, ...): "id.method" is not
+a graphical parameter
+Warning in axis(side = side, at = at, labels = labels, ...): "id.method" is not
+a graphical parameter</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in box(...): "id.method" is not a graphical parameter</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in title(...): "id.method" is not a graphical parameter</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in plot.xy(xy.coords(x, y), type = type, ...): "id.method" is not a
+graphical parameter</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Analise_residuos_Parte2_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      StudRes       Hat       CookD
+1   0.1328713 0.2626034 0.002242622
+6   0.7839791 0.4595353 0.178789920
+10 -1.8603732 0.1523275 0.178094925
+17  5.3603492 0.1994649 0.837674683</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="medidas-corretivas-quando-há-violação-de-pressupostos" class="level2 page-columns page-full" data-number="11.3">
+<h2 data-number="11.3" class="anchored" data-anchor-id="medidas-corretivas-quando-há-violação-de-pressupostos"><span class="header-section-number">11.3</span> Medidas corretivas quando há violação de pressupostos</h2>
+<p>Se um modelo de regressão linear não for apropriado para um conjunto de dados, há dois caminhos básicos a seguir: 1) abandonar o modelo de regressão e usar um modelo mais apropriado ou 2) aplicar uma transformação nos dados de forma que o modelo ajustado aos dados transformados seja apropriado. Segundo Kutner et al.&nbsp;(2008), cada uma dessas escolhas traz vantagens e desvantagens. A primeira pode levar a um modelo que conduz melhores <em>insights</em>, porém mais complexo em termos de procedimentos de estimação. Já o uso de transformações pode envolver menos parâmetros que um modelo mais complexo, o que é uma vantagem quando temos amostras pequenas. Por outro lado, em algumas situações as transformações podem ofuscar conexões fundamentais entre as variáveis.</p>
+<p>A seguir está uma breve discussão para algumas situações específicas:</p>
+<ul>
+<li><p><strong>Não linearidade da função de regressão:</strong> Quando a função de regressão é não linear, uma solução imediata é modificar o modelo. Outras formas funcionais como os modelos polinomiais ou não lineares podem retratar melhor a relação entre as variáveis. A transformação nos dados pode linearizar, pelo menos aproximadamente, uma função de regressão não linear.</p></li>
+<li><p><strong>Erros não independentes<span class="math inline">\(^1\)</span>:</strong> Esse pressuposto é um dos mais importantes, mas o mais difícil de verificar. É extremamente difícil garantir que um banco de dados será uma verdadeira amostra aleatória da população de interesse. Observações dependentes podem causar vieses nos resultados, levando a conclusões fundamentalmente incorretas. Em geral, em vez de tentar responder se suas observações são uma amostra aleatória verdadeira, você pode se concentrar em se acredita que suas observações são representativas de uma população de interesse. Quando for possível verificar que os erros são correlacionados, uma medida corretiva é trabalhar com modelos que permitem erros correlacionados.</p></li>
+</ul>
+
+<div class="no-row-height column-margin column-container"><div class="margin-aside">
+<p><span class="math inline">\(^1\)</span> <a href="https://openintro-ims.netlify.app/inf-model-slr#why-do-we-need-technical-conditions">Introduction to Modern Statistics (2e)</a></p>
+</div></div><ul>
+<li><p><strong>Erros não normais<span class="math inline">\(^1\)</span>:</strong> A condição de normalidade é menos importante que a linearidade ou a independência dos erros. Isso porque o modelo obtido por mínimos quadrados ainda será uma estimativa não viesada do verdadeiro modelo populacional. No entanto, a distribuição da estimativa será desconhecida. Mas, graças ao Teorema Central do Limite, a maioria das análises (intervalos de confiança, valores-p) ainda serão válidas se os tamanhos amostrais forem suficientemente grandes. De qualquer forma, é muito comum o caso em que uma transformação aplicada para estabilizar a variância (em caso de heterocedasticidade) também contribua para normalizar os resíduos.</p></li>
+<li><p><strong>Variância dos erros não constante<span class="math inline">\(^1\)</span>:</strong> Assim como a normalidade, a condição de variância constante não irá causar problemas na estimação do modelo linear. Mas a inferência com base no modelo (ex: valores-p) será incorreta se a variabilidade for extremamente heterogênea. Por exemplo, dados que apresentam diferentes variabilidades ao longo dos valores de <span class="math inline">\(X\)</span> poderão estimar incorretamente a variabilidade da inclinação do modelo, o que terá consequências para os resultados da inferência (ou seja, testes de hipóteses e intervalos de confiança). Quando a variância varia de forma sistemática, uma alternativa é modificar para um modelo que permita isso e utilizar o <strong>método de mínimos quadrados ponderados</strong> no processo de estimação. Transformações nos dados também são efetivas na estabilização da variância.</p></li>
+<li><p><strong>Observações discrepantes:</strong> A presença de <em>outliers</em>, pode levar a sérias distorções na regressão estimada. Quando essas observações não são atribuídas a registros errados e não podem ser descartadas, é necessário usar um procedimento de estimação robusto, ou seja, que coloca menos ênfase nessas observações discrepantes.</p></li>
+</ul>
+</section>
+<section id="transformações-box-cox2" class="level2 page-columns page-full" data-number="11.4">
+<h2 data-number="11.4" class="anchored" data-anchor-id="transformações-box-cox2"><span class="header-section-number">11.4</span> Transformações Box-Cox<span class="math inline">\(^2\)</span></h2>
+
+<div class="no-row-height column-margin column-container"><div class="margin-aside">
+<p><span class="math inline">\(^2\)</span> Kutner et al.&nbsp;(2008), Seção 3.9.</p>
+</div></div><p>Em algumas situações é difícil determinar no diagnóstico qual transformação de <span class="math inline">\(y\)</span> é mais apropriada para corrigir a assimetria na distriuição dos erros, variâncias de erros não homogêneas e não linearidade da função de regressão.</p>
+<p>O procedimento de Box-Cox automaticamente identifica uma transformação útil da família de transformações de potência em <span class="math inline">\(y\)</span>. Essa família é da forma:</p>
+<p><span class="math display">\[
+y' = y^{\lambda}
+\]</span></p>
+<p>em que <span class="math inline">\(\lambda\)</span> é um parâmetro a ser determinado a partir dos dados. Note que essa família engloba as seguintes transformações:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><span class="math inline">\(\lambda\)</span></th>
+<th><span class="math inline">\(y'\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td><span class="math inline">\(y^2\)</span></td>
+</tr>
+<tr class="even">
+<td>0,5</td>
+<td><span class="math inline">\(\sqrt y\)</span></td>
+</tr>
+<tr class="odd">
+<td>0</td>
+<td><span class="math inline">\(\log_{e}y\)</span></td>
+</tr>
+<tr class="even">
+<td>-0,5</td>
+<td><span class="math inline">\(1/y\)</span></td>
+</tr>
+<tr class="odd">
+<td>-1,0</td>
+<td><span class="math inline">\(1/y\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Ao aplicar a transformação, o modelo de regressão linear passa a ter a forma:</p>
+<p><span class="math display">\[
+y^{\lambda}_{i} = \beta_{0} + \beta_{1}x_{1i} + \beta_{2}x_{2i} + \beta_{3}x_{3i} + \ldots + \beta_{k}x_{ki} + \varepsilon_{i},
+\]</span></p>
+<p>Note que o modelo inclui um novo parâmetro, <span class="math inline">\(\lambda\)</span>, a ser estimado. O procedimento Box-Cox usa o método de máxima verossimilhança para estimar <span class="math inline">\(\lambda\)</span> e os outros parâmetros do modelo. Dessa forma, o procedimento identifica a estimativa de máxima verossimilhança <span class="math inline">\(\hat\lambda\)</span> que deve ser usada na transformação de potência.</p>
+<p>A transformação é dada por:</p>
+<p><span class="math display">\[
+y^{(\lambda)} =
+\begin{cases}
+\dfrac{y^\lambda - 1}{\lambda}, &amp; \text{se } \lambda \neq 0, \\
+\log(y), &amp; \text{se } \lambda = 0,
+\end{cases}
+\]</span></p>
+<p>sendo <span class="math inline">\(\lambda\)</span> o parâmetro da transformação e <span class="math inline">\(y\)</span> a variável resposta.</p>
+<p><strong>Aplicação aos dados do Exemplo 1 - fósforo</strong></p>
+<p>Primeiro, vamos obter a ANOVA com SQ sequenciais do primeiro modelo ajustado a fim de compreender os efeitos das variáveis explicativas.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Anova Table (Type II tests)
+
+Response: y
+          Sum Sq Df F value   Pr(&gt;F)   
+x1        4419.0  1 10.3344 0.005787 **
+x2          18.6  1  0.0436 0.837396   
+Residuals 6413.9 15                    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>A transformação Box-Cox pode ser identificada usando a função <code>boxcox()</code> do pacote <code>MASS</code>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Analise_residuos_Parte2_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Depois de realizada a transformação, um novo modelo deve ser ajustado aos dados transformados e sua adequacidade deve ser avaliada.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Anova Table (Type II tests)
+
+Response: 1/sqrt(y)
+              Sum Sq Df F value   Pr(&gt;F)   
+x1        0.00179467  1 12.7947 0.002753 **
+x2        0.00000032  1  0.0023 0.962599   
+Residuals 0.00210400 15                    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Analise_residuos_Parte2_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="home">
+<p>Vocês devem ter notado que, para o exemplo 2, só foi feito o gráfico apresentado na Seção 2.1. Assumindo o modelo:</p>
+<p><span class="math display">\[
+y_{ij} = \beta_{0} + \beta_{1}x_{1i} + \beta_{2}x_{2j} + \beta_{3}(x_{1}x_{2})_{ij} + \varepsilon_{ij}
+\]</span></p>
+<p>em que <span class="math inline">\(x_{1}\)</span> é o efeito do tipo, <span class="math inline">\(x_{2}\)</span> é o efeito do tratamento e <span class="math inline">\(\varepsilon_{ij} \sim N(0, \sigma^{2})\)</span>, obtenha os outros gráficos apresentados nessa aula a fim de verificar a adequacidade do modelo.</p>
+<p>Caso os pressupostos sejam violados, encontre uma transformação adequada da família Box-Cox, ajuste o modelo novamente e estude as diferenças entre os dois ajustes (variável original e variável transformada).</p>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-agresti2007introduction" class="csl-entry" role="listitem">
+Agresti, Alan. 2007. <em>An Introduction to Categorical Data Analysis</em>. 2nd ed. Hoboken: John Wiley &amp; Sons.
+</div>
+<div id="ref-agresti2012categorical" class="csl-entry" role="listitem">
+———. 2012. <em>Categorical Data Analysis</em>. 3rd ed. Hoboken, NJ: John Wiley &amp; Sons.
+</div>
+<div id="ref-allison1999logistic" class="csl-entry" role="listitem">
+Allison, Paul D. 1999. <em>Logistic Regression Using the SAS System: Theory and Application</em>. Cary: SAS Institute Inc.
+</div>
+<div id="ref-cetinkaya2023introduction" class="csl-entry" role="listitem">
+Çetinkaya-Rundel, Mine, and Johanna Hardin. 2023. <em>Introduction to Modern Statistics</em>. 2nd ed. OpenIntro Inc. <a href="https://openintro-ims.netlify.app/">https://openintro-ims.netlify.app/</a>.
+</div>
+<div id="ref-charnet2008analise" class="csl-entry" role="listitem">
+Charnet, Reinaldo, Clarice Azevedo de Luna Freire, Eugênia Maria R. Charnet, and Helio Bonvino. 2008. <em>An<span>á</span>lise de Modelos de Regress<span>ã</span>o Linear: Com Aplica<span>ç</span><span>õ</span>es</em>. 2nd ed. Campinas: Editora Unicamp.
+</div>
+<div id="ref-cordeiro2024modelos" class="csl-entry" role="listitem">
+Cordeiro, Gauss M., Clarice G. B. Demétrio, and Rafael A. Moral. 2024. <em>Modelos Lineares Generalizados e Aplica<span>ç</span><span>õ</span>es</em>. S<span>ã</span>o Paulo: Blucher.
+</div>
+<div id="ref-demetrio2011modelos" class="csl-entry" role="listitem">
+Demétrio, Clarice G. B., and S. S. Zocchi. 2011. <em>Modelos de Regress<span>ã</span>o</em>. Piracicaba: ESALQ.
+</div>
+<div id="ref-draper1998applied" class="csl-entry" role="listitem">
+Draper, Norman R., and Harry Smith. 1998. <em>Applied Regression Analysis</em>. 3rd ed. New York: John Wiley &amp; Sons.
+</div>
+<div id="ref-ferreira2013recursos" class="csl-entry" role="listitem">
+Ferreira, Daniel Furtado. 2013. <em>Recursos Computacionais Utilizando r</em>. Lavras.
+</div>
+<div id="ref-hoffmann1977analise" class="csl-entry" role="listitem">
+Hoffmann, Rodolfo, and Sonia Vieira. 1977. <em>An<span>á</span>lise de Regress<span>ã</span>o: Uma Introdu<span>ç</span><span>ã</span>o <span class="nocase">à</span> Econometria</em>. 2nd ed. S<span>ã</span>o Paulo: Editora Hucitec.
+</div>
+<div id="ref-kutner2005applied" class="csl-entry" role="listitem">
+Kutner, Michael H., Christopher J. Nachtsheim, John Neter, and William Li. 2005. <em>Applied Linear Statistical Models</em>. 5th ed. New York: McGraw-Hill/Irwin.
+</div>
+<div id="ref-levine2016estatistica" class="csl-entry" role="listitem">
+Levine, David M., David F. Stephan, and Kathryn A. Szabat. 2016. <em>Estat<span>ı́</span>stica - Teoria e Aplica<span>ç</span><span>õ</span>es Usando o Microsoft Excel Em Portugu<span>ê</span>s</em>. 7th ed. Rio de Janeiro: LTC.
+</div>
+<div id="ref-mallows1973comments" class="csl-entry" role="listitem">
+Mallows, Colin L. 1973. <span>“Some Comments on <span class="math inline">\(C_p\)</span>.”</span> <em>Technometrics</em> 15 (4): 661–75.
+</div>
+<div id="ref-morais2001introducao" class="csl-entry" role="listitem">
+Morais, Augusto Ramalho de, Lı́via Maria Chaves, and Maria Cristina R. P. Toledo. 2001. <em>Introdu<span>ç</span><span>ã</span>o <span class="nocase">à</span> <span class="nocase">á</span>lgebra de Matrizes</em>. Lavras: UFLA/FAEPE.
+</div>
+<div id="ref-noble1977applied" class="csl-entry" role="listitem">
+Noble, Ben, and James W. Daniel. 1977. <em>Applied Linear Algebra</em>. 3rd ed. Englewood Cliffs: Prentice-Hall.
+</div>
+<div id="ref-regazzi2010modelos" class="csl-entry" role="listitem">
+Regazzi, Adair José. 2010. <em>Modelos Lineares i</em>. Vi<span>ç</span>osa: UFV.
+</div>
+<div id="ref-rencher2008linear" class="csl-entry" role="listitem">
+Rencher, Alvin C., and G. Bruce Schaalje. 2008. <em>Linear Models in Statistics</em>. 2nd ed. Hoboken, New Jersey: John Wiley &amp; Sons.
+</div>
+<div id="ref-santos2017curso" class="csl-entry" role="listitem">
+Santos, Reginaldo J. 2017. <em>Um Curso de Geometria Anal<span>ı́</span>tica e <span class="nocase">á</span>lgebra Linear</em>. Belo Horizonte: Imprensa Universit<span>á</span>ria da UFMG.
+</div>
+<div id="ref-searle1982matrix" class="csl-entry" role="listitem">
+Searle, Shayle R. 1982. <em>Matrix Algebra Useful for Statistics</em>. New York: John Wiley &amp; Sons.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./Residuos_Diagnosticos.html" class="pagination-link" aria-label="Análise de Resíduos e Diagnósticos">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./Multicolinearidade.html" class="pagination-link" aria-label="Multicolinearidade">
+        <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Multicolinearidade</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

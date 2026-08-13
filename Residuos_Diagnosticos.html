@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>10&nbsp; Análise de Resíduos e Diagnósticos – Modelos Lineares: modelos de posto completo</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./Analise_residuos_Parte2.html" rel="next">
+<link href="./Formas_quadraticas_aula1.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-26470a742aafa1a1e7b10f54c72c41f3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-578930c7c9073de1ad26189988221688.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Residuos_Diagnosticos.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Modelos Lineares: modelos de posto completo</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bem-vindos!</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./prefacio.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefácio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ML_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introdução aos modelos lineares</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRLS_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">O modelo de regressão linear simples (MRLS)</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_outrospolinomios_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelos de regressão linear (MRL) - modelos polinomiais</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRLM_matricial_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modelos de regressão linear múltipla (MRLM) e representação matricial</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_estimacao_matricial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Estimação em modelos de regressão linear (MRL) - representação matricial</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_estimacao.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Estimação em Modelos de Regressão Linear</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_ANOVA.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Análise de variância (ANOVA) da regressão</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./TH_comparacao_modelos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Testes de hipóteses: Comparação de modelos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Formas_quadraticas_aula1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Formas quadráticas</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Residuos_Diagnosticos.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Analise_residuos_Parte2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Multicolinearidade.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Multicolinearidade</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Aula_MRL_Qualitativas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Modelos de regressão para preditores qualitativos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Metodos_selecao_variaveis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Métodos de seleção de variáveis</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Regressão logística</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica_ParteII.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Regressão logística: inferência e aplicações</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica_ParteIII.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Regressão logística: seleção de modelos, predição e qualidade do ajuste</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./referencias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referências</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Conteúdo</h2>
+   
+  <ul>
+  <li><a href="#introdução" id="toc-introdução" class="nav-link active" data-scroll-target="#introdução"><span class="header-section-number">10.1</span> Introdução</a></li>
+  <li><a href="#tipos-de-resíduos" id="toc-tipos-de-resíduos" class="nav-link" data-scroll-target="#tipos-de-resíduos"><span class="header-section-number">10.2</span> Tipos de resíduos</a>
+  <ul class="collapse">
+  <li><a href="#resíduos-ordinários" id="toc-resíduos-ordinários" class="nav-link" data-scroll-target="#resíduos-ordinários"><span class="header-section-number">10.2.1</span> Resíduos ordinários</a></li>
+  <li><a href="#resíduos-estudentizados-internamente-studentized-residual" id="toc-resíduos-estudentizados-internamente-studentized-residual" class="nav-link" data-scroll-target="#resíduos-estudentizados-internamente-studentized-residual"><span class="header-section-number">10.2.2</span> Resíduos estudentizados internamente (<em>Studentized residual</em>)</a></li>
+  <li><a href="#resíduos-estudentizados-externamente-jacknifed-residuals-deletion-residuals-externally-studentized-residual_-ou-rstudent" id="toc-resíduos-estudentizados-externamente-jacknifed-residuals-deletion-residuals-externally-studentized-residual_-ou-rstudent" class="nav-link" data-scroll-target="#resíduos-estudentizados-externamente-jacknifed-residuals-deletion-residuals-externally-studentized-residual_-ou-rstudent"><span class="header-section-number">10.2.3</span> Resíduos estudentizados externamente (<em>jacknifed residuals</em>, <em>deletion residuals</em>, externally studentized residual_ ou <em>RStudent</em>)</a></li>
+  </ul></li>
+  <li><a href="#estatísticas-para-diagnósticos" id="toc-estatísticas-para-diagnósticos" class="nav-link" data-scroll-target="#estatísticas-para-diagnósticos"><span class="header-section-number">10.3</span> Estatísticas para diagnósticos</a>
+  <ul class="collapse">
+  <li><a href="#elementos-da-diagonal-da-matriz-mathbfh-h_i" id="toc-elementos-da-diagonal-da-matriz-mathbfh-h_i" class="nav-link" data-scroll-target="#elementos-da-diagonal-da-matriz-mathbfh-h_i"><span class="header-section-number">10.3.1</span> Elementos da diagonal da matriz <span class="math inline">\(\mathbf{H}\)</span> (<span class="math inline">\(h_i\)</span>)</a></li>
+  <li><a href="#dfbeta_i-ou-dfbetas_i" id="toc-dfbeta_i-ou-dfbetas_i" class="nav-link" data-scroll-target="#dfbeta_i-ou-dfbetas_i"><span class="header-section-number">10.3.2</span> <span class="math inline">\(DFBeta_{(i)}\)</span> ou <span class="math inline">\(DFBetaS_{(i)}\)</span></a></li>
+  <li><a href="#dffits_i" id="toc-dffits_i" class="nav-link" data-scroll-target="#dffits_i"><span class="header-section-number">10.3.3</span> <span class="math inline">\(DFFitS_{(i)}\)</span></a></li>
+  <li><a href="#distância-de-cook" id="toc-distância-de-cook" class="nav-link" data-scroll-target="#distância-de-cook"><span class="header-section-number">10.3.4</span> Distância de Cook</a></li>
+  <li><a href="#covratio" id="toc-covratio" class="nav-link" data-scroll-target="#covratio"><span class="header-section-number">10.3.5</span> <span class="math inline">\(COVRATIO\)</span></a></li>
+  </ul></li>
+  <li><a href="#exemplo" id="toc-exemplo" class="nav-link" data-scroll-target="#exemplo"><span class="header-section-number">10.4</span> Exemplo</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapterintro">
+<p>Nessa aula vamos iniciar a descrição de métodos e estatísticas para diagnóstico em modelos de regressão linear. São utilizadas para avaliar ou verificar se as pressuposições foram atendidas e se existem pontos atípicos no conjunto de dados. De maneira geral, esses métodos e estatísticas estão relacionadas aos resíduos do modelo de regressão ajustado aos dados.</p>
+<p>Essa aula é baseada no <strong>Capítulo 4 - Análise de Resíduos e Diagnósticos</strong> da apostila <em>Modelos de Regressão</em> (Demétrio e Zocchi, 2011) no livro <strong>Applied Linear Statistical Models</strong> (Kutner et al., 2008).</p>
+</div>
+<section id="introdução" class="level2" data-number="10.1">
+<h2 data-number="10.1" class="anchored" data-anchor-id="introdução"><span class="header-section-number">10.1</span> Introdução</h2>
+<p>Um modelo de regressão linear (MRL) pode ser representado, de maneira geral, como um modelo de regressão linear múltiplo, ou seja, <span id="eq-mrlm"><span class="math display">\[
+y_i = \beta_{0} + \beta_{1}x_{1i} + \beta_{2}x_{2i} + \ldots + \beta_{k}x_{ki} + \varepsilon_i,
+\tag{10.1}\]</span></span> em que <span class="math inline">\(y_i\)</span> é a <em>i-ésimo</em> valor observado, com <span class="math inline">\(i=1,2,\ldots,n\)</span>; <span class="math inline">\(x_{1i}, x_{2i}, \ldots, x_{ki}\)</span> são os valores das <em>k-ésimas</em> variáveis independentes ou explicativas associadas à observação <span class="math inline">\(y_i\)</span>; <span class="math inline">\(\beta_0\)</span>, <span class="math inline">\(\beta_1\)</span>, <span class="math inline">\(\beta_2\)</span>, <span class="math inline">\(\ldots\)</span>, <span class="math inline">\(\beta_k\)</span> são os <span class="math inline">\(k+1\)</span> parâmetros do modelo; e <span class="math inline">\(\varepsilon_i\)</span> é o <em>i-ésimo</em> erro, sendo os erros idenpendentes e identicamente distribuídos segundo uma normal com variância única, ou seja, <span class="math inline">\(\varepsilon_i \sim \textrm{N}(0; \sigma^{2})\)</span>.</p>
+<p>O modelo definido na <a href="Metodos_selecao_variaveis.html#eq-mrlm" class="quarto-xref">Equation&nbsp;<span>14.1</span></a> pode ser representado matricialmente como <span id="eq-mrlmat"><span class="math display">\[
+\mathbf{Y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon},
+\tag{10.2}\]</span></span> em que <span class="math inline">\(\mathbf{Y}\)</span> é o vetor <span class="math inline">\(n \times 1\)</span> de observações; <span class="math inline">\(\mathbf{X}\)</span> é uma matriz <span class="math inline">\(n \times (k+1)\)</span>, denominada de matriz de incidência ou de modelo; <span class="math inline">\(\boldsymbol{\beta}\)</span> é o vetor <span class="math inline">\((k+1) \times 1\)</span> de parâmetros; e <span class="math inline">\(\boldsymbol{\varepsilon}\)</span> é o vetor <span class="math inline">\(n \times 1\)</span> de erros, tal que <span class="math inline">\(\boldsymbol{\varepsilon} \sim N(\boldsymbol{\phi},\boldsymbol{\Sigma})\)</span>, em que <span class="math inline">\(\boldsymbol{\phi}\)</span> é um vetor <span class="math inline">\(n \times 1\)</span> de 0’s e <span class="math inline">\(\boldsymbol{\Sigma}\)</span> é uma matriz, <span class="math inline">\(n \times n\)</span>, de variâncias e covariâncias dos erros (<span class="math inline">\(\varepsilon_i\)</span>’s), que, sendo os erros idenpendentes e com variância única <span class="math inline">\(\sigma^2\)</span>, <span class="math inline">\(\boldsymbol{\Sigma} = \mathbf{I} \sigma^2\)</span>.</p>
+<p>É importante observar que pressuposições em relação aos erros, como independência, homocedasticidade e normalidade, são assumidas e, portanto, todo o processo de inferência é válido somente sob a condição que essas pressuposições são atendidas. Porém, de acordo com Demétrio e Zocchi (2011), se as pressuposições forem violadas, podem ocorrer <em>falhas sistemáticas</em>, como não normalidade, heterocedasticidade e não independência dos erros, não linearidade, dentre outros e a análise resultante pode levar a conclusões duvidosas ou equivocadas.</p>
+<p>Em estudos de regressão linear múltipla, um ponto <span class="math inline">\(i\)</span> corresponde à posição em um espaço multidimensional, definida por suas coordenadas, ou seja, <span class="math inline">\((y_i, x_{1i}, x_{2i}, \ldots, x_{ki})\)</span> e um fato bastante comum e que deve ser considerado, é a presença de pontos atípicos (<em>falhas isoladas</em>), que podem influenciar, ou não, o ajuste do modelo. Esses pontos atípicos podem ocorrer por vários motivos, dentre os quais podemos citar:</p>
+<ul>
+<li><p>erros grosseiros na variável resposta ou nas variáveis explicativas, devido a mesurações erradas, erros no registro da observação ou erros de transcrição (como por exemplo, erros de digitação dos dados);</p></li>
+<li><p>observação obtida em condições distintas das demais, ou seja, falta de padronização durante as mensurações;</p></li>
+<li><p>modelo mal especiﬁcado, ocasionado, por exemplo, por falta de uma ou mais variáveis, modelo inadequado, dentre outros;</p></li>
+<li><p>escala errada e, portanto, os dados deveriam ser melhor representados considerando uma transformação do tipo logarıtmica ou raiz quadrada;</p></li>
+<li><p>considerar uma distribuição equivocada da variável resposta, o que não está diretamente relacionado aos ajustes de modelos de regressão linear vistos nesse curso, mas tem relação com o ajuste considerando outros métodos, como por exemplo, os modelos lineares generalizados.</p></li>
+</ul>
+<p>Uma das maneiras para avaliar se um ponto é considerado atípico, consiste em utilizar o que é denominado de deleção. Nessa estratégia compara-se e avalia-se o ajuste do modelo considerando todos os pontos, com o ajuste do mesmo modelo, retirando ou desconsiderando os pontos atípicos. Nessa caso serão utilizadas estatísticas específicas, cuja notação envolve, geralmente, o uso de um índice entre parênteses. Por exemplo, <span class="math inline">\(\hat{\sigma}^2_{(i)}\)</span> representa a variância residual estimada, tendo excluído o ponto <span class="math inline">\(i\)</span>.</p>
+<p>Portanto, após o ajuste de um MRL é importante avaliar ou verificar se as pressuposições foram atendidas e se existem pontos atípicos no conjunto de dados. Para isso, geralmente são considerados:</p>
+<ul>
+<li><p>os valores estimados: <span class="math inline">\(\hat{y}_i\)</span> ou, matricialmente <span class="math inline">\(\hat{\mathbf{Y}}\)</span>;</p></li>
+<li><p>os erros estimados, também chamados de resíduos: <span class="math inline">\(\hat{\varepsilon}_i = y_i - \hat{y}_i\)</span> ou, matricialmente <span class="math inline">\(\boldsymbol{\varepsilon} = \mathbf{Y} - \hat{\mathbf{Y}}\)</span>;</p></li>
+<li><p>variância residual estimada: <span class="math inline">\(\hat{\sigma}^2 = QMErro\)</span>; e</p></li>
+<li><p>os elementos da diagonal da <em><strong>matriz hat</strong></em> ou de projeção <span class="math inline">\(\mathbf{H}\)</span>, denominados de <em>leverage</em>. Conforme definido em outras aulas, essa matriz é dada por <span class="math display">\[
+\mathbf{H} = \mathbf{X} (\mathbf{X}' \mathbf{X})^{-1} \mathbf{X}' =
+\begin{bmatrix}
+h_1 &amp; h_{12} &amp; h_{13} &amp; \cdots &amp; h_{1n} \\
+h_{12} &amp; h_2 &amp; h_{23} &amp; \cdots &amp; h_{2n} \\
+h_{13} &amp; h_{23} &amp; h_3 &amp; \cdots &amp; h_{3n} \\
+\vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+h_{1n} &amp; h_{2n} &amp; h_{3n} &amp; \cdots &amp; h_n \\
+\end{bmatrix},
+\]</span> na qual <span class="math inline">\(h_i\)</span>, com <span class="math inline">\(i=1,2,\ldots,n\)</span>, é o <em>leverage</em> <span class="math inline">\(i\)</span> associado à <em>i-ésima</em> observação <span class="math inline">\(y_i\)</span>. Pode-se observar que <span class="math display">\[
+\mathbf{H} = \mathbf{X} (\mathbf{X}' \mathbf{X})^{-1} \mathbf{X}' =
+\begin{bmatrix}
+1 &amp; x_{11} &amp; x_{21} &amp; \cdots &amp; x_{k1} \\
+1 &amp; x_{12} &amp; x_{22} &amp; \cdots &amp; x_{k2} \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+1 &amp; x_{1n} &amp; x_{2n} &amp; \cdots &amp; x_{kn} \\
+\end{bmatrix} (\mathbf{X}' \mathbf{X})^{-1}
+\begin{bmatrix}
+1 &amp; 1 &amp; \cdots &amp; 1 \\
+x_{11} &amp; x_{12} &amp; \cdots &amp; x_{1n} \\
+x_{21} &amp; x_{22} &amp; \cdots &amp; x_{2n} \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+x_{k1} &amp; x_{k2} &amp; \cdots &amp; x_{kn} \\
+\end{bmatrix}
+\]</span> e, portanto, <span class="math display">\[
+\begin{array}{rcl}
+h_1 &amp; = &amp;
+\begin{bmatrix}
+1 &amp; x_{11} &amp; x_{21} &amp; \cdots &amp; x_{k1}
+\end{bmatrix} (\mathbf{X}' \mathbf{X})^{-1}
+\begin{bmatrix}
+1 \\ x_{11} \\ x_{21} \\ \vdots \\ x_{k1}
+\end{bmatrix} \\
+h_2 &amp; = &amp;
+\begin{bmatrix}
+1 &amp; x_{12} &amp; x_{22} &amp; \cdots &amp; x_{k2}
+\end{bmatrix} (\mathbf{X}' \mathbf{X})^{-1}
+\begin{bmatrix}
+1 \\ x_{12} \\ x_{22} \\ \vdots \\ x_{k2}
+\end{bmatrix} \\
+\vdots &amp; \vdots &amp; \qquad \qquad \qquad \vdots \\
+h_n &amp; = &amp;
+\begin{bmatrix}
+1 &amp; x_{1n} &amp; x_{2n} &amp; \cdots &amp; x_{kn}
+\end{bmatrix} (\mathbf{X}' \mathbf{X})^{-1}
+\begin{bmatrix}
+1 \\ x_{1n} \\ x_{2n} \\ \vdots \\ x_{kn}
+\end{bmatrix}
+\end{array}.
+\]</span> Dessa forma, pode-se definir, de maneira geral, <span class="math inline">\(h_i = \mathbf{x}_i (\mathbf{X}'\mathbf{X})^{-1} \mathbf{x}'_i\)</span>, em que <span class="math inline">\(\mathbf{x}_i = \begin{bmatrix} 1 &amp; x_{1i} &amp; x_{2i} &amp; \cdots &amp; x_{ki} \end{bmatrix}\)</span>.</p></li>
+</ul>
+<p>Segundo Demétrio e Zocchi (2011), as técnicas utilizadas na verificação do ajuste de um modelo podem ser informais ou formais. A</p>
+<ul>
+<li><p><strong>Técnicas informais:</strong> incluem a avaliação visual de gráficos específicos, buscando identificar padrões que indiquem um ajuste ruim do modelo proposto ou a presença de pontos discrepantes.</p></li>
+<li><p><strong>Técnicas formais:</strong> envolvem o ajuste de diferentes modelos, sendo o modelo proposto aninhado em uma classe maior, que contempla a inclusão de mais um parâmetro ou um vetor de parâmetros. As mais utilizadas têm como base a aplicação de testes <em>score</em> ou da <em>razão de verossimilhanças</em>. Essa adição de novos parâmetros contemplam:</p>
+<ul>
+<li><p>inclusão de uma covariável adicional;</p></li>
+<li><p>aninhamento de uma variável <span class="math inline">\(X\)</span> em uma família indexada por um parâmetro <span class="math inline">\(\gamma\)</span>, sendo um exemplo a família Box-Cox;</p></li>
+<li><p>inclusão de uma variável construída;</p></li>
+<li><p>inclusão de uma variável <em>dummy</em>, que assume valor 0 (zero) para os pontos discrepantes e 1 (um) para os demais. Isso equivale a realizar as análises desconsiderando ou não as observações referentes aos pontos discrepantes e avaliar se ocorre uma alteração significativa na <span class="math inline">\(SQErro\)</span>. Porém, deve-se inicialmente identificar os pontos discrepantes.</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="tipos-de-resíduos" class="level2" data-number="10.2">
+<h2 data-number="10.2" class="anchored" data-anchor-id="tipos-de-resíduos"><span class="header-section-number">10.2</span> Tipos de resíduos</h2>
+<p>Conforme descrito anteriormente, os resíduos são importantes na avaliação do ajuste de MRL e na identificação de pontos atípicos. Até o momento definimos o resíduo como <span class="math inline">\(\hat{\varepsilon}_i = y_i - \hat{y}_i\)</span>, que corresponde ao denominado <em><strong>resíduo ordinário</strong></em>. Porém, esse não é único tipo de resíduo utilizado. A seguir, definiremos três tipos de resíduos: resíduo ordinário, resíduo estudentizado internamente e resíduo estudentizado externamente.</p>
+<section id="resíduos-ordinários" class="level3" data-number="10.2.1">
+<h3 data-number="10.2.1" class="anchored" data-anchor-id="resíduos-ordinários"><span class="header-section-number">10.2.1</span> Resíduos ordinários</h3>
+<p>Conforme definido anteriormente, o resíduo ordinário é dado por: <span class="math display">\[
+\hat{\varepsilon}_i = y_i - \hat{y}_i,
+\]</span> em que <span class="math inline">\(y_i\)</span> e <span class="math inline">\(\hat{y}_i\)</span> são, respectivamente, o <em>i-ésimo</em> valor observado e estimado por meio do modelo ajustado. O vetor contendo os resíduos ordinários é dado por <span class="math display">\[
+\hat{\boldsymbol{\varepsilon}} = \mathbf{Y} - \hat{\mathbf{Y}},
+\]</span> em que <span class="math inline">\(\mathbf{Y}\)</span> e <span class="math inline">\(\hat{\mathbf{Y}}\)</span> são, respectivamente, os vetores <span class="math inline">\(n \times 1\)</span> de valores observados e estimados. Esse vetor também pode ser representado sa seguinte forma: <span class="math display">\[
+\hat{\boldsymbol{\varepsilon}} = \mathbf{Y} - \mathbf{X} \hat{\boldsymbol{\beta}} = \mathbf{Y} - \mathbf{X} (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y} = \mathbf{Y} - \mathbf{HY} = \left( \mathbf{I} - \mathbf{H} \right) \mathbf{Y}.
+\]</span></p>
+<p>Vale ressaltar que os erros (<span class="math inline">\(\varepsilon_i\)</span>) são idenpendentes e identicamente distribuídos com variância única. Porém, isso não é válido para os resíduos ou erros estimados (<span class="math inline">\(\hat{\varepsilon}_i\)</span>). No caso dos resíduos ordinários tem-se:</p>
+<ul>
+<li>Variância do resíduo ordinário: <span class="math display">\[
+V(\hat{\boldsymbol{\varepsilon}}) = V \left[ \left( \mathbf{I} - \mathbf{H} \right) \mathbf{Y} \right] = \left( \mathbf{I} - \mathbf{H} \right)Var \left(  \mathbf{Y} \right) = \left( \mathbf{I} - \mathbf{H} \right) \sigma^2
+\]</span> ou para o <em>i-ésimo</em> resíduo ordinário: <span class="math display">\[
+V(\hat{\varepsilon}_i) = (1-h_i)\sigma^2;
+\]</span></li>
+<li>Covariância dos <em>i-ésimo</em> e <em>i’-ésimo</em> resíduos ordinários: <span class="math display">\[
+COV(\hat{\varepsilon}_i,\hat{\varepsilon}_{i'}) = -h_{ii'}\sigma^2.
+\]</span> Como os resíduos ordinários têm variâncias diferentes ou heterogêneas, utilizá-los na avaliação do ajuste de um MRL pode não ser adequado. Por isso, foram propostas diferentes padronizações desses resíduos para contornar os problemas. Dentre essas padronizações podemos citar: os resíduos estudentizados internamente e os resíduos estudentizados externamente.</li>
+</ul>
+</section>
+<section id="resíduos-estudentizados-internamente-studentized-residual" class="level3" data-number="10.2.2">
+<h3 data-number="10.2.2" class="anchored" data-anchor-id="resíduos-estudentizados-internamente-studentized-residual"><span class="header-section-number">10.2.2</span> Resíduos estudentizados internamente (<em>Studentized residual</em>)</h3>
+<p>Um estimador não viesado para <span class="math inline">\(V(\hat{\varepsilon}_i)\)</span> é dado por: <span class="math display">\[
+\hat{V}(\hat{\varepsilon}_i) = (1-h_i)\hat{\sigma}^2 = (1-h_i) QMErro.
+\]</span> Como <span class="math inline">\(E(\hat{\varepsilon}_i) = 0\)</span>, o resíduo estudentizado internamente é definido por: <span class="math display">\[
+rsi_i = \dfrac{\hat{\varepsilon}_i}{\sqrt{\hat{V}(\hat{\varepsilon}_i)}} = \dfrac{\hat{\varepsilon}_i}{\sqrt{(1-h_i) QMErro}}.
+\]</span> Segundo Demétrio e Zocchi (2011), os <span class="math inline">\(rsi\)</span> são mais sensíveis do que os resíduos ordinários, pois variâncias distintas são consideradas. Além disso, um valor discrepante pode alterar consideravelmente a variância residual (<span class="math inline">\(QMErro\)</span>). Ademais, o numerador e o denominador são variáveis dependentes, ou seja, <span class="math inline">\(COV(\hat{\varepsilon}_i, QMErro) \ne 0\)</span>.</p>
+</section>
+<section id="resíduos-estudentizados-externamente-jacknifed-residuals-deletion-residuals-externally-studentized-residual_-ou-rstudent" class="level3" data-number="10.2.3">
+<h3 data-number="10.2.3" class="anchored" data-anchor-id="resíduos-estudentizados-externamente-jacknifed-residuals-deletion-residuals-externally-studentized-residual_-ou-rstudent"><span class="header-section-number">10.2.3</span> Resíduos estudentizados externamente (<em>jacknifed residuals</em>, <em>deletion residuals</em>, externally studentized residual_ ou <em>RStudent</em>)</h3>
+<p>Para contornar o problema da não independência entre <span class="math inline">\(\hat{\varepsilon}_i\)</span> e <span class="math inline">\(QMErro\)</span> na padronização dos resíduos, foi definido o resíduo estudentizado externamente, dado por: <span class="math display">\[
+rse_{(i)} = \dfrac{\hat{\varepsilon}_i}{\sqrt{(1-h_i) QMErro_{(i)}}} = \dfrac{\hat{\varepsilon}_i}{\sqrt{(1-h_i) \hat{\sigma}^2_{(i)}}} = \dfrac{\hat{\varepsilon}_i}{\hat{\sigma}_{(i)}\sqrt{(1-h_i)}},
+\]</span> em que <span class="math inline">\(QMErro_{(i)} = \hat{\sigma}^2_{(i)}\)</span> é quadrado médio do erro livre da observação <span class="math inline">\(i\)</span>, ou seja, obtido no ajuste do modelo sem considerar a observação <span class="math inline">\(i\)</span>.</p>
+<p>Pode-se demonstrar que: <span class="math display">\[
+rse_{(i)} = rsi_{i} \sqrt{\dfrac{n-p-1}{n-p-rsi_i^2}},
+\]</span> em que <span class="math inline">\(p = k+1\)</span> corresponde ao número de parâmetros do modelo.</p>
+<p>Segundo Demétrio e Zocchi (2011), uma das vantagens de se utilizar o <span class="math inline">\(rse_{(i)}\)</span> é que, sob a condição de normalidade dos erros, esse resíduo tem distribuição <span class="math inline">\(t\)</span> de Student com <span class="math inline">\((n-p-1)\)</span> graus de liberdade. Porém, não se recomenda a utilização de testes de significância na análise de resíduos. No entanto, uma observação que apresente <span class="math inline">\(|rse_{(i)}|\)</span> maior que o percentil <span class="math inline">\(100 \left( 1-\dfrac{\alpha}{2n} \right)\)</span> da distribuição <span class="math inline">\(t\)</span> com <span class="math inline">\((n-p-1)\)</span> graus de liberdade, em que <span class="math inline">\(\alpha\)</span> é o nível de significância, deve ser avaliada com atenção especial.</p>
+</section>
+</section>
+<section id="estatísticas-para-diagnósticos" class="level2" data-number="10.3">
+<h2 data-number="10.3" class="anchored" data-anchor-id="estatísticas-para-diagnósticos"><span class="header-section-number">10.3</span> Estatísticas para diagnósticos</h2>
+<p>Neste tópico apresentaremos e descreveremos de maneira sucinta as seguintes estatísticas: <span class="math inline">\(h_i\)</span> (<em>leverage</em>), <span class="math inline">\(DFBeta\)</span>, <span class="math inline">\(DFFitS\)</span>, Distância de Cook (<span class="math inline">\(D_{(i)}\)</span> ou <span class="math inline">\(C_i\)</span>) e <em>COVRATIO</em>.</p>
+<p>Essas estatísticas são utilizadas com o objetivo de identificar pontos aberrantes, atípicos ou extremos (<em>outliers</em>). Estes são pontos com <span class="math inline">\(h_i\)</span> e/ou resíduos grandes. Para isso, conforme Demétrio e Zocchi (2011), é importante considerar os conceitos de <em>leverage</em>, inconsistência e influência, que estão ilustrados graficamente na Figura 4.1 de Demétrio e Zocchi (2011, p.104). A seguir é apresentada uma breve descrição desses conceitos.</p>
+<p><strong>a. Inconsistência:</strong> um valor inconsistente apresenta <span class="math inline">\(|rse_{(i)}| \ge t_{(\alpha/2n; n-p-1)}\)</span>, com nível de significância igual a <span class="math inline">\(100\alpha\%\)</span> e ele é considerado um <em>outlier</em> quando o <em>leverage</em> <span class="math inline">\((h_i)\)</span> for pequeno e o <span class="math inline">\(rse_{(i)}\)</span> for grande. Na Figura 4.1 de Demétrio e Zocchi (2011), compare os gráficos (a) e (c) com o (b).</p>
+<p><strong>b. Ponto de alavanca:</strong> um ponto é considerado como de alavanca quando apresenta <span class="math inline">\(h_i\)</span> grande, em geral quando <span class="math inline">\(h_i \ge \frac{2p}{n}\)</span>. Pode ser considerado como bom ou ruim, o que pode ser visualizado na Figura 4.1 de Demétrio e Zocchi (2011) e comparando os gráficos (b) e (c) com o (a).</p>
+<p><strong>c.&nbsp;Ponto influente:</strong> esse é caracterizado por uma observação que está distante das demais e que, se for desconsiderado nas análises, leva a mudanças consideráveis no ajuste do modelo. Ela pode ou não ser influente, o que pode ser visualizado ao comparar os gráficos (a) e (b) com o (c), na Figura 4.1 de Demétrio e Zocchi (2011). Uma observação influente pode ou não ser um <em>outlier</em> e ela pode ser influente de diferentes formas:</p>
+<ol type="i">
+<li><p>no ajuste do modelo (<span class="math inline">\(DFFitS_{(i)}\)</span> e <span class="math inline">\(D_{(i)}\)</span> ou <span class="math inline">\(C_i\)</span> grandes);<br>
+</p></li>
+<li><p>no conjunto das estimativas dos parâmetros do modelo (<span class="math inline">\(DFBeta_{(i)}\)</span> grande);</p></li>
+<li><p>na estimativa de um <span class="math inline">\(\beta_j\)</span> específico (<span class="math inline">\(DFBeta_{(i)}\)</span> grande para um específico <span class="math inline">\(\beta_j\)</span>);</p></li>
+<li><p>na escolha de uma transformação da variável resposta ou de uma variável explicativa.</p></li>
+</ol>
+<p>No R (Core Team, 2025), ao utilizar a função <code>influence.measures()</code>, a <em>i-ésima</em> observação é considerada influente se:</p>
+<ul>
+<li><p><span class="math inline">\(|DFBetaS_{(i)}| &gt; 1\)</span>; ou</p></li>
+<li><p><span class="math inline">\(DFFitS_{(i)} &gt; 3 \sqrt{\dfrac{p}{n-p}}\)</span>; ou</p></li>
+<li><p><span class="math inline">\(|1-COVRATIO| &gt; \dfrac{3p}{n-p}\)</span>; ou</p></li>
+<li><p><span class="math inline">\(D_{(i)} &gt; F_{(0,50;p;n-p)}\)</span>; ou</p></li>
+<li><p><span class="math inline">\(h_i &gt; \dfrac{3p}{n}\)</span>.</p></li>
+</ul>
+<section id="elementos-da-diagonal-da-matriz-mathbfh-h_i" class="level3" data-number="10.3.1">
+<h3 data-number="10.3.1" class="anchored" data-anchor-id="elementos-da-diagonal-da-matriz-mathbfh-h_i"><span class="header-section-number">10.3.1</span> Elementos da diagonal da matriz <span class="math inline">\(\mathbf{H}\)</span> (<span class="math inline">\(h_i\)</span>)</h3>
+<p>Os elementos da diagonal principal da matriz <span class="math inline">\(\mathbf{H}\)</span>, os <span class="math inline">\(h_i's\)</span> são conhecidos como <em>leverages</em>. Conforme definido anteriormente, <span class="math display">\[
+\mathbf{H} = \mathbf{X} (\mathbf{X}' \mathbf{X})^{-1} \mathbf{X}' =
+\begin{bmatrix}
+h_1 &amp; h_{12} &amp; h_{13} &amp; \cdots &amp; h_{1n} \\
+h_{12} &amp; h_2 &amp; h_{23} &amp; \cdots &amp; h_{2n} \\
+h_{13} &amp; h_{23} &amp; h_3 &amp; \cdots &amp; h_{3n} \\
+\vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+h_{1n} &amp; h_{2n} &amp; h_{3n} &amp; \cdots &amp; h_n \\
+\end{bmatrix},
+\]</span> ou ainda, <span class="math display">\[
+h_i = \mathbf{x}_i (\mathbf{X}'\mathbf{X})^{-1} \mathbf{x}'_i
+\]</span></p>
+</section>
+<section id="dfbeta_i-ou-dfbetas_i" class="level3" data-number="10.3.2">
+<h3 data-number="10.3.2" class="anchored" data-anchor-id="dfbeta_i-ou-dfbetas_i"><span class="header-section-number">10.3.2</span> <span class="math inline">\(DFBeta_{(i)}\)</span> ou <span class="math inline">\(DFBetaS_{(i)}\)</span></h3>
+<p>Essa estatística é utilizada para avaliar a alteração que ocorre m <span class="math inline">\(\hat{\boldsymbol{\beta}}\)</span> ao se retirar ou desconsiderar a <em>i-ésima</em> observação. É definido por: <span class="math display">\[
+DFBeta_{(i)} = \hat{\boldsymbol{\beta}} - \hat{\boldsymbol{\beta}}_{(i)} = \dfrac{1}{1-h_i} (X'X)^{-1} \mathbf{x}_i \hat{\boldsymbol{\varepsilon}}_i.
+\]</span></p>
+<p>Kutner et al.&nbsp;(2008) apresenta a estatística <span class="math inline">\(DFBetaS_{(i)}\)</span> que, basicamente, consiste na divisão do <span class="math inline">\(DFBeta_{(i)}\)</span> pela estimativa do desvio padrão do <span class="math inline">\(\hat{\beta}_j\)</span>, em que <span class="math inline">\(\beta_j\)</span> corresponde a um coeficiente de regressão específico, com <span class="math inline">\(j=1,2, \ldots, k\)</span>. É dada por: <span class="math display">\[
+DFBetaS_{(i)} = \dfrac{\beta_j - \hat{\beta}_{j(i)}}{\sqrt{\hat{\sigma}^2_{(i)} c_{kk}}},
+\]</span> em que <span class="math inline">\(c_{kk}\)</span> é o <em>k-ésimo</em> elemento da diagonal de <span class="math inline">\((\mathbf{X}'\mathbf{X})^{-1}\)</span>.</p>
+</section>
+<section id="dffits_i" class="level3" data-number="10.3.3">
+<h3 data-number="10.3.3" class="anchored" data-anchor-id="dffits_i"><span class="header-section-number">10.3.3</span> <span class="math inline">\(DFFitS_{(i)}\)</span></h3>
+<p>Utilizada para avaliar o efeito da retirada da <em>i-ésima</em> observação no valor predito (<span class="math inline">\(\hat{y}_i\)</span>). É definida por: <span class="math display">\[
+DFFitS_{(i)} = \dfrac{DFFit_{(i)}}{\sqrt{h_i \hat{\sigma}_{(i)}}} = \dfrac{\mathbf{x}_i \left( \hat{\boldsymbol{\beta}} - \hat{\boldsymbol{\beta}_{(i)}} \right)}{\sqrt{h_i \hat{\sigma}_{(i)}}} = \dfrac{\hat{y}_i - \hat{y}_{i(i)}}{\sqrt{h_i \hat{\sigma}_{(i)}}}
+\]</span> ou <span class="math display">\[
+DFFitS_{(i)} = \left( \dfrac{h_i}{1-h_i} \right)^{\frac{1}{2}} \dfrac{\hat{\varepsilon}_i}{\hat{\sigma}_{(i)} \sqrt{1-h_i}} = \left( \dfrac{h_i}{1-h_i} \right)^{\frac{1}{2}} rse_{(i)}
+\]</span> em que <span class="math inline">\(\dfrac{h_i}{1-h_i}\)</span> é chamado de potencial de influência, ou seja, mede a distância de um ponto em relação às demais observações.</p>
+<p>De acordo com Belsley, Kuh e Welsch (1980 apud Demétrio e Zocchi, 2011, p.&nbsp;107), valores absolutos de <span class="math inline">\(DFFitS_{(i)}\)</span> que excederem <span class="math inline">\(2 \sqrt{\dfrac{p}{n}}\)</span> indicam observações influentes.</p>
+</section>
+<section id="distância-de-cook" class="level3" data-number="10.3.4">
+<h3 data-number="10.3.4" class="anchored" data-anchor-id="distância-de-cook"><span class="header-section-number">10.3.4</span> Distância de Cook</h3>
+<p>A Distância de Cook - <span class="math inline">\(D_{(i)}\)</span>, assim como a <span class="math inline">\(DFFitS_{(i)}\)</span>, é utilizada na avaliação do afastamento dos <span class="math inline">\(\hat{y}_i's\)</span> provocado pela retirada da <em>i-ésima</em> observação. É dada por: <span class="math display">\[
+D_{(i)} = \dfrac{\displaystyle \sum_{i=1}^{n} \left( \hat{y}_i - \hat{y}_{i(i)} \right)^2}{p \hat{\sigma}^2} = \dfrac{\left( \hat{\boldsymbol{\beta}}_i - \hat{\boldsymbol{\beta}}_{i(i)}  \right)' \mathbf{X}'\mathbf{X} \left( \hat{\boldsymbol{\beta}}_i - \hat{\boldsymbol{\beta}}_{i(i)}  \right)}{p \hat{\sigma}^2} = \dfrac{h_i}{(1-h_i)^2} \cdot \dfrac{\hat{\varepsilon}_i^2}{p \hat{\sigma}^2}
+\]</span> ou <span class="math display">\[
+D_{(i)} = \dfrac{h_i}{(1-h_i)} \cdot \dfrac{1}{p} \cdot rsi_i^2.
+\]</span></p>
+<p><strong>- Distância de Cook modificada:</strong><br>
+Atkinson (1981 apud Demétrio e Zocchi, 2011, p.&nbsp;107) sugere uma modificação em <span class="math inline">\(D_{(i)}\)</span> e, assim, a Distância de Cook modificada é dada por: <span class="math display">\[
+C_i = \left( \dfrac{n-p}{p} \cdot \dfrac{h_i}{1-h_i} \right)^\frac{1}{2} |rse_{(i)}| = \left( \dfrac{n-p}{p} \right)^\frac{1}{2} DFFitS_{(i)}.
+\]</span></p>
+</section>
+<section id="covratio" class="level3" data-number="10.3.5">
+<h3 data-number="10.3.5" class="anchored" data-anchor-id="covratio"><span class="header-section-number">10.3.5</span> <span class="math inline">\(COVRATIO\)</span></h3>
+<p>Essa estatística é utilizada para avaliar a influência de uma observação sobre o volume do elipsoide de confiança. Pode ser definida como uma medida de alteração na precisão das estimativas dos parâmetros, obtidas por meio de modelos ajustados na presença e na ausência da <em>i-ésima</em> observação.</p>
+<p>De acordo com Demétrio e Zocchi (2011), sabe-se que a região de <span class="math inline">\(100(1-\alpha)\%\)</span> de confiança para o vetor de parâmetros <span class="math inline">\(\boldsymbol{\beta}\)</span> é dada pelos valores de <span class="math inline">\(\boldsymbol{\beta}\)</span> tais que <span class="math display">\[
+\left( \boldsymbol{\beta} - \hat{\boldsymbol{\beta}}  \right)' \mathbf{X}'\mathbf{X} \left( \boldsymbol{\beta} - \hat{\boldsymbol{\beta}}  \right) \le p\hat{\sigma}^2 F_{(\alpha,\nu,\gamma)},
+\]</span> em que <span class="math inline">\(F_{(\alpha,\nu,\gamma)}\)</span> é o quantil na distribuição <span class="math inline">\(F\)</span> referente ao percentil <span class="math inline">\(100\alpha\%\)</span>, com os graus de liberdade <span class="math inline">\(\nu = p\)</span> e <span class="math inline">\(\gamma = GLErro\)</span>. Essa região é delimitada por um elipsoide cujo volume, dependente do determinate de <span class="math inline">\(\mathbf{X}'\mathbf{X}\)</span> e de <span class="math inline">\(\hat{\sigma}^2\)</span>, é dado por <span class="math display">\[
+E \varpropto \left\{ \dfrac{\hat{\sigma}^{2p}}{|\mathbf{X}'\mathbf{X}|} \right\}^\frac{1}{2}.
+\]</span> Quando a <em>i-ésima</em> observação é desconsiderada nos ajustes, o volume passa a ser <span class="math display">\[
+E_{(i)} \varpropto \left\{ \dfrac{\hat{\sigma}_{(i)}^{2p}}{|\mathbf{X}_{(i)}'\mathbf{X}_{(i)}|} \right\}^\frac{1}{2}.
+\]</span> Como uma forma de se determinar a influência da <em>i-ésima</em> observação sobre o volume do elipsoide de confiança, Belsley, Kuh e Welsch (1980 apud Demétrio e Zocchi, 2011, p.&nbsp;136) propuseram a medida chamada <span class="math inline">\(COVRATIO\)</span>, dada por: <span class="math display">\[
+COVRATIO = \left\{ \dfrac{E_{(i)}}{E} \right\}^2.
+\]</span></p>
+</section>
+</section>
+<section id="exemplo" class="level2" data-number="10.4">
+<h2 data-number="10.4" class="anchored" data-anchor-id="exemplo"><span class="header-section-number">10.4</span> Exemplo</h2>
+<p>Considere como exemplo de aplicação da Análise de Resíduos e Diagnósticos, o exemplo com os dados de altura e DAP das Sequoias. O seguinte script do R será utilizado:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">###############################</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="do">## GES119 - Modelos Lineares I (2025-2)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="do">## ANALISE DE RESIDUO E DIAGNOSTICOS</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="do">###############################</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="do">##########</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Esequoia$dap_cmemplo - Dados Sequoias</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="do">##########</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list=</span><span class="fu">ls</span>())</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>librarsequoia<span class="sc">$</span><span class="fu">altura_m</span>(ggplot2)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>librarsequoia<span class="sc">$</span><span class="fu">altura_m</span>(readsequoia<span class="sc">$</span>dap_cml)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>sequoia <span class="ot">&lt;-</span> read_esequoia<span class="sc">$</span><span class="fu">dap_cmcel</span>(<span class="st">"Dados/sequoia.sequoia$dap_cmlssequoia$dap_cm"</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(sequoia)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="do">### Diagrama de dispersao dos dados</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(sequoia<span class="sc">$</span>altura_m<span class="sc">~</span>sequoia<span class="sc">$</span>dap_cm, <span class="at">xlab =</span> <span class="st">"DAP (cm)"</span>, <span class="at">ylab =</span> <span class="st">"Altura (m)"</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="do">### Ajuste do modelo de 1o. grau</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>mod1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(sequoia<span class="sc">$</span>altura_m<span class="sc">~</span>sequoia<span class="sc">$</span>dap_cm)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>(summ1<span class="ot">&lt;-</span> <span class="fu">summary</span>(mod1))</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>(an1<span class="ot">&lt;-</span> <span class="fu">anova</span>(mod1))</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(sequoia<span class="sc">$</span>altura_m<span class="sc">~</span>sequoia<span class="sc">$</span>dap_cm, <span class="at">xlab =</span> <span class="st">"DAP (cm)"</span>, </span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Altura (m)"</span>, <span class="at">pch=</span><span class="dv">19</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Grafico com a reta ajustada</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>dap_cm.graf<span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(sequoia<span class="sc">$</span>dap_cm), <span class="fu">max</span>(sequoia<span class="sc">$</span>dap_cm), <span class="at">l=</span><span class="dv">100</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>altura_m.est<span class="ot">&lt;-</span> summ1<span class="sc">$</span>coef[<span class="dv">1</span>,<span class="dv">1</span>] <span class="sc">+</span> summ1<span class="sc">$</span>coef[<span class="dv">2</span>,<span class="dv">1</span>]<span class="sc">*</span>dap_cm.graf</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(dap_cm.graf, altura_m.est, <span class="at">col=</span><span class="dv">2</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="do">## RESIDUOS</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="do">## Residuos ordinarios</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>(rord<span class="ot">&lt;-</span> <span class="fu">residuals</span>(mod1))</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="do">## Residuos estudentizados internamente (rsi)</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>(QMRes<span class="ot">&lt;-</span> an1[<span class="dv">2</span>,<span class="dv">3</span>])</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>(n<span class="ot">&lt;-</span> <span class="fu">length</span>(sequoia<span class="sc">$</span>altura_m))</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>p<span class="ot">&lt;-</span> <span class="dv">2</span> <span class="co"># numero de parametros do modelo</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>(X<span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(sequoia<span class="sc">$</span>altura_m<span class="sc">~</span>sequoia<span class="sc">$</span>dap_cm))</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>(XlX<span class="ot">&lt;-</span> <span class="fu">t</span>(X) <span class="sc">%*%</span> X)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>(iXlX<span class="ot">&lt;-</span> <span class="fu">solve</span>(XlX))</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>(H<span class="ot">&lt;-</span> X <span class="sc">%*%</span> iXlX <span class="sc">%*%</span> <span class="fu">t</span>(X))</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>(h.i<span class="ot">&lt;-</span> <span class="fu">diag</span>(H))</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>(rsi<span class="ot">&lt;-</span> rord<span class="sc">/</span><span class="fu">sqrt</span>((<span class="dv">1</span><span class="sc">-</span>h.i)<span class="sc">*</span>QMRes))</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="fu">rstandard</span>(mod1)</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="fu">cbind</span>(rsi, <span class="fu">rstandard</span>(mod1))</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="do">## Residuos estudentizados externamente (rse)</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>rse<span class="ot">&lt;-</span><span class="cn">NULL</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>  mod1.i<span class="ot">&lt;-</span> <span class="fu">lm</span>(sequoia<span class="sc">$</span>altura_m[<span class="sc">-</span>j]<span class="sc">~</span>sequoia<span class="sc">$</span>dap_cm[<span class="sc">-</span>j])</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>  QMRes.i<span class="ot">&lt;-</span> <span class="fu">anova</span>(mod1.i)[<span class="dv">2</span>,<span class="dv">3</span>]</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>  rse<span class="ot">&lt;-</span> <span class="fu">c</span>(rse, rord[j]<span class="sc">/</span><span class="fu">sqrt</span>((<span class="dv">1</span><span class="sc">-</span>h.i[j])<span class="sc">*</span>QMRes.i))</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>rse <span class="co"># ou</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>rsi<span class="sc">*</span><span class="fu">sqrt</span>((n<span class="sc">-</span>p<span class="dv">-1</span>)<span class="sc">/</span>(n<span class="sc">-</span>p<span class="sc">-</span>rsi<span class="sc">^</span><span class="dv">2</span>)) <span class="co"># ou ainda mais facil</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="fu">rstudent</span>(mod1)</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="fu">cbind</span>(rse, rsi<span class="sc">*</span><span class="fu">sqrt</span>((n<span class="sc">-</span>p<span class="dv">-1</span>)<span class="sc">/</span>(n<span class="sc">-</span>p<span class="sc">-</span>rsi<span class="sc">^</span><span class="dv">2</span>)), <span class="fu">rstudent</span>(mod1))</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="do">## Estatisticas para diagnosticos</span></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>beta.est<span class="ot">&lt;-</span> summ1<span class="sc">$</span>coef[,<span class="dv">1</span>]</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>beta.est</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>DFBetaS<span class="ot">&lt;-</span><span class="cn">NULL</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>  mod1.i<span class="ot">&lt;-</span> <span class="fu">lm</span>(sequoia<span class="sc">$</span>altura_m[<span class="sc">-</span>j]<span class="sc">~</span>sequoia<span class="sc">$</span>dap_cm[<span class="sc">-</span>j])</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>  summ1.i<span class="ot">&lt;-</span> <span class="fu">summary</span>(mod1.i)</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>  betaest.i<span class="ot">&lt;-</span> summ1.i<span class="sc">$</span>coef[,<span class="dv">1</span>]</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>  QMRes.i<span class="ot">&lt;-</span> <span class="fu">anova</span>(mod1.i)[<span class="dv">2</span>,<span class="dv">3</span>]</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="co">#  DFBeta&lt;- rbind(DFBeta, t((1/(1-h.i[j])) * isequoia$dap_cmlsequoia$dap_cm %*% mat.sequoia$dap_cm[j,] %*% rord[j]))</span></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="co">#  DFBetaS&lt;- rbind(DFBetaS, </span></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="co">#                 ((beta.est-betaest.i)/sqrt(QMRes.i*diag(sequoia$dap_cmlsequoia$dap_cm))))</span></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>  DFBetaS<span class="fl">.0</span><span class="ot">&lt;-</span> (beta.est[<span class="dv">1</span>]<span class="sc">-</span>betaest.i[<span class="dv">1</span>])<span class="sc">/</span></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sqrt</span>(QMRes.i<span class="sc">*</span>iXlX[<span class="dv">1</span>,<span class="dv">1</span>])</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>  DFBetaS<span class="fl">.1</span><span class="ot">&lt;-</span> (beta.est[<span class="dv">2</span>]<span class="sc">-</span>betaest.i[<span class="dv">2</span>])<span class="sc">/</span></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sqrt</span>(QMRes.i<span class="sc">*</span>iXlX[<span class="dv">2</span>,<span class="dv">2</span>])</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>  DFBetaS<span class="ot">&lt;-</span> <span class="fu">rbind</span>(DFBetaS, <span class="fu">c</span>(DFBetaS<span class="fl">.0</span>,DFBetaS<span class="fl">.1</span>))</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>DFBetaS</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>DFFitS<span class="ot">&lt;-</span> <span class="fu">sqrt</span>(h.i<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>h.i))<span class="sc">*</span>rse</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>DFFitS</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>Cook<span class="ot">&lt;-</span> (h.i<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>h.i))<span class="sc">*</span>rsi<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>p</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>Cook</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>h.i</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a><span class="fu">qf</span>(<span class="fl">0.5</span>,<span class="dv">2</span>,<span class="dv">7</span>)</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>(IM<span class="ot">&lt;-</span> <span class="fu">influence.measures</span>(mod1))</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="fu">cbind</span>(DFBetaS, IM<span class="sc">$</span>infmat[,<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>])</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a><span class="fu">cbind</span>(DFFitS, IM<span class="sc">$</span>infmat[,<span class="dv">3</span>])</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a><span class="fu">cbind</span>(Cook, IM<span class="sc">$</span>infmat[,<span class="dv">5</span>])</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="fu">cbind</span>(h.i, IM<span class="sc">$</span>infmat[,<span class="dv">6</span>])</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(IM)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-agresti2007introduction" class="csl-entry" role="listitem">
+Agresti, Alan. 2007. <em>An Introduction to Categorical Data Analysis</em>. 2nd ed. Hoboken: John Wiley &amp; Sons.
+</div>
+<div id="ref-agresti2012categorical" class="csl-entry" role="listitem">
+———. 2012. <em>Categorical Data Analysis</em>. 3rd ed. Hoboken, NJ: John Wiley &amp; Sons.
+</div>
+<div id="ref-allison1999logistic" class="csl-entry" role="listitem">
+Allison, Paul D. 1999. <em>Logistic Regression Using the SAS System: Theory and Application</em>. Cary: SAS Institute Inc.
+</div>
+<div id="ref-cetinkaya2023introduction" class="csl-entry" role="listitem">
+Çetinkaya-Rundel, Mine, and Johanna Hardin. 2023. <em>Introduction to Modern Statistics</em>. 2nd ed. OpenIntro Inc. <a href="https://openintro-ims.netlify.app/">https://openintro-ims.netlify.app/</a>.
+</div>
+<div id="ref-charnet2008analise" class="csl-entry" role="listitem">
+Charnet, Reinaldo, Clarice Azevedo de Luna Freire, Eugênia Maria R. Charnet, and Helio Bonvino. 2008. <em>An<span>á</span>lise de Modelos de Regress<span>ã</span>o Linear: Com Aplica<span>ç</span><span>õ</span>es</em>. 2nd ed. Campinas: Editora Unicamp.
+</div>
+<div id="ref-cordeiro2024modelos" class="csl-entry" role="listitem">
+Cordeiro, Gauss M., Clarice G. B. Demétrio, and Rafael A. Moral. 2024. <em>Modelos Lineares Generalizados e Aplica<span>ç</span><span>õ</span>es</em>. S<span>ã</span>o Paulo: Blucher.
+</div>
+<div id="ref-demetrio2011modelos" class="csl-entry" role="listitem">
+Demétrio, Clarice G. B., and S. S. Zocchi. 2011. <em>Modelos de Regress<span>ã</span>o</em>. Piracicaba: ESALQ.
+</div>
+<div id="ref-draper1998applied" class="csl-entry" role="listitem">
+Draper, Norman R., and Harry Smith. 1998. <em>Applied Regression Analysis</em>. 3rd ed. New York: John Wiley &amp; Sons.
+</div>
+<div id="ref-ferreira2013recursos" class="csl-entry" role="listitem">
+Ferreira, Daniel Furtado. 2013. <em>Recursos Computacionais Utilizando r</em>. Lavras.
+</div>
+<div id="ref-hoffmann1977analise" class="csl-entry" role="listitem">
+Hoffmann, Rodolfo, and Sonia Vieira. 1977. <em>An<span>á</span>lise de Regress<span>ã</span>o: Uma Introdu<span>ç</span><span>ã</span>o <span class="nocase">à</span> Econometria</em>. 2nd ed. S<span>ã</span>o Paulo: Editora Hucitec.
+</div>
+<div id="ref-kutner2005applied" class="csl-entry" role="listitem">
+Kutner, Michael H., Christopher J. Nachtsheim, John Neter, and William Li. 2005. <em>Applied Linear Statistical Models</em>. 5th ed. New York: McGraw-Hill/Irwin.
+</div>
+<div id="ref-levine2016estatistica" class="csl-entry" role="listitem">
+Levine, David M., David F. Stephan, and Kathryn A. Szabat. 2016. <em>Estat<span>ı́</span>stica - Teoria e Aplica<span>ç</span><span>õ</span>es Usando o Microsoft Excel Em Portugu<span>ê</span>s</em>. 7th ed. Rio de Janeiro: LTC.
+</div>
+<div id="ref-mallows1973comments" class="csl-entry" role="listitem">
+Mallows, Colin L. 1973. <span>“Some Comments on <span class="math inline">\(C_p\)</span>.”</span> <em>Technometrics</em> 15 (4): 661–75.
+</div>
+<div id="ref-morais2001introducao" class="csl-entry" role="listitem">
+Morais, Augusto Ramalho de, Lı́via Maria Chaves, and Maria Cristina R. P. Toledo. 2001. <em>Introdu<span>ç</span><span>ã</span>o <span class="nocase">à</span> <span class="nocase">á</span>lgebra de Matrizes</em>. Lavras: UFLA/FAEPE.
+</div>
+<div id="ref-noble1977applied" class="csl-entry" role="listitem">
+Noble, Ben, and James W. Daniel. 1977. <em>Applied Linear Algebra</em>. 3rd ed. Englewood Cliffs: Prentice-Hall.
+</div>
+<div id="ref-regazzi2010modelos" class="csl-entry" role="listitem">
+Regazzi, Adair José. 2010. <em>Modelos Lineares i</em>. Vi<span>ç</span>osa: UFV.
+</div>
+<div id="ref-rencher2008linear" class="csl-entry" role="listitem">
+Rencher, Alvin C., and G. Bruce Schaalje. 2008. <em>Linear Models in Statistics</em>. 2nd ed. Hoboken, New Jersey: John Wiley &amp; Sons.
+</div>
+<div id="ref-santos2017curso" class="csl-entry" role="listitem">
+Santos, Reginaldo J. 2017. <em>Um Curso de Geometria Anal<span>ı́</span>tica e <span class="nocase">á</span>lgebra Linear</em>. Belo Horizonte: Imprensa Universit<span>á</span>ria da UFMG.
+</div>
+<div id="ref-searle1982matrix" class="csl-entry" role="listitem">
+Searle, Shayle R. 1982. <em>Matrix Algebra Useful for Statistics</em>. New York: John Wiley &amp; Sons.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./Formas_quadraticas_aula1.html" class="pagination-link" aria-label="Formas quadráticas">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Formas quadráticas</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./Analise_residuos_Parte2.html" class="pagination-link" aria-label="Análise de Resíduos e Diagnósticos">
+        <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>15&nbsp; Regressão logística – Modelos Lineares: modelos de posto completo</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./Regressao_logistica_ParteII.html" rel="next">
+<link href="./Metodos_selecao_variaveis.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-26470a742aafa1a1e7b10f54c72c41f3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-578930c7c9073de1ad26189988221688.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Regressao_logistica.html"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Regressão logística</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Modelos Lineares: modelos de posto completo</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bem-vindos!</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./prefacio.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefácio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ML_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introdução aos modelos lineares</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRLS_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">O modelo de regressão linear simples (MRLS)</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_outrospolinomios_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelos de regressão linear (MRL) - modelos polinomiais</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRLM_matricial_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modelos de regressão linear múltipla (MRLM) e representação matricial</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_estimacao_matricial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Estimação em modelos de regressão linear (MRL) - representação matricial</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_estimacao.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Estimação em Modelos de Regressão Linear</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_ANOVA.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Análise de variância (ANOVA) da regressão</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./TH_comparacao_modelos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Testes de hipóteses: Comparação de modelos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Formas_quadraticas_aula1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Formas quadráticas</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Residuos_Diagnosticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Analise_residuos_Parte2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Multicolinearidade.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Multicolinearidade</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Aula_MRL_Qualitativas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Modelos de regressão para preditores qualitativos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Metodos_selecao_variaveis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Métodos de seleção de variáveis</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Regressão logística</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica_ParteII.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Regressão logística: inferência e aplicações</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica_ParteIII.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Regressão logística: seleção de modelos, predição e qualidade do ajuste</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./referencias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referências</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Conteúdo</h2>
+   
+  <ul>
+  <li><a href="#introdução" id="toc-introdução" class="nav-link active" data-scroll-target="#introdução"><span class="header-section-number">15.1</span> Introdução</a></li>
+  <li><a href="#exemplo-de-motivação-horseshoe-crab" id="toc-exemplo-de-motivação-horseshoe-crab" class="nav-link" data-scroll-target="#exemplo-de-motivação-horseshoe-crab"><span class="header-section-number">15.2</span> Exemplo de motivação: <em>Horseshoe Crab</em></a></li>
+  <li><a href="#alguns-problemas-quando-a-variável-resposta-é-binária" id="toc-alguns-problemas-quando-a-variável-resposta-é-binária" class="nav-link" data-scroll-target="#alguns-problemas-quando-a-variável-resposta-é-binária"><span class="header-section-number">15.3</span> Alguns problemas quando a variável resposta é binária</a></li>
+  <li><a href="#modelo-de-regressão-logística" id="toc-modelo-de-regressão-logística" class="nav-link" data-scroll-target="#modelo-de-regressão-logística"><span class="header-section-number">15.4</span> Modelo de regressão logística</a></li>
+  <li><a href="#estimação-dos-parâmetros" id="toc-estimação-dos-parâmetros" class="nav-link" data-scroll-target="#estimação-dos-parâmetros"><span class="header-section-number">15.5</span> Estimação dos parâmetros</a></li>
+  <li><a href="#interpretação-dos-parâmetros-odds-e-odds-ratio" id="toc-interpretação-dos-parâmetros-odds-e-odds-ratio" class="nav-link" data-scroll-target="#interpretação-dos-parâmetros-odds-e-odds-ratio"><span class="header-section-number">15.6</span> Interpretação dos parâmetros: <em>odds</em> e <em>odds ratio</em></a></li>
+  <li><a href="#erros-padrões-intervalos-de-confiança-teste-de-wald-e-razão-de-verossimilhanças" id="toc-erros-padrões-intervalos-de-confiança-teste-de-wald-e-razão-de-verossimilhanças" class="nav-link" data-scroll-target="#erros-padrões-intervalos-de-confiança-teste-de-wald-e-razão-de-verossimilhanças"><span class="header-section-number">15.7</span> Erros padrões, intervalos de confiança, teste de Wald e razão de verossimilhanças</a></li>
+  <li><a href="#ajuste-do-modelo-de-regressão-logística-aos-dados-do-exemplo-de-motivação" id="toc-ajuste-do-modelo-de-regressão-logística-aos-dados-do-exemplo-de-motivação" class="nav-link" data-scroll-target="#ajuste-do-modelo-de-regressão-logística-aos-dados-do-exemplo-de-motivação"><span class="header-section-number">15.8</span> Ajuste do modelo de regressão logística aos dados do exemplo de motivação</a>
+  <ul class="collapse">
+  <li><a href="#utilizando-o-r" id="toc-utilizando-o-r" class="nav-link" data-scroll-target="#utilizando-o-r"><span class="header-section-number">15.8.1</span> Utilizando o R</a></li>
+  <li><a href="#utilizando-o-sasscriptsize-textregistered" id="toc-utilizando-o-sasscriptsize-textregistered" class="nav-link" data-scroll-target="#utilizando-o-sasscriptsize-textregistered"><span class="header-section-number">15.8.2</span> Utilizando o SAS<span class="math inline">\(\scriptsize ^\textregistered\)</span></a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Regressão logística</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapterintro">
+<p>Neste tópico iremos discutir sobre regressão logística. Trata-se de um modelo de regressão não linear e serão abordados aspectos teóricos e aplicados, envolvendo estimação dos parâmetros do modelo de regressão e inferência. Nas aplicações serão utilizados os softwares R e SAS<span class="math inline">\(\scriptsize ^\textregistered\)</span>, considerando diferentes conjuntos de dados.</p>
+<p>Essa aula é baseada no <strong>Capítulo 4 - Logistic regression</strong> do livro <em>An introduction to categorical data analysis</em> (Agresti, 2007), <strong>Capítulo 14 - Logistic regression, Poisson regression, and Generalized Linear Models</strong> do livro <em>Applied Linear Statistical Models</em> (Kutner et al., 2005) e no livro <em>Logistic regression using the SAS<span class="math inline">\(\scriptsize ^\textregistered\)</span> system - theory and application</em> (Allison, 1999).</p>
+</div>
+<section id="introdução" class="level2 page-columns page-full" data-number="15.1">
+<h2 data-number="15.1" class="anchored" data-anchor-id="introdução"><span class="header-section-number">15.1</span> Introdução</h2>
+<p>Neste tópico trataremos sobre a modelagem estatística de variáveis resposta binárias ou dicotômicas, sob o contexto de ajuste de modelos de regressão. Variáveis binárias são aquelas que assumem como resposta apenas dois possiveis valores, muitas vezes definidos como <em>sucesso</em> e <em>fracasso</em>, que geralmente assumem os valores 1 e 0, respectivamente.</p>
+<p>Kutner et al.&nbsp;(2005) afirma que em várias aplicações de análise de regressão têm-se variáveis resposta binárias e apresentam os seguintes exemplos:</p>
+<ol type="1">
+<li>Em um estudo com o objetivo de avaliar se o fato de empresas possuírem ou não um departamento de relações industriais está relacionado ao tamanho das mesmas (<span class="math inline">\(X\)</span>), a variável resposta foi definida com os dois resultados possíveis: a empresa possui um departamento de relações industriais (<em>sucesso</em>) ou a empresa não possui um departamento de relações industriais (<em>fracasso</em>). Esses resultados podem ser codificados como 1 e 0, respectivamente ou vice-versa.</li>
+<li>Em um estudo sobre a participação de mulheres casadas no mercado de trabalho, ou seja, que trabalham fora, em função da idade (<span class="math inline">\(X_1\)</span>), do número de filhos (<span class="math inline">\(X_2\)</span>) e da renda do marido (<span class="math inline">\(X_3\)</span>), a variável resposta <span class="math inline">\(Y\)</span> pode ser codificada como 1, no caso em que a mulher trabalha fora (<em>sucesso</em>) ou 0, quando não trabalha fora (<em>fracasso</em>).</li>
+<li>Em um estudo sobre a posse de seguro de responsabilidade civil, de acordo com a idade do chefe da família (<span class="math inline">\(X_1\)</span>), a renda familiar (<span class="math inline">\(X_2\)</span>) e o tipo de ocupação do chefe de família (<span class="math inline">\(X_3\)</span>), a variável resposta <span class="math inline">\(Y\)</span> foi definida com os dois resultados possíveis: a família possui seguro de responsabilidade civil (<em>sucesso</em> ou <span class="math inline">\(Y=1\)</span>) e a família não possui seguro de responsabilidade civil (<em>fracasso</em> ou <span class="math inline">\(Y=0\)</span>).</li>
+<li>Em um estudo longitudinal de doença coronariana em função de idade (<span class="math inline">\(X_1\)</span>), sexo (<span class="math inline">\(X_2\)</span>), histórico de tabagismo (<span class="math inline">\(X_3\)</span>), nível de colesterol (<span class="math inline">\(X_4\)</span>), percentual do peso corporal ideal (<span class="math inline">\(X_5\)</span>) e pressão arterial (<span class="math inline">\(X_6\)</span>), a variável resposta <span class="math inline">\(Y\)</span> foi definida com dois resultados possíveis: a pessoa desenvolveu doença cardíaca durante o estudo (<em>sucesso</em> ou <span class="math inline">\(Y=1\)</span>) ou a pessoa não desenvolveu doença cardíaca durante o estudo (<em>fracasso</em> ou <span class="math inline">\(Y=0\)</span>).</li>
+</ol>
+<p>Esses quatro exemplos correspondem a uma pequena amostra da infinidade de estudos que mensuram variáveis binárias e nos quais tem-se o objetivo de ajustar um modelo de regressão linear para avaliar a relação entre essa variável binária (variável dependente) e as variáveis explicativas (variáveis independentes).</p>
+<p>De acordo com Agresti (2007), os dados binários correspondem à forma mais comum de dados categóricos e o modelo mais utilizado para esse tipo de dado é o de <strong>regressão logística</strong>.</p>
+<div class="important">
+<p>O modelo de regressão logística é parte de um conjunto maior, denominado por Nelder e Wedderburn (1972) como <em><strong>modelos lineares generalizados (MLG)</strong></em>. Esses autores mostraram que vários métodos ou técnicas estatísticas estudadas e propostas separadamente, poderiam ser representadas sob uma formulação unificada (Cordeiro et al., 2024). Dentre os modelos comumente utilizados na análise de dados, que pertencem à classe dos <em>MLG</em>, podemos citar:</p>
+<ul>
+<li>modelos de regressão linear;</li>
+<li>modelos de análise de variância (ANOVA);</li>
+<li>modelo logístico;</li>
+<li>modelo complemento log-log;</li>
+<li>modelo probito;</li>
+<li>modelos log-lineares;</li>
+<li>dentre outros.</li>
+</ul>
+<p>Resumidamente, os <em>MLG</em> possuem três componentes:</p>
+<ul>
+<li>o <strong>componente aleatório</strong>, que refere-se à variável resposta <span class="math inline">\(Y\)</span>, que tem distribuição de probabilidade pertencente à família exponencial;</li>
+<li>o <strong>componente sistemático</strong>, que especifica as variáveis explicativas do modelo, na forma de um modelo linear;</li>
+<li>a <strong>função de ligação</strong>, que corresponde a uma função do valor esperado de <span class="math inline">\(Y\)</span> ou média, <span class="math inline">\(\mu = E(Y)\)</span> e que estabelece a ligação entre os componentes aleatório e sistemático. Ela pode ser definida pela função <span class="math inline">\(g(\cdot)\)</span> que relaciona <span class="math inline">\(\mu\)</span> ao preditor linear (componente sistemático). Como exemplos têm-se:</li>
+</ul>
+<ol type="1">
+<li><p><strong>Modelo de regressão linear:</strong> <span class="math display">\[g(\mu) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \ldots + \beta_k X_k,\]</span> no qual o componente sistemático ou preditor linear corresponde a um modelo de regressão linear múltipla (MRLM). Neste curso definimos o MRLM por: <span class="math display">\[Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \ldots + \beta_k X_{ki} + \varepsilon_i,\]</span> em que <span class="math inline">\(E(Y_i) = \mu_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \ldots + \beta_k X_{ki}\)</span>. Portanto, tem-se nesse modelo a <em>função de ligação identidade</em>, ou seja, <span class="math inline">\(g(\mu_i) = \mu_i\)</span>. Esse tipo de função de ligação também é comumente considerada nos modelos de ANOVA.</p></li>
+<li><p><strong>Modelo de regressão logística:</strong> considere <span class="math inline">\(Y\)</span> uma variável aleatória (v.a.) que tenha distribuição Bernoulli e uma amostra aleatória de <span class="math inline">\(n\)</span> v.a. dada por <span class="math inline">\(Y_1, Y_2, \ldots Y_n\)</span>. Dessa forma, <span class="math inline">\(Y_i \sim Bernoulli(\pi_i)\)</span>, com <span class="math inline">\(E(Y_i) = \mu_i = \pi_i\)</span> e <span class="math inline">\(V(Y_i) = \pi_i(1-\pi_i)\)</span>. Nessa situação, uma das possíveis maneiras é definir <span class="math inline">\(g(\mu_i)\)</span> como uma função <em>logit</em> ou <em>logito</em>. Assim tem-se: <span class="math display">\[ g(\mu_i) = g(\pi_i) = logit (\pi_i) = log \left( \dfrac{\pi_i}{1-\pi_i} \right) = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \ldots + \beta_k X_{ki}.
+  \]</span></p></li>
+</ol>
+</div>
+
+<div class="no-row-height column-margin column-container"><div class="margin-aside">
+<p>AGRESTI, A. <strong>An introduction to categorical data analysis</strong>. 2nd ed.&nbsp;Hoboken: John Wiley &amp; Sons Inc.&nbsp;2007</p>
+<p><br>
+</p>
+<p>ALLISON, P.D. <strong>Logistic regression using the SAS<span class="math inline">\(\scriptsize ^\textregistered\)</span> system: theory and application</strong>. Cary: SAS Institute Inc., 1999.</p>
+<p>&nbsp;</p>
+<p>CORDEIRO, G.M.; DEMÉTRIO, C.G.B.; MORAL, R.A. <strong>Modelos lineares generalizados e aplicações</strong>. São Paulo: Blucher, 2024</p>
+<p><br>
+</p>
+<p>KUTNER, M.H.; NACHTSSHEIM, C.J.; NETER, J.; LI, W. <strong>Applied linear statistical models</strong>. 5ed. New York: McGraw-Hill/Irwin, 2005.</p>
+</div></div></section>
+<section id="exemplo-de-motivação-horseshoe-crab" class="level2" data-number="15.2">
+<h2 data-number="15.2" class="anchored" data-anchor-id="exemplo-de-motivação-horseshoe-crab"><span class="header-section-number">15.2</span> Exemplo de motivação: <em>Horseshoe Crab</em></h2>
+<div class="data">
+<p>Considere os dados apresentados por Agresti (2007), provenientes de uma pesquisa realizada em uma ilha do Golfo do México, com fêmeas de caranguejos-ferradura (<em>horseshoe crab</em>). São informações de 173 fêmeas do caranguejo-ferradura em acasalamento e têm-se as seguintes variáveis:</p>
+<ul>
+<li><em><strong>color</strong></em> : cor da fêmea (2 = <em>clara</em>, 3 = <em>média</em>, 4 = <em>escura</em> e 5 = <em>mais escura</em>);</li>
+<li><em><strong>spine</strong></em> : condição dos espinhos (1 = <em>ambos bons</em>, 2 = <em>um desgastado ou quebrado</em> e 3 = <em>ambos desgastados ou quebrados</em>);</li>
+<li><em><strong>width</strong></em> : largura da carapaça da fêmea (cm);</li>
+<li><em><strong>satell</strong></em> : número de satélites;</li>
+<li><em><strong>weight</strong></em> : peso da fêmea (g);</li>
+<li><em><strong>y</strong></em> : indica se a fêmea possui algum <em>satélite</em> — macho que se agrupa ao redor da fêmea e pode fertilizar seus óvulos;</li>
+</ul>
+</div>
+<div class="columns">
+<div class="column" style="width:50%;">
+
+</div><div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="imagens/horseshoe_crab.jpg" class="img-fluid figure-img" style="width:50.0%"></p>
+<figcaption>Caranguejo-ferradura (<em>horseshoe crab</em>). Wikipedia. <a href="https://en.wikipedia.org/wiki/Horseshoe_crab">https://en.wikipedia.org/wiki/Horseshoe_crab</a></figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>&nbsp;</p>
+<p>Suponha que o pesquisador tenha o objetivo de estudar a relação entre a variável binária <em><strong>presença de machos satélites (Y)</strong></em> (0 = sem satélite e 1 = pelo menos um satélite) e o tamanho da fêmea do caranguejo-ferradura, avaliado com base na largura da carapaça (<em>width</em>), dada em <em>cm</em>. Machos satélites são aqueles que poderiam acasalar ou fertilizar os óvulos da fêmea. Inicialmente, vamos obter um gráfico de dispersão considerando essas duas variáveis.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(horseshoe, <span class="fu">aes</span>(<span class="at">x =</span> width, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Largura da carapaça (cm)"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Presença de satélite"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-disp1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-disp1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Regressao_logistica_files/figure-html/fig-disp1-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-disp1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.1: Gráfico de dispersão largura da carapaça (cm) e presença de satélites de 173 fêmeas de caranguejo-ferradura.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Pensando no modelo mais simples, ou seja, de 1<span class="math inline">\(^o\)</span> grau, podemos ajustar uma reta para descrever essa relação, conforme pode ser visto na <a href="#fig-disp2" class="quarto-xref">Figure&nbsp;<span>15.2</span></a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(horseshoe, <span class="fu">aes</span>(<span class="at">x =</span> width, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Largura da carapaça (cm)"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Presença de satélite"</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-disp2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-disp2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Regressao_logistica_files/figure-html/fig-disp2-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-disp2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.2: Regressão linear simples para representar a relação entre a largura da carapaça (cm) e presença de satélites.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Pode-se observar na <a href="#fig-disp2" class="quarto-xref">Figure&nbsp;<span>15.2</span></a> que o modelo linear simples não é nada adequado para descrever a relação entre a presença de satélites <em>(Y)</em> e a largura da carapaça <em>(X)</em>. Além de verificar que a reta não reflete o comportamento dos pontos, ainda pode-se observar que essa reta leva à obtenção de valores estimados acima de <em>1</em>, o que não pode ocorrer, pois tem-se apenas valores de <span class="math inline">\(Y\)</span> iguais a 0 ou 1.</p>
+<p>Dessa maneira, utilizar um modelo de regressão linear simples (MRLS) não é adequado nessas situações em que se tem uma variável dependente dicotômica ou binária, ou seja, que assume apenas valores iguais a 0 e 1. Apesar de estar considerando inicialmente o MRLS, essa conclusão é válida para qualquer modelo de regressão linear múltipla (MRLM). Portanto, em situações em que se tenha variáveis resposta binárias, utilizar modelos de regressão linear (MRL), como os que foram vistos até o momento, não é adequado.</p>
+<p>Pensando em uma possível melhoria no modelo proposto, será que o ajuste apresentado na <a href="#fig-disp3" class="quarto-xref">Figure&nbsp;<span>15.3</span></a> é mais plausível?</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-disp3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-disp3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Regressao_logistica_files/figure-html/fig-disp3-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-disp3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.3: Ilustração de uma função da resposta binária, <span class="math inline">\(E(Y_i) = \pi_i\)</span> e sua relação com a largura da carapaça (cm).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Conforme pode ser visto na <a href="#fig-disp3" class="quarto-xref">Figure&nbsp;<span>15.3</span></a>, os valores estimados da função da resposta binária, <span class="math inline">\(E(Y_i) = \pi_i\)</span>, estão no intervalo <span class="math inline">\(0 \leq \pi_i \leq 1\)</span>. Como <span class="math inline">\(\pi_i\)</span> corresponde a uma probabilidade, o modelo proposto e ajustado com certeza é mais plausível. Porém, nesse modelo considera-se que a probabilidade de se ter <em>satélites</em> é igual a zero para fêmeas com uma largura de carapaça inferior a um determinado valor (que na <a href="#fig-disp3" class="quarto-xref">Figure&nbsp;<span>15.3</span></a> foi assumido 24 cm) e é igual a 1 para fêmeas com largura de carapaça superior a 26 cm. Portanto, esse tipo de modelo não é adequado, uma vez que não existe uma regra plausível para a determinação desses limiares (<em><strong>obs.:</strong></em> na <a href="#fig-disp3" class="quarto-xref">Figure&nbsp;<span>15.3</span></a> os limiares foram definidos de forma totalmente aleatória).</p>
+<p>Uma outra alternativa ao modelo apresentado na <a href="#fig-disp3" class="quarto-xref">Figure&nbsp;<span>15.3</span></a> seria considerar um modelo para o qual as probabilidades 0 e 1 sejam atingidas assintoticamente, como ocorre no caso de curvas em forma de S ou S invertido, cuja forma pode ser descrita por um modelo logístico. Um exemplo desse tipo de ajuste é apresentado na <a href="#fig-disp4" class="quarto-xref">Figure&nbsp;<span>15.4</span></a>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-disp4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-disp4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Regressao_logistica_files/figure-html/fig-disp4-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-disp4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.4: Curva ajusta em forma de S, considerando uma função da resposta binária, <span class="math inline">\(E(Y_i) = \pi_i\)</span> e sua relação com a largura da carapaça (cm).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>A curva ajustada apresentada na <a href="#fig-disp4" class="quarto-xref">Figure&nbsp;<span>15.4</span></a> é exatamente aquela obtida considerando a análise de regressão logística.</p>
+<p>A seguir serão descritos os principais problemas ao considerar diretamente um modelo de regressão linear na avaliação de variáveis binárias. Posteriormente, será detalhado o ajuste de modelos de regressão logística.</p>
+</section>
+<section id="alguns-problemas-quando-a-variável-resposta-é-binária" class="level2" data-number="15.3">
+<h2 data-number="15.3" class="anchored" data-anchor-id="alguns-problemas-quando-a-variável-resposta-é-binária"><span class="header-section-number">15.3</span> Alguns problemas quando a variável resposta é binária</h2>
+<p>Kutner et al.&nbsp;(2005) e Allison (1999) apresentam uma breve, mas importante, discussão em relação a problemas que surgem em relação ao uso de MRL para o caso de variáveis binárias.</p>
+<p>Inicialmente, vamos relembrar algumas pressuposições dos MRL, considerando um MRLS dado por: <span class="math display">\[
+y_i = \beta_{0} + \beta_{1}x_{i} + \varepsilon_i,
+\]</span> em que <span class="math inline">\(y_i\)</span> e <span class="math inline">\(x_i\)</span> são, respectivamente, os i-ésimos valores observados das variáveis dependente e independente, <span class="math inline">\(\beta_{0}\)</span> e <span class="math inline">\(\beta_{1}\)</span> são os parâmetros do modelo e <span class="math inline">\(\varepsilon_i\)</span> é o erro associado à observação <span class="math inline">\(y_i\)</span>, sendo esses erros independentes e identicamente distibuídos segundo uma normal com média zero e variância comum <span class="math inline">\(\sigma^2\)</span>, ou seja, <span class="math inline">\(\varepsilon_i \sim N(0,\sigma^2)\)</span>. Assim, <span class="math inline">\(E(\varepsilon_i)=0\)</span>, <span class="math inline">\(V(\varepsilon_i)=\sigma^2\)</span> e <span class="math inline">\(Cov(\varepsilon_i,\varepsilon_i')=0\)</span>, com <span class="math inline">\(i \ne i'\)</span>.</p>
+<p>Dentre os vários problemas em relação ao uso de MRL para o caso de variáveis binárias, podem ser destacados três:</p>
+<ol type="1">
+<li><em><strong>Termos dos erros não normais</strong></em>: para uma variável resposta binária 0, 1, cada termo de erro, dado por <span class="math inline">\(\varepsilon_i = y_i - (\beta_0 + \beta_1 x_i)\)</span> pode assumir apenas dois valores:</li>
+</ol>
+<ul>
+<li><p>Se <span class="math inline">\(y_i = 1\)</span>: <span class="math inline">\(\varepsilon_i = 1 - \beta_0 - \beta_1 x_i\)</span>; e</p></li>
+<li><p>Se <span class="math inline">\(y_i = 0\)</span>: <span class="math inline">\(\varepsilon_i = -\beta_0 - \beta_1 x_i\)</span>.</p>
+<p>Claramente, o MRLS, o qual assume que os <span class="math inline">\(\varepsilon_i\)</span> são normalmente distribuídos, não é apropriado, conforme pode ser visto no histograma apresentado na <a href="#fig-hist1" class="quarto-xref">Figure&nbsp;<span>15.5</span></a>, dos erros estimados ao considerar o ajuste desse modelo aos dados do exemplo de motivação.</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>reg1<span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> width, <span class="at">data=</span>horseshoe)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>resid.reg1<span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">res =</span> <span class="fu">residuals</span>(reg1))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(resid.reg1, <span class="fu">aes</span>(<span class="at">x =</span> res)) <span class="sc">+</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>() <span class="sc">+</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Resíduos"</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Frequência absoluta"</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-hist1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-hist1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Regressao_logistica_files/figure-html/fig-hist1-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-hist1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.5: Histograma dos resíduos estimados da regressão linear simples para representar a relação entre a largura da carapaça (cm) e presença de satélites.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li><p><em><strong>Variância dos erros não constante (heterocedasticidade)</strong></em>: os erros <span class="math inline">\(\varepsilon_i\)</span> não têm variâncias iguais quando a variável resposta é uma variável binária. Para visualizar isso, considere que <span class="math inline">\(Y_i\)</span> é uma variável aleatória com distribuição Bernoulli, ou seja, <span class="math inline">\(Y_i \sim Bernoulli(\pi_i)\)</span>, uma vez ela assume apenas valores 0 ou 1. Assim,</p>
+<ol type="i">
+<li><span class="math inline">\(P(Y_i = 1) = \pi_i\)</span>;</li>
+<li><span class="math inline">\(P(Y_i = 0) = 1 - \pi_i\)</span>;</li>
+<li><span class="math inline">\(E(Y_i) = \pi_i\)</span>; e</li>
+<li><span class="math inline">\(V(Y_i) = \pi_i (1 - \pi_i)\)</span>.</li>
+</ol>
+<p>Além disso, <span class="math inline">\(\varepsilon_i = y_i - \beta_0 - \beta_1 x_i\)</span>, em que <span class="math inline">\(- \beta_0 - \beta_1 x_i\)</span> é uma constante e, portanto, <span class="math inline">\(V(\varepsilon_i) = V(Y_i) = \pi_i (1 - \pi_i)\)</span>. Ademais, considerando o modelo de regressão linear simples, <span id="eq-expY"><span class="math display">\[E(Y_i) = \beta_0 + \beta_1 x_i = \pi_i. \tag{15.1}\]</span></span> Assim, <span class="math display">\[ V(\varepsilon_i) = V(Y_i) = \pi_i (1 - \pi_i) = (\beta_0 + \beta_1 x_i) (1 - \beta_0 - \beta_1 x_i), \]</span> ou seja, a <span class="math inline">\(V(\varepsilon_i)\)</span> depende do valor de <span class="math inline">\(x_i\)</span> e, dessa forma, varia conforme o valor de <span class="math inline">\(x_i\)</span>. Assim, tem-se que <span class="math inline">\(V(\varepsilon_i)\)</span> é diferente para diferentes valores de <span class="math inline">\(Y_i\)</span>.</p>
+<p>De acordo com Allison (1999) a violação da ´pressuposição de homogeneidade de variâncias tem duas consequências indesejadas:</p>
+<ol type="i">
+<li>As estimativas dos parâmetros não são mais <em>eficientes</em>, ou seja, existe pelo menos um método alternativo de estimação que garante um menor erro padrão. Portanto, não se tem um estimador não viesado com variância mínima;</li>
+<li>Definido pelo autor como o mais sério, os erros padrões estimados não são mais <em>consistentes</em>, ou seja, eles podem ser viesados.</li>
+</ol></li>
+<li><p><em><strong>Restrição na função resposta</strong></em>: ao considerar um MRLS, que a variável resposta é binária e a <a href="#eq-expY" class="quarto-xref">Equation&nbsp;<span>15.1</span></a>, tem-se que <span id="eq-piMRLS"><span class="math display">\[
+\pi_i = \beta_0 + \beta_1 x_i.
+\tag{15.2}\]</span></span></p>
+<p>Inicialmente parece não haver problema algum com o modelo definido na <a href="#eq-piMRLS" class="quarto-xref">Equation&nbsp;<span>15.2</span></a>. Porém, sabe-se que <span class="math inline">\(\pi_i\)</span> é uma probabilidade e, portanto, <span class="math inline">\(0 \leq \pi_i \leq 1\)</span>. Assim, pensar que para valores contínuos de <span class="math inline">\(x_i\)</span>, que geralmente não assume valores em um intervalo qualquer, que tenha muito bem definido limites inferior e superior, não se possa obter valores de <span class="math inline">\(\pi_i\)</span> inferiores a 0 ou superiores a 1, é no mínimo não plausível. Esse problema pode ser observado na <a href="#fig-disp2" class="quarto-xref">Figure&nbsp;<span>15.2</span></a>, onde se têm valores estimados para <span class="math inline">\(y_i\)</span> maiores do que 1.</p></li>
+</ol>
+<p>Esses problemas relacionados ao ajuste de MRL considerando uma variável resposta binária, levaram ao desenvolvimento de métodos alternativos que fossem mais coerentes conceitualmente e que apresentassem melhores propriedades estatísticas (Allison, 1999). Dentre esses métodos podemos citar o ajuste de modelos logístico (ou de regressão logística), probito e complemento log-log.</p>
+<p>&nbsp;</p>
+</section>
+<section id="modelo-de-regressão-logística" class="level2" data-number="15.4">
+<h2 data-number="15.4" class="anchored" data-anchor-id="modelo-de-regressão-logística"><span class="header-section-number">15.4</span> Modelo de regressão logística</h2>
+<p>Neste material definiremos o modelo de regressão logística como descrito no item 3.2.3 de Agresti (2007, pág. 70).</p>
+<p>Considere a v.a. <span class="math inline">\(Y_i\)</span>, tal que <span class="math inline">\(Y_i \sim Bernoulli(\pi_i)\)</span>. Assim, a v.a. <span class="math inline">\(Y_i\)</span> assume apenas dois possíveis valores (0 ou 1). Nessa situação têm-se:</p>
+<ol type="i">
+<li>a função de probabilidade é dada por: <span class="math display">\[P(Y_i = y_i) = f_{Y_i}(y_i) = \pi_i^{y_i} (1-\pi_i)^{1-y_i} I_{\{0,1\}}(y_i)\]</span> e, portanto:</li>
+</ol>
+<ul>
+<li><span class="math inline">\(P(Y_i = 1) = \pi_i\)</span>;</li>
+<li><span class="math inline">\(P(Y_i = 0) = 1 - \pi_i\)</span>;</li>
+</ul>
+<ol start="2" type="i">
+<li><span class="math inline">\(E(Y_i) = \pi_i\)</span>; e</li>
+<li><span class="math inline">\(V(Y_i) = \pi_i (1 - \pi_i)\)</span>.</li>
+</ol>
+<p>Inicialmente, será considerado como preditor linear um modelo de regressão linear simples, ou seja, <span class="math display">\[
+g(\mu_i) = g(\pi_i) = \beta_0 + \beta_1 x_i.
+\]</span></p>
+<p>De acordo com Agresti (2007), as relações entre <span class="math inline">\(\pi_i\)</span> e <span class="math inline">\(x_i\)</span> geralmente são não lineares, ao invés de lineares. Uma mudança no valor de <span class="math inline">\(x_i\)</span> pode ter menos impacto quando <span class="math inline">\(\pi_i\)</span> está próximo de 0 ou 1 do que quando <span class="math inline">\(\pi_i\)</span> está próximo a 0,5 (que corresponde ponto médio do intervalo entre 0 e 1). Como exemplo, considere que se tenha interesse em comprar um automóvel novo ou usado. Seja <span class="math inline">\(\pi_i\)</span> a probabilidade de decidir por um carro novo, quando a renda familiar anual for igual a <span class="math inline">\(x_i\)</span>. Um aumento de <span class="math inline">\(US\$ 10.000\)</span> na renda familiar anual provavelmente teria menos efeito quando <span class="math inline">\(x_i = US\$ 1.000.000\)</span>, que corresponde à situação em que <span class="math inline">\(\pi_i\)</span> está próximo de 1, do que quando <span class="math inline">\(x_i = US\$ 50.000\)</span>.</p>
+<p>Ao estabelecer a relação entre <span class="math inline">\(\pi_i\)</span> e <span class="math inline">\(x_i\)</span>, geralmente <span class="math inline">\(\pi_i\)</span> aumenta ou diminui continuamente à medida que <span class="math inline">\(x_i\)</span> aumenta. Exemplos de curvas em formato de <em>S</em> ou <em>S invertido</em> para descrever essa relação são apresentadas na <a href="#fig-log1" class="quarto-xref">Figure&nbsp;<span>15.6</span></a>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-log1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-log1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Regressao_logistica_files/figure-html/fig-log1-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-log1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.6: Exemplos de curvas ajustadas de regressão logística.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Segundo Agresti (2007), a equação matemática mais importante que descreve <span class="math inline">\(\pi_i\)</span> como função de <span class="math inline">\(x_i\)</span>, conforme as formas apresentadas na <a href="#fig-log1" class="quarto-xref">Figure&nbsp;<span>15.6</span></a>, é dada por: <span id="eq-flog"><span class="math display">\[
+\pi_i = \dfrac{exp(\beta_0 + \beta_1 x_i)}{1+exp(\beta_0 + \beta_1 x_i)} = \dfrac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}},
+\tag{15.3}\]</span></span></p>
+<p>a qual é chamada de função de <em>regressão logística</em>.</p>
+<p>O modelo regressão logística é definido a partir da <a href="#eq-flog" class="quarto-xref">Equation&nbsp;<span>15.3</span></a>, efetuando-se algumas operações algébricas e aplicando-se o logaritmo neperiano ou natural, que definiremos aqui como <em>log</em>, ou seja, <span class="math display">\[
+\begin{array}{rcl}
+\pi_i &amp; = &amp; \dfrac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}} \\
+\dfrac{1}{\pi_i} &amp; = &amp; \dfrac{1+e^{\beta_0 + \beta_1 x_i}}{e^{\beta_0 + \beta_1 x_i}} \\
+\dfrac{1}{\pi_i} &amp; = &amp; \dfrac{1}{e^{\beta_0 + \beta_1 x_i}} + 1 \\
+\dfrac{1}{\pi_i} - 1 &amp; = &amp; \dfrac{1}{e^{\beta_0 + \beta_1 x_i}} \\
+\dfrac{1 - \pi_i}{\pi_i} &amp; = &amp; \dfrac{1}{e^{\beta_0 + \beta_1 x_i}} \\
+\dfrac{\pi_i}{1 - \pi_i} &amp; = &amp; e^{\beta_0 + \beta_1 x_i} \\
+log \left( \dfrac{\pi_i}{1 - \pi_i} \right) &amp; = &amp; log \left( e^{\beta_0 + \beta_1 x_i} \right)
+\end{array}
+\]</span> <span id="eq-modlog"><span class="math display">\[ log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 x_i  \tag{15.4}\]</span></span></p>
+<p>Como descrito anteriormente, o modelo de regressão logística (<a href="#eq-modlog" class="quarto-xref">Equation&nbsp;<span>15.4</span></a>) é um caso particular dos modelos lineares generalizados em que:</p>
+<ul>
+<li><p><strong>Componente aleatório:</strong> a variável resposta <span class="math inline">\(Y_i\)</span> é binária, ou seja, assume apenas valores 0 ou 1. Portanto, <span class="math inline">\(Y_i \sim Bernoulli(\pi_i)\)</span>, que pertence à família exponencial. Vale ressaltar que o modelo <em>logit</em> também pode ser utilizado quando <span class="math inline">\(Y_i \sim Binomial(n,\pi_i)\)</span>, uma vez que na distribuição binomial a v.a. corresponde ao número de sucessos em <span class="math inline">\(n\)</span> realizações independentes de uma Bernoulli.</p></li>
+<li><p><strong>Função de ligação:</strong> é a função <em>logit</em> de <span class="math inline">\(\pi_i\)</span>, ou seja, <span class="math display">\[
+log \left( \dfrac{\pi_i}{1 - \pi_i} \right).
+\]</span></p></li>
+</ul>
+<p>Observe que, apesar de <span class="math inline">\(\pi_i\)</span> estar restrito ao intervalo de 0 a 1, o <em>logit</em> de <span class="math inline">\(\pi_i\)</span> pode ser qualquer número real. Os números reais também são o intervalo potencial para os preditores lineares (como <span class="math inline">\(\beta_0 + \beta_1 x_i\)</span>) que formam o componente sistemático de um GLM. Portanto, este modelo não tem o problema estrutural que o modelo de probabilidade linear (<a href="#eq-piMRLS" class="quarto-xref">Equation&nbsp;<span>15.2</span></a>) tem.</p>
+</section>
+<section id="estimação-dos-parâmetros" class="level2" data-number="15.5">
+<h2 data-number="15.5" class="anchored" data-anchor-id="estimação-dos-parâmetros"><span class="header-section-number">15.5</span> Estimação dos parâmetros</h2>
+<p>Neste tópico descreveremos resumidamente, conforme apresentado por Casella e Berger (2002), sobre o método de estimação comumente utilizado na obtenção de <span class="math inline">\(\hat{\beta}_0\)</span> e <span class="math inline">\(\hat{\beta}_1\)</span>, ao considerar o modelo de regressão logística dado por <span id="eq-modlog2"><span class="math display">\[
+logit (\pi_i) = log \left( \dfrac{\pi_i}{1-\pi_i} \right) = \beta_0 + \beta_1 x_{i}.
+\tag{15.5}\]</span></span></p>
+<p>Pode-se observar que na <a href="Regressao_logistica_ParteII.html#eq-modlog2" class="quarto-xref">Equation&nbsp;<span>16.1</span></a>, a relação entre a v.a. <span class="math inline">\(Y_i\)</span> e o preditor <span class="math inline">\(\beta_0 + \beta_1 x_{i}\)</span> não é mais direta, como tínhamos no caso de um MRLM dado por: <span class="math display">\[
+Y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots + \beta_k x_{ki}.
+\]</span> Portanto, de acordo com Casella e Berger (2002), o método dos mínimos quadrados deixa de ser uma opção. Assim, utiliza-se o método da máxima verossimilhança na obtenção dos estimadores de <span class="math inline">\(\beta_0\)</span> e <span class="math inline">\(\beta_1\)</span>.</p>
+<p>Apesar de estar considerando o preditor linear como um modelo de regressão linear simples, a expansão para o caso de modelos de regressão múltipla é direta.</p>
+<p>Conforme definido anteriormente, a v.a. a ser analisada é binária, ou seja, assume apenas valores iguais a 0 ou 1. Portanto, considerando uma amostra aleatória de <span class="math inline">\(n\)</span> v.a. <span class="math inline">\(Y_i\)</span>, tem-se que <span class="math inline">\(Y_i \sim Bernoulli(\pi_i)\)</span>. Assim, tem-se a função de probabilidade: <span class="math display">\[P(Y_i = y_i) = f_{Y_i}(y_i) = \pi_i^{y_i} (1-\pi_i)^{1-y_i} I_{\{0,1\}}(y_i)\]</span> e a função de verossimilhança é dada por: <span class="math display">\[
+L(\beta_0, \beta_1| \mathbf{y}) = \prod_{i=1}^n \pi_i^{y_i} (1-\pi_i)^{1-y_i}.
+\]</span> Para facilitar o processo de derivação em relação a <span class="math inline">\(\beta_0\)</span> e <span class="math inline">\(\beta_1\)</span>, Casella e Berger (2002) definem a função <span class="math inline">\(F_i = F(\beta_0 +\beta_1 x_i)\)</span>, uma vez que <span class="math display">\[
+\pi_i = \dfrac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}},
+\]</span> ou seja, <span class="math inline">\(\pi_i\)</span> é uma função de <span class="math inline">\(\beta_0 +\beta_1 x_i\)</span>.</p>
+<p>Dessa forma, a função de verossimilhança é dada por <span class="math display">\[
+L(\beta_0, \beta_1| \mathbf{y}) = \prod_{i=1}^n \pi_i^{y_i} (1-\pi_i)^{1-y_i} = \prod_{i=1}^n F_i^{y_i} (1-F_i)^{1-y_i},
+\]</span> com a <em>log-verossimilhança</em> <span class="math display">\[
+\begin{array}{rcl}
+\mbox{log }L(\beta_0, \beta_1| \mathbf{y}) &amp; = &amp; \sum_{i=1}^n \mbox{log} \left[ F_i^{y_i} (1-F_i)^{1-y_i} \right] \\
+&amp; = &amp; \mbox{log} \left[ F_i^{y_i} \right] + \mbox{log} \left[(1-F_i)^{1-y_i} \right] \\
+&amp; = &amp; y_i \mbox{log} (F_i) + (1-y_i) \mbox{log} (1-F_i) \\
+&amp; = &amp; y_i \mbox{log} (F_i) - y_i \mbox{log} (1-F_i) +  \mbox{log} (1-F_i) \\
+&amp; = &amp; \mbox{log} (1-F_i) + y_i \left[ \mbox{log} (F_i) - \mbox{log} (1-F_i) \right] \\
+&amp; = &amp; \mbox{log} (1-F_i) + y_i \mbox{log} \left( \dfrac{F_i}{1-F_i} \right).
+\end{array}
+\]</span> Para obter <span class="math inline">\(\hat{\beta}_0\)</span> e <span class="math inline">\(\hat{\beta}_1\)</span> deve-se utilizar as derivadas parciais da função <em>log-verossimilhança</em> em relação aos parâmetros <span class="math inline">\(\beta_0\)</span> e <span class="math inline">\(\beta_1\)</span>. Para isso, considere <span class="math display">\[
+\dfrac{dF(w)}{dw} = f(w)
+\]</span> como a derivada parcial de <span class="math inline">\(F(w)\)</span>, sendo <span class="math inline">\(f_i = f(\beta_0 + \beta_1 x_i)\)</span>. Além disso, considere as seguinte regra de derivação: dada <span class="math inline">\(u\)</span> como uma função da variável <span class="math inline">\(x\)</span>, <span class="math display">\[
+\dfrac{d}{dx} log(u) = \dfrac{1}{u} \dfrac{du}{dx}
+\]</span> Portanto, <span class="math display">\[
+\begin{array}{rcl}
+\dfrac{\partial}{\partial \beta_0}  \mbox{log} (1-F_i) &amp; = &amp;
+\dfrac{1}{(1-F_i)} \cdot \dfrac{\partial}{\partial \beta_0} (1-F_i) \\
+&amp; = &amp; \dfrac{1}{(1-F_i)} \cdot f_i \cdot (-1) \\
+&amp; = &amp; - \dfrac{f_i}{(1-F_i)} \\
+&amp; = &amp; - \dfrac{F_i f_i}{F_i (1-F_i)}
+\end{array}
+\]</span> e <span class="math display">\[
+\begin{array}{rcl}
+\dfrac{\partial}{\partial \beta_0}  y_i \mbox{log} \dfrac{F_i}{1-F_i} &amp; = &amp; y_i \dfrac{\partial}{\partial \beta_0}  \left[ \mbox{log} (F_i) - \mbox{log} (1-F_i) \right] \\
+&amp; = &amp; y_i \left\{ \dfrac{1}{F_i} \cdot f_i - \dfrac{1}{(1-F_i)} \cdot f_i \cdot (-1) \right\} \\
+&amp; = &amp; y_i f_i \left[ \dfrac{1}{F_i} + \dfrac{1}{(1-F_i)} \right] \\
+&amp; = &amp; y_i f_i \left[ \dfrac{1-F_i+F_i}{F_i(1-F_i)} \right] \\
+&amp; = &amp; \dfrac{y_i f_i}{F_i(1-F_i)}.
+\end{array}
+\]</span> Assim, <span id="eq-derb0"><span class="math display">\[
+\begin{array}{rcl}
+\dfrac{\partial}{\partial \beta_0}\mbox{log }L(\beta_0, \beta_1| \mathbf{y}) &amp; = &amp; \sum_{i=1}^{n} \left[ \dfrac{y_i f_i}{F_i(1-F_i)} - \dfrac{F_i f_i}{F_i (1-F_i)} \right] \\
+&amp; = &amp; \sum_{i=1}^{n} (y_i - F_i) \dfrac{f_i}{F_i (1-F_i)}.
+\end{array}
+\tag{15.6}\]</span></span> De forma semelhante, tem-se <span id="eq-derb1"><span class="math display">\[
+\dfrac{\partial}{\partial \beta_1}\mbox{log }L(\beta_0, \beta_1| \mathbf{y}) = \sum_{i=1}^{n} (y_i - F_i) \dfrac{f_i}{F_i (1-F_i)} x_i.
+\tag{15.7}\]</span></span></p>
+<p>De acordo com Casella e Berger (2002), para a regressão logística tem-se <span class="math inline">\(F(w) = \dfrac{e^w}{1+e^w}\)</span> e <span class="math inline">\(\dfrac{f_i}{F_i (1-F_i)} = 1\)</span>. Assim, a <a href="#eq-derb0" class="quarto-xref">Equation&nbsp;<span>15.6</span></a> e a <a href="#eq-derb1" class="quarto-xref">Equation&nbsp;<span>15.7</span></a> podem ser representadas de uma forma mais simples, ou seja, <span id="eq-derb0-2"><span class="math display">\[
+\dfrac{\partial}{\partial \beta_0}\mbox{log }L(\beta_0, \beta_1| \mathbf{y}) = \sum_{i=1}^{n} (y_i - F_i)
+\tag{15.8}\]</span></span> e <span id="eq-derb1-2"><span class="math display">\[
+\dfrac{\partial}{\partial \beta_1}\mbox{log }L(\beta_0, \beta_1| \mathbf{y}) = \sum_{i=1}^{n} (y_i - F_i)  x_i.
+\tag{15.9}\]</span></span></p>
+<p>Pode-se observar que tanto a derivada em relação a <span class="math inline">\(\beta_0\)</span>, quanto em relação a <span class="math inline">\(\beta_1\)</span> dependem dos dois parâmetros, pois <span class="math inline">\(F_i\)</span> e <span class="math inline">\(f_i\)</span> são funções de <span class="math inline">\(\beta_0 + \beta_1 x_i\)</span>. Portanto, ao igualar a <a href="#eq-derb0" class="quarto-xref">Equation&nbsp;<span>15.6</span></a> e a <a href="#eq-derb1" class="quarto-xref">Equation&nbsp;<span>15.7</span></a> a zero obtém-se um sistema de equações não-lineares nos parâmetros, ou seja, que não tem solução direta. Assim, é necessário a utilização de algum método iterativo, dentre os quais o Newton-Raphson e o escore de Fisher são comumente utilizados.</p>
+<p>Em vários materiais sobre regressão logística encontra-se a equação <a href="#eq-derb0-2" class="quarto-xref">Equation&nbsp;<span>15.8</span></a> e a <a href="#eq-derb1-2" class="quarto-xref">Equation&nbsp;<span>15.9</span></a> nas seguintes formas mais simples, respectivamente: <span class="math display">\[
+\begin{array}{rcl}
+\dfrac{\partial}{\partial \beta_0}\mbox{log }L(\beta_0, \beta_1| \mathbf{y}) &amp; = &amp; \sum_{i=1}^{n} (y_i - \pi_i), \\
+\dfrac{\partial}{\partial \beta_1}\mbox{log }L(\beta_0, \beta_1| \mathbf{y}) &amp; = &amp; \sum_{i=1}^{n} (y_i - \pi_i)  x_i.
+\end{array}
+\]</span></p>
+</section>
+<section id="interpretação-dos-parâmetros-odds-e-odds-ratio" class="level2" data-number="15.6">
+<h2 data-number="15.6" class="anchored" data-anchor-id="interpretação-dos-parâmetros-odds-e-odds-ratio"><span class="header-section-number">15.6</span> Interpretação dos parâmetros: <em>odds</em> e <em>odds ratio</em></h2>
+<p>Dois conceitos importantes quando tratamos de regressão logística são <em>odds</em> (<em>chances</em>) e <em>odds ratio</em> (<em>razão de chances</em>).</p>
+<p><em>Odds</em> é um termo muito comum quando ouvimos sobre apostas e jogos. De acordo com Allison (1999), <em>odds</em> de um evento é a razão do número esperado de vezes que um evento ocorrerá e do número de vezes que esse evento não ocorrerá. Por exemplo, uma <em>odds</em> igual a 4 significa que esperamos quatro vezes mais ocorrência do que não ocorrência do evento de interesse. Vale ressaltar que a <em>odds</em> pode ser um valor menor que 1 e, assim, espera-se maior número de vezes de não ocorrência do evento.</p>
+<p>Considerando <span class="math inline">\(\pi\)</span> como a probabilidade de ocorrência de um evento, a <em>odds</em> é definida por: <span class="math display">\[
+odds = \dfrac{\pi}{1-\pi}.
+\]</span> Allison (1999) apresenta uma tabela para ilustrar os valores e interpretação da <em>odds</em>, que está representada na <a href="#tbl-odds1" class="quarto-xref">Table&nbsp;<span>15.1</span></a>.</p>
+<div id="tbl-odds1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-odds1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;15.1: Relação entre probabilidade de um evento e <em>odds</em>
+</figcaption>
+<div aria-describedby="tbl-odds1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Probabilidade (<span class="math inline">\(\pi\)</span>)</th>
+<th style="text-align: center;"><em>odds</em></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">0,1</td>
+<td style="text-align: center;">0,11</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">0,2</td>
+<td style="text-align: center;">0,25</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">0,3</td>
+<td style="text-align: center;">0,43</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">0,4</td>
+<td style="text-align: center;">0,67</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">0,5</td>
+<td style="text-align: center;">1,00</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">0,6</td>
+<td style="text-align: center;">1,50</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">0,7</td>
+<td style="text-align: center;">2,33</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">0,8</td>
+<td style="text-align: center;">4,00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">0,9</td>
+<td style="text-align: center;">9,00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Observe na <a href="#tbl-odds1" class="quarto-xref">Table&nbsp;<span>15.1</span></a> que a <em>odds</em> é menor que 1 quando <span class="math inline">\(\pi &lt; 0,5\)</span> e maior que 1 para <span class="math inline">\(\pi&gt;0,5\)</span>. Uma <em>odds</em> é maior ou igual a zero, mas não tem um limite superior definido.</p>
+<p>De acordo com Allison (1999), a <em>odds</em> apresenta uma escala mais adequada para comparações multiplicativas e descreve o seguinte exemplo: se eu tenho uma probabilidade igual a 0,30 de votar em um candidato e a probabilidade de outra pessoa é 0,60, é razoável afirmar que a outra pessoa tem duas vezes mais chance de votar nesse candidato. No entanto, se minha probabilidade é igual a 0,60, é impossível pensar que outra pessoa tem o dobro de chance de votar no candidato. Porém, podemos usar a <em>odds</em> para efetuar essa comparação, sem ter problemas com a escala. No caso de <span class="math inline">\(\pi = 0,6\)</span>, tem-se <span class="math inline">\(odds = 0,6/0,4 = 1,5\)</span>, que pode ser comparada com a <em>odds</em> de outra pessoa.</p>
+<p>Nessa situação surge o conceito de <em>odds ratio</em>, que é uma medida de relacionamento muito utilizada na análise e comparação de variáveis binárias.</p>
+<p>Na conceituação da <em>odds ratio</em>, inicialmente, vamos apresentar o exemplo semelhante ao de uma tabela de contingência dada por Allison (1999, pág. 12), a qual está apresentada na <span class="citation" data-cites="tbl_conting">(<a href="referencias.html#ref-tbl_conting" role="doc-biblioref"><strong>tbl_conting?</strong></a>)</span>.</p>
+<div id="tbl-conting" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-conting-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;15.2: Frequência da ocorrência de uma determinada doença entre grupos de fumantes e não fumantes
+</figcaption>
+<div aria-describedby="tbl-conting-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Ocorrência da doença</th>
+<th style="text-align: center;">Fumante</th>
+<th style="text-align: center;">Não fumante</th>
+<th style="text-align: center;">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Sim</td>
+<td style="text-align: center;">28</td>
+<td style="text-align: center;">22</td>
+<td style="text-align: center;">50</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Não</td>
+<td style="text-align: center;">45</td>
+<td style="text-align: center;">52</td>
+<td style="text-align: center;">97</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Total</td>
+<td style="text-align: center;">73</td>
+<td style="text-align: center;">74</td>
+<td style="text-align: center;">147</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Obervando a <a href="#tbl-conting" class="quarto-xref">Table&nbsp;<span>15.2</span></a> tem-se que, no geral, a <em>odds</em> da ocorrência da doença é igual a 50/97 = 0,52. Para os grupos de fumantes e não fumantes têm-se, respectivamente, <span class="math inline">\(odds_{Fumantes} = 28/45 = 0,62\)</span> e <span class="math inline">\(odds_{Não fumantes} = 22/52 = 0,42\)</span>. Assim, a razão de chances de fumantes e não fumantes é <span class="math display">\[
+odds \mbox{ } ratio = \dfrac{0,62}{0,42} = 1,47,
+\]</span> ou seja, pode-se concluir que a <em>odds</em> para a ocorrência da doença em pessoas fumantes é 47% maior do que entre não fumantes.</p>
+<p>Em tabelas de contingência, como a apresentada na <a href="#tbl-conting" class="quarto-xref">Table&nbsp;<span>15.2</span></a>, é comum calcular a <em>odds ratio</em> como a razão do produto cruzado, ou seja, <span class="math display">\[
+odds \mbox{ } ratio = \dfrac{28 \cdot 52}{45 \cdot 22} = 1,47,
+\]</span> Ao considerar o ajuste de um modelo de regressão logística simples (1<span class="math inline">\(^o\)</span> grau), a forma de obtenção e interpretação da <em>odds</em> geralmente é relacionada ao <span class="math inline">\(\beta_1\)</span>. Agresti (2007) define a <em>odds</em> para a resposta igual a 1 (ou <em>sucesso</em>) por <span id="eq-odds-beta"><span class="math display">\[
+\dfrac{\pi}{1-\pi} = e^{\beta_0 + \beta_1 x} = e^{\beta_0}(e^{\beta_1})^x .
+\tag{15.10}\]</span></span></p>
+<p>A relação exponencial apresentada na <a href="Regressao_logistica_ParteII.html#eq-odds-beta" class="quarto-xref">Equation&nbsp;<span>16.2</span></a> fornece uma interpretação prática para o coeficiente <span class="math inline">\(\beta_1\)</span>, ou seja, a <em>odds</em> é multiplicada por <span class="math inline">\(e^{\beta_1}\)</span> para cada unidade que se aumenta em <span class="math inline">\(x\)</span>. Quando <span class="math inline">\(\beta_1 = 0\)</span>, <span class="math inline">\(e^{\beta_1} = 1\)</span> e a <em>odds</em> não muda ou não é influenciada por mudanças em <span class="math inline">\(x\)</span>.</p>
+</section>
+<section id="erros-padrões-intervalos-de-confiança-teste-de-wald-e-razão-de-verossimilhanças" class="level2" data-number="15.7">
+<h2 data-number="15.7" class="anchored" data-anchor-id="erros-padrões-intervalos-de-confiança-teste-de-wald-e-razão-de-verossimilhanças"><span class="header-section-number">15.7</span> Erros padrões, intervalos de confiança, teste de Wald e razão de verossimilhanças</h2>
+<!--
+Erro padrão: slide 44 (Aula 2 - Geraldo Goes) e Casella e Berger (2002, pág 595), Giolo (2006, pág 77)
+
+Teste de Wald e LRT: Casella e Berger (2002, pág 596)
+-->
+</section>
+<section id="ajuste-do-modelo-de-regressão-logística-aos-dados-do-exemplo-de-motivação" class="level2" data-number="15.8">
+<h2 data-number="15.8" class="anchored" data-anchor-id="ajuste-do-modelo-de-regressão-logística-aos-dados-do-exemplo-de-motivação"><span class="header-section-number">15.8</span> Ajuste do modelo de regressão logística aos dados do exemplo de motivação</h2>
+<section id="utilizando-o-r" class="level3" data-number="15.8.1">
+<h3 data-number="15.8.1" class="anchored" data-anchor-id="utilizando-o-r"><span class="header-section-number">15.8.1</span> Utilizando o R</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>horseshoe<span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"Dados/horseshoe_crab.xlsx"</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(horseshoe)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>reglog1.hc<span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> width, </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                 <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>), </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> horseshoe)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(reglog1.hc)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="do">## Grafico</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(horseshoe, <span class="fu">aes</span>(<span class="at">x =</span> width, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"glm"</span>,   </span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>              <span class="at">method.args =</span> <span class="fu">list</span>(<span class="at">family =</span> <span class="st">"binomial"</span>),</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>              <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span>  </span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>( <span class="at">x =</span> <span class="st">"Largura da carapaça (cm)"</span>,</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="fu">expression</span>(<span class="fu">hat</span>(pi))) <span class="sc">+</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="utilizando-o-sasscriptsize-textregistered" class="level3" data-number="15.8.2">
+<h3 data-number="15.8.2" class="anchored" data-anchor-id="utilizando-o-sasscriptsize-textregistered"><span class="header-section-number">15.8.2</span> Utilizando o SAS<span class="math inline">\(\scriptsize ^\textregistered\)</span></h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="sc">/</span><span class="er">*</span> Generated <span class="fu">Code</span> (IMPORT) <span class="sc">*</span><span class="er">/</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="er">/*</span> Source File<span class="sc">:</span> horseshoe_crab.xlsx <span class="sc">*</span><span class="er">/</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="er">/*</span> Source Path<span class="sc">:</span> <span class="er">/</span>home<span class="sc">/</span>u63243446<span class="sc">/</span>Disciplinas_Grad<span class="sc">/</span>GES119_Mod_Lin_I <span class="sc">*</span><span class="er">/</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="er">/*</span> Code generated on<span class="sc">:</span> <span class="dv">16</span><span class="sc">/</span><span class="dv">11</span><span class="sc">/</span><span class="dv">2025</span> <span class="dv">23</span><span class="sc">:</span><span class="dv">32</span> <span class="sc">*</span><span class="er">/</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>%<span class="fu">web_drop_table</span>(WORK.horseshoe);</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>FILENAME REFFILE <span class="st">'/home/u63243446/Disciplinas_Grad/GES119_Mod_Lin_I/horseshoe_crab.xlsx'</span>;</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>PROC IMPORT DATAFILE<span class="ot">=</span>REFFILE</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    DBMS<span class="ot">=</span>XLSX</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    OUT<span class="ot">=</span>WORK.horseshoe;</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    GETNAMES<span class="ot">=</span>YES;</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>RUN;</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>PROC CONTENTS DATA<span class="ot">=</span>WORK.horseshoe; RUN;</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>%<span class="fu">web_open_table</span>(WORK.horseshoe);</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>proc print data<span class="ot">=</span>horseshoe;</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>run;</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>proc logistic data<span class="ot">=</span>horseshoe;</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>model y <span class="ot">=</span> width;</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>run;</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>proc genmod data<span class="ot">=</span>horseshoe;</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>model y <span class="ot">=</span> width <span class="sc">/</span> dist<span class="ot">=</span>binomial;</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>run;</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="sc">/</span><span class="er">***********************</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a> COMENTÁRIO IMPORTANTE<span class="sc">:</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a> <span class="er">***********************</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a> Observe que as estimativas obtidas utilizando<span class="sc">-</span>se o SAS apresentam</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a> sinais invertidos, quando comparados ao R, ou seja, no R tem<span class="sc">-</span>se </span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a> b0 <span class="ot">=</span> <span class="sc">-</span><span class="dv">12</span>,<span class="dv">3508</span> e b1 <span class="ot">=</span> <span class="dv">0</span>,<span class="dv">4972</span>, enquanto no SAS tem<span class="sc">-</span>se b0 <span class="ot">=</span> <span class="dv">12</span>,<span class="dv">3508</span> </span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a> e b1 <span class="ot">=</span> <span class="sc">-</span><span class="dv">0</span>,<span class="fl">4972.</span> Isso aconteceu pois os softwares estão modelando </span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a> probabilidades diferentes. No R modela<span class="sc">-</span>se a probabilidade de Y<span class="ot">=</span><span class="dv">1</span>,</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a> enquanto no SAS modela<span class="sc">-</span>se a probabilidade do Y<span class="ot">=</span><span class="dv">0</span>, conforme está </span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a> escrito nos resultados do SAS.</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a> Para contornar essa diferença, basta usar os seguintes comandos<span class="sc">:</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="er">*/</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>proc logistic data<span class="ot">=</span>horseshoe;</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>model <span class="fu">y</span>(<span class="at">event=</span><span class="st">'1'</span>) <span class="ot">=</span> width;</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>run;</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>proc genmod data<span class="ot">=</span>horseshoe;</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>model <span class="fu">y</span>(<span class="at">event=</span><span class="st">'1'</span>) <span class="ot">=</span> width <span class="sc">/</span> dist<span class="ot">=</span>binomial type1 type3;</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>run;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-agresti2007introduction" class="csl-entry" role="listitem">
+Agresti, Alan. 2007. <em>An Introduction to Categorical Data Analysis</em>. 2nd ed. Hoboken: John Wiley &amp; Sons.
+</div>
+<div id="ref-agresti2012categorical" class="csl-entry" role="listitem">
+———. 2012. <em>Categorical Data Analysis</em>. 3rd ed. Hoboken, NJ: John Wiley &amp; Sons.
+</div>
+<div id="ref-allison1999logistic" class="csl-entry" role="listitem">
+Allison, Paul D. 1999. <em>Logistic Regression Using the SAS System: Theory and Application</em>. Cary: SAS Institute Inc.
+</div>
+<div id="ref-cetinkaya2023introduction" class="csl-entry" role="listitem">
+Çetinkaya-Rundel, Mine, and Johanna Hardin. 2023. <em>Introduction to Modern Statistics</em>. 2nd ed. OpenIntro Inc. <a href="https://openintro-ims.netlify.app/">https://openintro-ims.netlify.app/</a>.
+</div>
+<div id="ref-charnet2008analise" class="csl-entry" role="listitem">
+Charnet, Reinaldo, Clarice Azevedo de Luna Freire, Eugênia Maria R. Charnet, and Helio Bonvino. 2008. <em>An<span>á</span>lise de Modelos de Regress<span>ã</span>o Linear: Com Aplica<span>ç</span><span>õ</span>es</em>. 2nd ed. Campinas: Editora Unicamp.
+</div>
+<div id="ref-cordeiro2024modelos" class="csl-entry" role="listitem">
+Cordeiro, Gauss M., Clarice G. B. Demétrio, and Rafael A. Moral. 2024. <em>Modelos Lineares Generalizados e Aplica<span>ç</span><span>õ</span>es</em>. S<span>ã</span>o Paulo: Blucher.
+</div>
+<div id="ref-demetrio2011modelos" class="csl-entry" role="listitem">
+Demétrio, Clarice G. B., and S. S. Zocchi. 2011. <em>Modelos de Regress<span>ã</span>o</em>. Piracicaba: ESALQ.
+</div>
+<div id="ref-draper1998applied" class="csl-entry" role="listitem">
+Draper, Norman R., and Harry Smith. 1998. <em>Applied Regression Analysis</em>. 3rd ed. New York: John Wiley &amp; Sons.
+</div>
+<div id="ref-ferreira2013recursos" class="csl-entry" role="listitem">
+Ferreira, Daniel Furtado. 2013. <em>Recursos Computacionais Utilizando r</em>. Lavras.
+</div>
+<div id="ref-hoffmann1977analise" class="csl-entry" role="listitem">
+Hoffmann, Rodolfo, and Sonia Vieira. 1977. <em>An<span>á</span>lise de Regress<span>ã</span>o: Uma Introdu<span>ç</span><span>ã</span>o <span class="nocase">à</span> Econometria</em>. 2nd ed. S<span>ã</span>o Paulo: Editora Hucitec.
+</div>
+<div id="ref-kutner2005applied" class="csl-entry" role="listitem">
+Kutner, Michael H., Christopher J. Nachtsheim, John Neter, and William Li. 2005. <em>Applied Linear Statistical Models</em>. 5th ed. New York: McGraw-Hill/Irwin.
+</div>
+<div id="ref-levine2016estatistica" class="csl-entry" role="listitem">
+Levine, David M., David F. Stephan, and Kathryn A. Szabat. 2016. <em>Estat<span>ı́</span>stica - Teoria e Aplica<span>ç</span><span>õ</span>es Usando o Microsoft Excel Em Portugu<span>ê</span>s</em>. 7th ed. Rio de Janeiro: LTC.
+</div>
+<div id="ref-mallows1973comments" class="csl-entry" role="listitem">
+Mallows, Colin L. 1973. <span>“Some Comments on <span class="math inline">\(C_p\)</span>.”</span> <em>Technometrics</em> 15 (4): 661–75.
+</div>
+<div id="ref-morais2001introducao" class="csl-entry" role="listitem">
+Morais, Augusto Ramalho de, Lı́via Maria Chaves, and Maria Cristina R. P. Toledo. 2001. <em>Introdu<span>ç</span><span>ã</span>o <span class="nocase">à</span> <span class="nocase">á</span>lgebra de Matrizes</em>. Lavras: UFLA/FAEPE.
+</div>
+<div id="ref-noble1977applied" class="csl-entry" role="listitem">
+Noble, Ben, and James W. Daniel. 1977. <em>Applied Linear Algebra</em>. 3rd ed. Englewood Cliffs: Prentice-Hall.
+</div>
+<div id="ref-regazzi2010modelos" class="csl-entry" role="listitem">
+Regazzi, Adair José. 2010. <em>Modelos Lineares i</em>. Vi<span>ç</span>osa: UFV.
+</div>
+<div id="ref-rencher2008linear" class="csl-entry" role="listitem">
+Rencher, Alvin C., and G. Bruce Schaalje. 2008. <em>Linear Models in Statistics</em>. 2nd ed. Hoboken, New Jersey: John Wiley &amp; Sons.
+</div>
+<div id="ref-santos2017curso" class="csl-entry" role="listitem">
+Santos, Reginaldo J. 2017. <em>Um Curso de Geometria Anal<span>ı́</span>tica e <span class="nocase">á</span>lgebra Linear</em>. Belo Horizonte: Imprensa Universit<span>á</span>ria da UFMG.
+</div>
+<div id="ref-searle1982matrix" class="csl-entry" role="listitem">
+Searle, Shayle R. 1982. <em>Matrix Algebra Useful for Statistics</em>. New York: John Wiley &amp; Sons.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./Metodos_selecao_variaveis.html" class="pagination-link" aria-label="Métodos de seleção de variáveis">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Métodos de seleção de variáveis</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./Regressao_logistica_ParteII.html" class="pagination-link" aria-label="Regressão logística: inferência e aplicações">
+        <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Regressão logística: inferência e aplicações</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
