@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>8&nbsp; Análise de variância (ANOVA) da regressão: Teste da falta de ajuste – Modelos Lineares: modelos de posto completo</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./TH_comparacao_modelos.html" rel="next">
+<link href="./MRL_ANOVA.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-26470a742aafa1a1e7b10f54c72c41f3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-578930c7c9073de1ad26189988221688.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./MRL_ANOVA_Falta_Ajuste.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Análise de variância (ANOVA) da regressão: Teste da falta de ajuste</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Modelos Lineares: modelos de posto completo</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bem-vindos!</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./prefacio.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefácio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ML_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introdução aos modelos lineares</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRLS_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">O modelo de regressão linear simples (MRLS)</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_outrospolinomios_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelos de regressão linear (MRL) - modelos polinomiais</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRLM_matricial_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modelos de regressão linear múltipla (MRLM) e representação matricial</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_estimacao_matricial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Estimação em modelos de regressão linear (MRL) - representação matricial</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_estimacao.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Estimação em Modelos de Regressão Linear</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_ANOVA.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Análise de variância (ANOVA) da regressão</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./MRL_ANOVA_Falta_Ajuste.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Análise de variância (ANOVA) da regressão: Teste da falta de ajuste</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./TH_comparacao_modelos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Testes de hipóteses: Comparação de modelos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Formas_quadraticas_aula1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Formas quadráticas</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Residuos_Diagnosticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Analise_residuos_Parte2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Análise de Resíduos e Diagnósticos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Multicolinearidade.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Multicolinearidade</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Aula_MRL_Qualitativas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Modelos de regressão para preditores qualitativos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Metodos_selecao_variaveis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Métodos de seleção de variáveis</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Regressão logística</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica_ParteII.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Regressão logística: inferência e aplicações</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Regressao_logistica_ParteIII.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Regressão logística: seleção de modelos, predição e qualidade do ajuste</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./referencias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referências</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Conteúdo</h2>
+   
+  <ul>
+  <li><a href="#introdução" id="toc-introdução" class="nav-link active" data-scroll-target="#introdução"><span class="header-section-number">8.1</span> Introdução</a></li>
+  <li><a href="#anova-para-o-caso-de-dados-repetidos-de-y-em-diferentes-níveis-de-x_i" id="toc-anova-para-o-caso-de-dados-repetidos-de-y-em-diferentes-níveis-de-x_i" class="nav-link" data-scroll-target="#anova-para-o-caso-de-dados-repetidos-de-y-em-diferentes-níveis-de-x_i"><span class="header-section-number">8.2</span> ANOVA para o caso de dados repetidos de <span class="math inline">\(Y\)</span> em diferentes níveis de <span class="math inline">\(X_i\)</span></a>
+  <ul class="collapse">
+  <li><a href="#anova-incluindo-o-teste-f-para-a-falta-de-ajuste" id="toc-anova-incluindo-o-teste-f-para-a-falta-de-ajuste" class="nav-link" data-scroll-target="#anova-incluindo-o-teste-f-para-a-falta-de-ajuste"><span class="header-section-number">8.2.1</span> ANOVA incluindo o teste F para a falta de ajuste</a></li>
+  <li><a href="#coeficiente-de-determinação-r2" id="toc-coeficiente-de-determinação-r2" class="nav-link" data-scroll-target="#coeficiente-de-determinação-r2"><span class="header-section-number">8.2.2</span> Coeficiente de determinação (<span class="math inline">\(R^2\)</span>)</a></li>
+  </ul></li>
+  <li><a href="#exemplos" id="toc-exemplos" class="nav-link" data-scroll-target="#exemplos"><span class="header-section-number">8.3</span> Exemplos</a>
+  <ul class="collapse">
+  <li><a href="#exemplo-1" id="toc-exemplo-1" class="nav-link" data-scroll-target="#exemplo-1"><span class="header-section-number">8.3.1</span> Exemplo 1</a></li>
+  <li><a href="#exemplo-2" id="toc-exemplo-2" class="nav-link" data-scroll-target="#exemplo-2"><span class="header-section-number">8.3.2</span> Exemplo 2</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Análise de variância (ANOVA) da regressão: Teste da falta de ajuste</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapterintro">
+<p>Neste capítulo vamos apresentar a Análise de Variância (ANOVA) da Regressão para o caso de dados com repetições, em que podemos testar o que se chama de falta de ajuste de um modelo de regressão linear. A metodologia será apresentada considerando um exemplo de regressão linear simples e outro de regressão linear múltipla.</p>
+<p>Esse material é baseado nos capítulos 5 e 8 de Charnet et al.&nbsp;(2008) e na apostila <em>Modelos de Regressão</em> (Demétrio e Zocchi, 2011).</p>
+</div>
+<section id="introdução" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="introdução"><span class="header-section-number">8.1</span> Introdução</h2>
+<p>Conforme visto em aulas anteriores, a Análise de Variância da Regressão pode ser definida como uma metodologia com a qual verifica-se, por meio de um teste estatístico, se a variabilidade observada em uma variável dependente (<span class="math inline">\(Y\)</span>) é significativamente explicada por <span class="math inline">\(k\)</span> variáveis independentes ou explicativas (<span class="math inline">\(X_i\)</span>, com <span class="math inline">\(i=1,2,\ldots,k\)</span>).</p>
+<p>Até o momento, ao efetuar a ANOVA da regressão, a variação total dos dados foi decomposta em fontes como <em>Regressão</em> (a variação explicada pelo modelo proposto) e <em>Erro</em> (a variação não explicada ou independente da regressão). Assim, o teste F foi utilizado para verificar se temos evidências de que a variação explicada pelo modelo de regressão proposto é maior do que a independente da regressão. Pode-se observar que nos estudos analisados, para cada valor das <span class="math inline">\(X_i\)</span> variáveis independentes, com <span class="math inline">\(i=1,2,\ldots,k\)</span>, tinha-se um único valor de <span class="math inline">\(Y\)</span>.</p>
+<p>Também foi definido que</p>
+<p><span class="math display">\[
+SQErro = SQIndependente \mbox{ } da \mbox{ } Regressão = \displaystyle \sum_{i=1}^n \hat{\varepsilon}_i^2 = \displaystyle \sum_{i=1}^n (y_i - \hat{y}_i)^2 .
+\]</span></p>
+<p>Portanto, de alguma forma, a <span class="math inline">\(SQErro\)</span> ou o <span class="math inline">\(QMErro = \dfrac{SQErro}{GLErro}\)</span> são dependentes do modelo ajustado, pois no cálculo utiliza-se <span class="math inline">\(\hat{y}_i\)</span>. Dessa forma, tem-se que <span class="math inline">\(\hat{\sigma}^2 = QMErro\)</span> é um estimador não-viesado de <span class="math inline">\(\sigma^2\)</span>, sob a suposição de que o modelo ajustado é o correto para explicar a variabilidade observada em <span class="math inline">\(Y\)</span>.</p>
+<p>Conforme demonstrado e ilustrado na Figura 2.10 de Demétrio e Zocchi (2011, p.48), comparando-se os modelos de regressão linear simples e quadrático, caso o modelo não seja o correto tem-se um viés <span class="math inline">\(B_i\)</span> no valor esperado de <span class="math inline">\(Y_i\)</span>, ou seja, em <span class="math inline">\(E(Y_i)\)</span>. Assim, o <span class="math inline">\(QMErro\)</span> será um estimador viesado de <span class="math inline">\(\sigma^2\)</span>, pois <span class="math inline">\(E(QMErro) = \sigma^2 + \dfrac{1}{n-k-1} B_i^2\)</span>. Porém, essa comparação e visualização do viés se torna muito difícil se considerarmos modelos mais complexos, como por exemplo modelos de regressão linear múltipla.</p>
+<p>Porém, é necessário que se tenha um estimador não-viesado de <span class="math inline">\(\sigma^2\)</span> e que independa do modelo de regressão. Isso é possível, mas é necessário que se tenha mais de um valor de <span class="math inline">\(Y\)</span> para cada valor das <span class="math inline">\(X_i\)</span> variáveis independentes ou pelo menos para algumas variáveis <span class="math inline">\(X_i\)</span>. Essa situação se assemelha ao caso de experimentos planejados, quando se têm repetições de valores da variável <span class="math inline">\(Y\)</span>, uma vez que <em><strong>repetição</strong></em> é um dos princípios básicos da experimentação e é necessária para que se possa estimar a variância devido ao erro experimental (<span class="math inline">\(\sigma^2\)</span>).</p>
+<p>Nessa situação, em que se têm dados repetidos, é possível efetuar uma ANOVA isolando o que pode ser chamado de <em>Erro Puro</em>, além do que definimos como <em>Independente da Regressão</em>. Dessa forma, além de obter um estimador não-viesado de <span class="math inline">\(\sigma^2\)</span>, dado por <span class="math inline">\(\hat{\sigma}^2 = QMErro Puro\)</span>, é possível testar a falta de ajuste do modelo proposto (o que denominamos até o momento de <em>Independente da Regressão</em>), ou seja, verificar se o modelo proposto é adequado para descrever como as variáveis explicativas (<span class="math inline">\(X_i\)</span>) estão influenciando na variabilidade de <span class="math inline">\(Y\)</span>.</p>
+</section>
+<section id="anova-para-o-caso-de-dados-repetidos-de-y-em-diferentes-níveis-de-x_i" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="anova-para-o-caso-de-dados-repetidos-de-y-em-diferentes-níveis-de-x_i"><span class="header-section-number">8.2</span> ANOVA para o caso de dados repetidos de <span class="math inline">\(Y\)</span> em diferentes níveis de <span class="math inline">\(X_i\)</span></h2>
+<p>Inicialmente, considere a situação em que, para cada um de <span class="math inline">\(I\)</span> níveis ou valores de uma variável explicativa <span class="math inline">\(X\)</span> tenham-se <span class="math inline">\(n_i\)</span> dados ou observações da variável <span class="math inline">\(Y\)</span>. Assim, para <span class="math inline">\(x_1\)</span> têm-se os valores <span class="math inline">\(y_{11}, y_{12}, \ldots, y_{1n_1}\)</span>; para a variável <span class="math inline">\(x_2\)</span> têm-se os valores <span class="math inline">\(y_{21}, y_{22}, \ldots, y_{2n_2}\)</span>; e assim por diante, até o nível da variável <span class="math inline">\(X\)</span>, ou seja, <span class="math inline">\(x_I\)</span>, para a qual têm-se os valores <span class="math inline">\(y_{I1}, y_{I2}, \ldots, y_{In_I}\)</span>.</p>
+<p>Esses dados podem ser organizados em uma tabela, para facilitar a visualização, conforme apresentado na <a href="#tbl-dados" class="quarto-xref">Table&nbsp;<span>8.1</span></a>.</p>
+<div id="tbl-dados" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-dados-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;8.1: Dados experimentais com repetição
+</figcaption>
+<div aria-describedby="tbl-dados-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 50%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Valores de <span class="math inline">\(X\)</span></th>
+<th style="text-align: center;">Valores de <span class="math inline">\(Y\)</span></th>
+<th style="text-align: center;">Totais de <span class="math inline">\(x_i\)</span></th>
+<th style="text-align: center;">Médias de <span class="math inline">\(x_i\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><span class="math inline">\(x_1\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(y_{11} \qquad y_{12} \qquad \cdots \qquad y_{1n_1}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(T_1 = y_{1\cdot} = \displaystyle \sum_{j=1}^{n_1} y_{1j}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\bar{y}_1 = \dfrac{T_1}{n_1}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><span class="math inline">\(x_2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(y_{21} \qquad y_{22} \qquad \cdots \qquad y_{2n_2}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(T_2 = y_{2\cdot} = \displaystyle \sum_{j=1}^{n_2} y_{2j}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\bar{y}_2 = \dfrac{T_2}{n_2}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><span class="math inline">\(\vdots\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\vdots \qquad \quad \vdots \qquad \quad \vdots \qquad \quad \vdots\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\vdots\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\vdots\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><span class="math inline">\(x_I\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(y_{I1} \qquad y_{I2} \qquad \cdots \qquad y_{In_I}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(T_k = y_{I\cdot} = \displaystyle \sum_{j=1}^{n_I} y_{Ij}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\bar{y}_I = \dfrac{T_I}{n_I}\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p><br>
+</p>
+<p>Considerando que se tenha um conjunto de dados conforme apresentado na <a href="#tbl-dados" class="quarto-xref">Table&nbsp;<span>8.1</span></a>, pode-se demonstrar que</p>
+<p><span id="eq-desdobr-SQTotal"><span class="math display">\[
+(y_{ij} - \bar{y}) =  (\bar{y}_i - \bar{y}) + (y_{ij} - \bar{y}_i),
+\tag{8.1}\]</span></span></p>
+<p>em que <span class="math inline">\(y_{ij}\)</span> é o <em>j-ésimo</em> valor observado de <span class="math inline">\(Y\)</span> considerando a <em>i-ésima</em> variável explicativa <span class="math inline">\(X_i\)</span>; <span class="math inline">\(\bar{y} = \dfrac{\sum_{i=1}^{k} \sum_{j=1}^{n_i} y_{ij}}{n}\)</span>, com <span class="math inline">\(n = \sum_{i=1}^{k} n_i\)</span>, é a média geral dos dados observados; e <span class="math inline">\(\bar{y}_i = \dfrac{\sum_{j=1}^{n_i} y_{ij}}{n_i}\)</span> é a média dos <span class="math inline">\(n_i\)</span> valores observados de <span class="math inline">\(Y\)</span>, considerando a variável explicativa <span class="math inline">\(X_i\)</span>. A partição dada na <a href="#eq-desdobr-SQTotal" class="quarto-xref">Equation&nbsp;<span>8.1</span></a> é facilmente visualizada por meio de uma representação gráfica, conforme apresentado por Demétrio e Zocchi (2011, p.49, Figura 2.12).</p>
+<p>A partir da <a href="#eq-desdobr-SQTotal" class="quarto-xref">Equation&nbsp;<span>8.1</span></a>, pode-se obter a partição da variação total dos dados ou da <span class="math inline">\(SQTotal\)</span>, com o objetivo de se construir a tabela da ANOVA, dada por</p>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-style:solid;border-width:0px;font-family:Arial, sans-serif;font-size:16px;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:16px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;border-left:none;border-right:none}
+.tg .tg-0pky{border-color:inherit;text-align:center;vertical-align:middle}
+.tg .tg-Lpky{border-color:inherit;text-align:left;vertical-align:middle}
+</style>
+<div style="display: flex; justify-content: center;">
+<table class="tg">
+<thead>
+<tr>
+<th style="width: 280px;" class="tg-0pky">
+FV
+</th>
+<th style="width: 100px;" class="tg-0pky">
+GL
+</th>
+<th style="width: 150px;" class="tg-0pky">
+SQ
+</th>
+<th style="width: 150px;" class="tg-0pky">
+QM
+</th>
+<th style="width: 100px;" class="tg-0pky">
+F
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tg-Lpky">
+Entre níveis de <span class="math inline">\(X\)</span> (Tratamentos)
+</td>
+<td class="tg-0pky">
+I-1
+</td>
+<td class="tg-0pky">
+SQTrat
+</td>
+<td class="tg-0pky">
+QMTrat
+</td>
+<td class="tg-0pky">
+Fc
+</td>
+</tr>
+<tr>
+<td class="tg-Lpky">
+Erro Puro
+</td>
+<td class="tg-0pky">
+n-I
+</td>
+<td class="tg-0pky">
+SQErroPuro
+</td>
+<td class="tg-0pky">
+QMErroPuro
+</td>
+<td class="tg-0pky">
+</td>
+</tr>
+<tr>
+<th class="tg-Lpky">
+Total
+</th>
+<th class="tg-0pky">
+n-1
+</th>
+<th class="tg-0pky">
+SQTotal
+</th>
+<th class="tg-0pky">
+</th>
+<th class="tg-0pky">
+</th>
+</tr>
+</tbody>
+</table>
+</div>
+<!--
+:::{#tbl-ANOVA}
+
+
+
+
+
+```{=html}
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-style:solid;border-width:0px;font-family:Arial, sans-serif;font-size:16px;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:16px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;border-left:none;border-right:none}
+.tg .tg-0pky{border-color:inherit;text-align:center;vertical-align:middle}
+.tg .tg-Lpky{border-color:inherit;text-align:left;vertical-align:middle}
+</style>
+<div style="display: flex; justify-content: center;">
+
+<table class="tg caption-top" data-quarto-postprocess="true">
+<caption>Tabela da ANOVA (dados repetidos)</caption>
+<thead>
+<tr class="header">
+<th class="tg-0pky" data-quarto-table-cell-role="th" style="width: 50px">FV</th>
+<th class="tg-0pky" data-quarto-table-cell-role="th" style="width: 50px">GL</th>
+<th class="tg-0pky" data-quarto-table-cell-role="th" style="width: 100px">SQ</th>
+<th class="tg-0pky" data-quarto-table-cell-role="th" style="width: 50px">QM</th>
+<th class="tg-0pky" data-quarto-table-cell-role="th" style="width: 50px">F</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="tg-Lpky">Regressão</td>
+<td class="tg-0pky">1</td>
+<td class="tg-0pky">SQReg</td>
+<td class="tg-0pky">QMReg</td>
+<td class="tg-0pky">Fc</td>
+</tr>
+<tr class="even">
+<td class="tg-Lpky">Erro</td>
+<td class="tg-0pky">n-2</td>
+<td class="tg-0pky">SQErro</td>
+<td class="tg-0pky">QMErro</td>
+<td class="tg-0pky"></td>
+</tr>
+<tr class="odd">
+<td class="tg-Lpky" data-quarto-table-cell-role="th">Total</td>
+<td class="tg-0pky" data-quarto-table-cell-role="th">n-1</td>
+<td class="tg-0pky" data-quarto-table-cell-role="th">SQTotal</td>
+<td class="tg-0pky" data-quarto-table-cell-role="th"></td>
+<td class="tg-0pky" data-quarto-table-cell-role="th"></td>
+</tr>
+</tbody>
+</table>
+
+</div>
+```
+
+
+
+
+
+:::
+-->
+<p><br>
+</p>
+<p>A partição da <span class="math inline">\(SQTotal = SQTrat + SQErroPuro\)</span> é demonstrada a seguir.</p>
+<p><span class="math display">\[
+\begin{array}{rcl}
+(y_{ij} - \bar{y}) &amp; = &amp;  (\bar{y}_i - \bar{y}) + (y_{ij} - \bar{y}_i) \\
+\displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i}(y_{ij} - \bar{y})^2 &amp; = &amp;  \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} \left[ (\bar{y}_i - \bar{y}) + (y_{ij} - \bar{y}_i) \right]^2 \\
+\displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i}(y_{ij} - \bar{y})^2 &amp; = &amp;  \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\bar{y}_i - \bar{y})^2 + \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (y_{ij} - \bar{y}_i)^2 + 2 \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\bar{y}_i - \bar{y}) (y_{ij} - \bar{y}_i)
+\end{array}
+\]</span></p>
+<p>Pode-se demonstrar que</p>
+<p><span class="math display">\[
+2 \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\bar{y}_i - \bar{y}) (y_{ij} - \bar{y}_i) = 0
+\]</span></p>
+<p>e, assim,</p>
+<p><span class="math display">\[
+\begin{array}{rcccc}
+\displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i}(y_{ij} - \bar{y})^2 &amp; = &amp;  \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\bar{y}_i - \bar{y})^2 &amp; + &amp; \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (y_{ij} - \bar{y}_i)^2 \\
+SQTotal &amp; = &amp; SQTrat &amp; + &amp; SQErroPuro.
+\end{array}
+\]</span></p>
+<p>Essa partição é equivalente à de um experimento instalado segundo um delineamento inteiramente casualizado (DIC), com <span class="math inline">\(I\)</span> tratamentos e <span class="math inline">\(n_i\)</span> repetições em cada tratamento <span class="math inline">\(i\)</span>, com <span class="math inline">\(i=1,2,\ldots,I\)</span>. Nesse caso, o modelo é dado por</p>
+<p><span class="math display">\[
+y_{ij} = \mu + \alpha_i + e_{ij},
+\]</span></p>
+<p>em que <span class="math inline">\(y_{ij}\)</span> é o valor observado na <em>j-ésima</em> repetição do <em>i-ésimo</em> tratamento (ou nível da variável explicativa <span class="math inline">\(X\)</span>); <span class="math inline">\(\mu\)</span> é uma constante; <span class="math inline">\(\alpha_i\)</span> é o efeito do <em>i-ésimo</em> tratamento; e <span class="math inline">\(e_{ij}\)</span> é o erro aleatório associado a cada observação <span class="math inline">\(y_{ij}\)</span>, tal que <span class="math inline">\(e_{ij} \sim N(0,\sigma^2)\)</span>. Assim, tem-se um estimador não-viesado de <span class="math inline">\(\sigma^2\)</span> e que independe do modelo de regressão, dado por <span class="math inline">\(\hat{\sigma}^2 = QMErroPuro\)</span>.</p>
+<div class="important">
+<p>Vale lembrar que as fórmulas apresentadas para o cálculo das somas de quadrados Total, de Tratamento e do Erro (<em>Erro Puro</em>) são equivalentes às fórmulas usadas na obtenção da ANOVA, em cursos de Estatística Experimental, como será mostrado a seguir.</p>
+<ul>
+<li><p><span class="math inline">\(SQTotal = \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i}(y_{ij} - \bar{y})^2 =  \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} y_{ij}^2 - \dfrac{\left( \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} y_{ij} \right)^2}{n}\)</span>; ou de forma simplificada: <span class="math display">\[SQTotal = \displaystyle \sum_{ij}(y_{ij} - \bar{y})^2 =  \displaystyle \sum_{ij} y_{ij}^2 - \dfrac{\left( \displaystyle \sum_{ij} y_{ij} \right)^2}{n} = \displaystyle \sum_{ij} y_{ij}^2 - C,
+\]</span> em que <span class="math inline">\(C\)</span> é chamada de <em>correção</em>;</p></li>
+<li><p><span class="math inline">\(SQTrat = \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\bar{y}_i - \bar{y})^2 = \displaystyle \sum_{i=1}^{k} n_i (\bar{y}_i - \bar{y})^2 = \displaystyle \sum_{i=1}^{k} \dfrac{T_i}{n_i} - \dfrac{\left( \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} y_{ij} \right)^2}{n}\)</span>; ou de forma simplificada: <span class="math display">\[SQTrat = \displaystyle \sum_{i} \dfrac{T_i}{n_i} - \dfrac{\left( \displaystyle \sum_{ij} y_{ij} \right)^2}{n} = \displaystyle \sum_{i=1}^{k} \dfrac{T_i}{n_i} - C;\]</span></p></li>
+<li><p><span class="math inline">\(SQErroPuro = \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (y_{ij} - \bar{y}_i)^2 = SQTotal - SQTrat\)</span>.</p></li>
+</ul>
+</div>
+<section id="anova-incluindo-o-teste-f-para-a-falta-de-ajuste" class="level3" data-number="8.2.1">
+<h3 data-number="8.2.1" class="anchored" data-anchor-id="anova-incluindo-o-teste-f-para-a-falta-de-ajuste"><span class="header-section-number">8.2.1</span> ANOVA incluindo o teste F para a falta de ajuste</h3>
+<p>Conforme definido anteriormente, na ANOVA da Regressão tem-se o objetivo de avaliar, por meio do teste F, se a variabilidade observada em uma variável dependente (<span class="math inline">\(Y\)</span>) é significativamente explicada por <span class="math inline">\(k\)</span> variáveis independentes ou explicativas (<span class="math inline">\(X_i\)</span>, com <span class="math inline">\(i=1,2,\ldots,k\)</span>). Portanto, tem-se de maneira geral, um modelo de regressão linear com <span class="math inline">\(k+1\)</span> parâmetros.</p>
+<p>Nos casos em que se tenha mais de uma observação de <span class="math inline">\(Y\)</span> para diferentes níveis (ou valores) de uma mesma variável <span class="math inline">\(X\)</span> ou para diferentes combinações de valores de várias variáveis explicativas <span class="math inline">\(X_i\)</span>, ou seja, quando se têm dados repetidos, a variabilidade ou variação observada em <span class="math inline">\(Y\)</span>, devido ao efeito dos diferentes níveis ou variáveis explicativas, é quantificada pelo que denominamos anteriormente de <strong><em>Soma de quadrados entre níveis de X</em></strong> ou de <strong><em>Soma de Quadrados de Tratamentos</em></strong>. Portanto, deve-se desdobrar essa fonte de variação em duas partes: uma explicada pelo modelo de regressão ajustado, chamada de <strong><em>Regressão</em></strong>; e outra devido ao que não foi explicado pelo modelo proposto, que chamamos de <strong><em>Falta de Ajuste</em></strong>. Dessa forma, têm-se que a <em>SQTrat</em>, apresentada na tabela da ANOVA definida a partir da <a href="#eq-desdobr-SQTotal" class="quarto-xref">Equation&nbsp;<span>8.1</span></a>, pode ser desdobrada em outras duas fontes de variação, ou seja,</p>
+<p><span id="eq-desdobr-SQTrat"><span class="math display">\[
+SQTrat = SQRegressão + SQFalta \mbox{ } de \mbox{ } Ajuste.
+\tag{8.2}\]</span></span></p>
+<p>O desdobramento da <span class="math inline">\(SQTrat\)</span>, conforme definido na <a href="#eq-desdobr-SQTrat" class="quarto-xref">Equation&nbsp;<span>8.2</span></a>, pode ser demonstrado mais facilmente, partindo da representação gráfica apresentada por Demétrio e Zocchi (2011, p.49, Figura 2.12). Pode-se observar nessa representação gráfica que:</p>
+<p><span class="math display">\[
+(\bar{y}_i - \bar{y}) = (\hat{y}_i - \bar{y}) + (\bar{y}_i - \hat{y}_i),
+\]</span></p>
+<p>em que <span class="math inline">\(\bar{y}_i\)</span> é a média observada dos <span class="math inline">\(n_i\)</span> valores observados de <span class="math inline">\(Y\)</span>, associados a um valor específico da variável explicativa <span class="math inline">\(X\)</span> ou a uma combinação de valores específicos de todas as variáveis <span class="math inline">\(X_i's\)</span>, no caso de um modelo de regressão múltipla; <span class="math inline">\(\bar{y}\)</span> é a média geral dos dados observados; e <span class="math inline">\(\hat{y}_i\)</span> é o valor predito para a variável <span class="math inline">\(Y\)</span>, considerando um valor específico da variável <span class="math inline">\(X\)</span> ou uma combinação de valores específicos de todas as variáveis <span class="math inline">\(X_i's\)</span>, no caso de um modelo de regressão múltipla.</p>
+<p>A partição da <span class="math inline">\(SQTrat = SQRegressão + SQFalta \mbox{ } de \mbox{ } Ajuste\)</span> é demonstrada a seguir.</p>
+<p><span class="math display">\[
+\begin{array}{rcl}
+(\bar{y}_i - \bar{y}) &amp; = &amp; (\hat{y}_i - \bar{y}) + (\bar{y}_i - \hat{y}_i) \\
+\displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i}(\bar{y}_i - \bar{y})^2 &amp; = &amp;  \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} \left[ (\hat{y}_i - \bar{y}) + (\bar{y}_i - \hat{y}_i) \right]^2 \\
+\displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i}(\bar{y}_i - \bar{y})^2 &amp; = &amp;  \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\hat{y}_i - \bar{y})^2 + \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\bar{y}_i - \hat{y}_i)^2 + 2 \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\hat{y}_i - \bar{y}) (\bar{y}_i - \hat{y}_i) \\
+\displaystyle \sum_{i=1}^{k} n_i (\bar{y}_i - \bar{y})^2 &amp; = &amp;  \displaystyle \sum_{i=1}^{k} n_i (\hat{y}_i - \bar{y})^2 + \displaystyle \sum_{i=1}^{k} n_i (\bar{y}_i - \hat{y}_i)^2 + 2 \displaystyle \sum_{i=1}^{k} n_i (\hat{y}_i - \bar{y}) (\bar{y}_i - \hat{y}_i)
+\end{array}
+\]</span></p>
+<p>Pode-se demonstrar que</p>
+<p><span class="math display">\[
+2 \displaystyle \sum_{i=1}^{k} n_i (\hat{y}_i - \bar{y}) (\bar{y}_i - \hat{y}_i) = 0
+\]</span></p>
+<p>e, assim,</p>
+<p><span class="math display">\[
+\begin{array}{rcccc}
+\displaystyle \sum_{i=1}^{k} n_i (\bar{y}_i - \bar{y})^2 &amp; = &amp;  \displaystyle \sum_{i=1}^{k} n_i (\hat{y}_i - \bar{y})^2 &amp; + &amp;  \displaystyle \sum_{i=1}^{k} n_i (\bar{y}_i - \hat{y}_i)^2 \\
+SQTrat &amp; = &amp; SQRegressão &amp; + &amp; SQFalta \mbox{ } de \mbox{ } Ajuste.
+\end{array}
+\]</span></p>
+<p>Neste caso, não temos uma forma geral mais explícita para o cálculo da <span class="math inline">\(SQRegressão\)</span>, pois ela é dependente do modelo de regressão ajustado. Porém, tem-se a forma geral já apresentada para a <span class="math inline">\(SQTrat\)</span> e, assim, a forma mais fácil para se obter a <span class="math inline">\(SQFalta \mbox{ } de \mbox{ } Ajuste\)</span> é por diferença, ou seja,</p>
+<p><span class="math display">\[
+SQFalta \mbox{ } de \mbox{ } Ajuste = SQTrat - SQRegressão
+\]</span></p>
+<p>Considerando essa última partição, tem-se a seguinte tabela da ANOVA:</p>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-style:solid;border-width:0px;font-family:Arial, sans-serif;font-size:16px;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:16px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;border-left:none;border-right:none}
+.tg .tg-0pky{border-color:inherit;text-align:center;vertical-align:middle}
+.tg .tg-Lpky{border-color:inherit;text-align:left;vertical-align:middle}
+</style>
+<div style="display: flex; justify-content: center;">
+<table class="tg">
+<thead>
+<tr>
+<th style="width: 280px;" class="tg-0pky">
+FV
+</th>
+<th style="width: 100px;" class="tg-0pky">
+GL
+</th>
+<th style="width: 150px;" class="tg-0pky">
+SQ
+</th>
+<th style="width: 150px;" class="tg-0pky">
+QM
+</th>
+<th style="width: 100px;" class="tg-0pky">
+F
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tg-Lpky">
+Regressão
+</td>
+<td class="tg-0pky">
+k
+</td>
+<td class="tg-0pky">
+SQRegressão
+</td>
+<td class="tg-0pky">
+QMRegressão
+</td>
+<td class="tg-0pky">
+Fc<span class="math inline">\(_{Reg}\)</span>
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 1px solid black;" class="tg-Lpky">
+Falta de Ajuste
+</td>
+<td style="border-bottom: 1px solid black;" class="tg-0pky">
+I-k-1
+</td>
+<td style="border-bottom: 1px solid black;" class="tg-0pky">
+SQFalta de Ajuste
+</td>
+<td style="border-bottom: 1px solid black;" class="tg-0pky">
+QMFalta de Ajuste
+</td>
+<td style="border-bottom: 1px solid black;" class="tg-0pky">
+Fc<span class="math inline">\(_{Faltaj}\)</span>
+</td>
+</tr>
+<tr>
+<td class="tg-Lpky">
+(Entre níveis de <span class="math inline">\(X\)</span> - Tratamentos)
+</td>
+<td class="tg-0pky">
+(I-1)
+</td>
+<td class="tg-0pky">
+(SQTrat)
+</td>
+<td class="tg-0pky">
+QMTrat
+</td>
+<td class="tg-0pky">
+Fc<span class="math inline">\(_{Trat}\)</span>
+</td>
+</tr>
+<tr>
+<td class="tg-Lpky">
+Erro Puro
+</td>
+<td class="tg-0pky">
+n-I
+</td>
+<td class="tg-0pky">
+SQErroPuro
+</td>
+<td class="tg-0pky">
+QMErroPuro
+</td>
+<td class="tg-0pky">
+</td>
+</tr>
+<tr>
+<th class="tg-Lpky">
+Total
+</th>
+<th class="tg-0pky">
+n-1
+</th>
+<th class="tg-0pky">
+SQTotal
+</th>
+<th class="tg-0pky">
+</th>
+<th class="tg-0pky">
+</th>
+</tr>
+</tbody>
+</table>
+</div>
+<p><br>
+</p>
+</section>
+<section id="coeficiente-de-determinação-r2" class="level3" data-number="8.2.2">
+<h3 data-number="8.2.2" class="anchored" data-anchor-id="coeficiente-de-determinação-r2"><span class="header-section-number">8.2.2</span> Coeficiente de determinação (<span class="math inline">\(R^2\)</span>)</h3>
+<p>Conforme já definido em aula anterior, o coeficiente de determinação (<span class="math inline">\(R^2\)</span>) indica a proporção da variabilidade nos <span class="math inline">\(y_i's\)</span> observados que é explicada pelo modelo de regressão considerado. No caso de se ter dados repetidos de <span class="math inline">\(Y\)</span>, a variabilidade nos <span class="math inline">\(y_i's\)</span> causada pelos diferentes valores de uma única variável explicativa <span class="math inline">\(X\)</span> ou de várias variáveis exolicativas <span class="math inline">\(X_i's\)</span>, é dado pela <strong><em>Soma de Quadrados de Tratamentos (SQTrat)</em></strong>. Portanto, a maneira correta de se calcular o <span class="math inline">\(R^2\)</span> nesse caso é:</p>
+<p><span class="math display">\[
+R^2 = \dfrac{SQRegressão}{SQTrat}.
+\]</span></p>
+<p>A interpretação do <span class="math inline">\(R^2\)</span> continua sendo mesma, bem como os comentários a seu respeito continuam valendo.</p>
+<div class="algebra">
+<p>A representação matricial das fórmulas das <span class="math inline">\(SQ\)</span> para a situação em que se têm dados repetidos de <span class="math inline">\(Y\)</span> não será apresentada, pois depende de algumas adaptações na notação utilizada até o momento. Além disso, é necessário que se considere a teoria de modelos lineares de posto incompleto (modelos de delineamentos), o que não é parte do conteúdo dessa disciplina. Esse assunto específico será tratado na disciplina GES122 - Modelos Lineares II.</p>
+</div>
+<p><br>
+</p>
+</section>
+</section>
+<section id="exemplos" class="level2" data-number="8.3">
+<h2 data-number="8.3" class="anchored" data-anchor-id="exemplos"><span class="header-section-number">8.3</span> Exemplos</h2>
+<p>Para facilitar o entendimento da ANOVA da regressão com o teste para a <em>Falta de Ajuste</em>, utilizaremos dois exemplos, que estão apresentados a seguir. Esses exemplos serão resolvidos apenas com o R e os scripts, com comentários e explicações, para a realização das análises e correções necessárias está disponibilizado após cada exemplo.</p>
+<div class="tip">
+<p>Para estudar e fixar os conteúdos apresentados, faça esses dois exercícios a mão e confira com os resultados obtidos com o uso do R.</p>
+</div>
+<section id="exemplo-1" class="level3" data-number="8.3.1">
+<h3 data-number="8.3.1" class="anchored" data-anchor-id="exemplo-1"><span class="header-section-number">8.3.1</span> Exemplo 1</h3>
+<div class="data">
+<p>A <em>Hovenia dulcis</em>}_ mais conhecida como Uva-do-Japão, pertencente à família Rhamnaceae, ocorre naturalmente na China, Japão e Coréia. No sul do Brasil, ela é largamente difundida pelo cultivo em pequenos talhões ou de forma isolada (Carvalho, 1994). Segundo esse mesmo autor, a <em>Hovenia dulcis</em> além de frutífera, apresenta ótimas perspectivas como madeira, sendo que a indústria madeireira e moveleira da região de Caxias do Sul – RS, já vem executando plantios em pequena escala. Um estudo foi desenvolvido com o objetivo de avaliar os efeitos causados pela utilização de diferentes doses de vermicomposto (húmus) e seus reflexos no crescimento de mudas de <em>Hovenia dulcis</em>. O vermicomposto é o nome que se dá à ação das minhocas em um composto orgânico, transformando-o em húmus, que apresenta inúmeras vantagens quando usado como substrato. As mudas foram produzidas em recipientes de polipropileno (tubete), de seção circular e forma cônica, com um volume de 185 cm<span class="math inline">\(^3\)</span> de substrato. A semeadura foi manual direta, sendo semeadas três sementes por recipiente. Decorridos quinze dias após a germinação, foram retiradas as mudas em excesso, deixando uma muda por recipiente. O delineamento experimental utilizado foi o delineamento inteiramente casualizado (DIC) com cinco tratamentos e quatro repetições. Foram consideradas úteis trinta plantas por parcela. Os tratamentos foram: T1. testemunha (sem-vermicomposto), T2. com 10% de vermicomposto, T3. com 20% de vermicomposto, T4. com 30% de vermicomposto e T5. com 40% de vermicomposto do volume total do tubete. Após 90 dias da semeadura, foram avaliados os parâmetros: diâmetro do colo, altura da parte aérea, massa seca de raízes, massa seca da parte aérea e massa seca total. Os diâmetros médios das 30 mudas de cada parcela, em mm, estão apresentados na Tabela 1. (<font size="2">Adaptado de VOGEL, L.M.; SCHUMACHER, M.V.; BARICHELO, L.R.; OLIVEIRA, L.S.; CALDEIRA, M.V.W. <strong>Ciência Florestal</strong>, Santa Maria, v.11, n.1, p.21-27, 2001</font>)</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Tratamentos</th>
+<th style="text-align: center;">Rep.&nbsp;1</th>
+<th style="text-align: center;">Rep.&nbsp;2</th>
+<th style="text-align: center;">Rep.&nbsp;3</th>
+<th style="text-align: center;">Rep.&nbsp;4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">T1. 0% de vermicomposto</td>
+<td style="text-align: center;">0,95</td>
+<td style="text-align: center;">1,25</td>
+<td style="text-align: center;">0,85</td>
+<td style="text-align: center;">1,15</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">T2. 10% de vermicomposto</td>
+<td style="text-align: center;">1,37</td>
+<td style="text-align: center;">1,57</td>
+<td style="text-align: center;">1,27</td>
+<td style="text-align: center;">1,67</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">T3. 20% de vermicomposto</td>
+<td style="text-align: center;">1,61</td>
+<td style="text-align: center;">1,77</td>
+<td style="text-align: center;">2,03</td>
+<td style="text-align: center;">2,19</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">T4. 30% de vermicomposto</td>
+<td style="text-align: center;">2,22</td>
+<td style="text-align: center;">2,32</td>
+<td style="text-align: center;">2,52</td>
+<td style="text-align: center;">2,62</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">T5. 40% de vermicomposto</td>
+<td style="text-align: center;">2,87</td>
+<td style="text-align: center;">3,03</td>
+<td style="text-align: center;">2,85</td>
+<td style="text-align: center;">3,05</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Obtenha a ANOVA da regressão e aplique o teste F para <em>Regressão</em> e <em>Falta de Ajuste</em>, considerando o modelo linear de regressão simples, dado por: <span class="math display">\[
+y_{i} = \beta_{0} + \beta_{1}x_{i} + \varepsilon_{i},
+\]</span></p>
+<p>em que <span class="math inline">\(y_i\)</span> é o i-ésimo valor observado do diâmetro médio das mudas, <span class="math inline">\(x_i\)</span> é o i-ésimo valor da % de vermicomposto, <span class="math inline">\(\beta_0\)</span> e <span class="math inline">\(\beta_1\)</span> são os parâmetros do modelo e <span class="math inline">\(\varepsilon_{i}\)</span> é o erro aleatório associado à observação <span class="math inline">\(y_i\)</span>, sendo estes independentes e identicamente distribuídos, com <span class="math inline">\(\varepsilon_{i} \sim (0,\sigma^2)\)</span>.</p>
+<p>A seguir é apresentado um script do R para a realização das análises do Exemplo 1.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">#####################</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="do">## GES119 - Modelos Lineares I</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="do">## - Analise de regressão quando se </span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="do">##    tem dados com repeticoes</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="do">## - Teste para falta de ajuste</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="do">#####################</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="do">## EXEMPLO 1: Modelo de regressao linear simples</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">#dados1&lt;- read_excel("Dados/Dados_Exemplo1_Falta_Ajust.xlsx")</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">#str(dados1)</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>dados1.med<span class="ot">&lt;-</span> dados1 <span class="sc">|&gt;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Vermicomp) <span class="sc">|&gt;</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">Diam.med =</span> <span class="fu">mean</span>(Diam))</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(dados1.med)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 1a ANALISE:</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="do">## Ajuste do modelo linear simples - dados medios</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>reg1.med<span class="ot">&lt;-</span> <span class="fu">lm</span>(Diam.med <span class="sc">~</span> Vermicomp, <span class="at">data =</span> dados1.med)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reg1.med)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(reg1.med)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="do">## 2a ANALISE:</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="do">## Ajuste do modelo linear simples - dados com repeticoes</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="do">## ** ANALISE ERRADA **</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="do">##  Equacao estimada correta, mas inferencias erradas, pois</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="do">##  considera-se o QMErro errado</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="do">##  Aqui a SQErro = SQErro puro + SQFalta de ajuste</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="do">##  (relacao valida para GL tambem)</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>reg1.errada<span class="ot">&lt;-</span> <span class="fu">lm</span>(Diam <span class="sc">~</span> Vermicomp, <span class="at">data =</span> dados1)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reg1.errada)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(reg1.errada)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="do">## 3a ANALISE:</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="do">## Ajuste do modelo linear simples - dados com repeticoes</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="do">## ** ANALISE PARCIALMENTE CORRETA **</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="do">##  Equacao estimada incorreta e teste F da ANOVA correto, pois</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="do">##  considera-se o QMErro puro</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="do">##  Porem, os resultados do teste t para os parametros</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="do">##  e o R^2 estao errados, pois as estimativas estao incorretas</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="do">##  Portanto, nao se deve considerar os resultados da funcao summary()</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="do">##  Aqui tem-se SQErro puro e SQFalta de ajuste separadas</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="do">##  (vale para GL tambem)</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="do">##  As correcoes do R^2 e dos testes t serao mostrados </span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="do">##  mais a frente</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>dados1<span class="sc">$</span>Faltajuste<span class="ot">&lt;-</span> <span class="fu">as.factor</span>(dados1<span class="sc">$</span>Vermicomp)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>reg1.correta<span class="ot">&lt;-</span> <span class="fu">lm</span>(Diam <span class="sc">~</span> Vermicomp <span class="sc">+</span> Faltajuste, <span class="at">data =</span> dados1)</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>reg1.correta<span class="ot">&lt;-</span> <span class="fu">lm</span>(Diam <span class="sc">~</span> Vermicomp <span class="sc">+</span> Faltajuste, <span class="at">data =</span> dados1)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reg1.correta)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="co">#summary(reg1.correta)</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="do">## Comparacao das tres ANOVA's</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reg1.med)</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reg1.errada)</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reg1.correta)</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="do">## 4a ANALISE:</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="do">## ANOVA dos dados experimentais</span></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>an1<span class="ot">&lt;-</span> <span class="fu">lm</span>(Diam <span class="sc">~</span> <span class="fu">as.factor</span>(Vermicomp), <span class="at">data =</span> dados1)</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(an1)</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="do">## Correcao do R^2 na análise correta</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>(SQTratamento <span class="ot">&lt;-</span> <span class="fl">9.0250+0.0289</span>)</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>(R2<span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fl">9.0250</span><span class="sc">/</span>SQTratamento, <span class="dv">4</span>))</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="do">## Correcao dos testes t para os parametros do modelo</span></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="do">## Da 1a ANALISE tem-se estimativas corretas, mas inferencias</span></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a><span class="do">## incorretas, pois os erros padroes estao errados, pois o</span></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a><span class="do">## QMErro esta errado (QMIndependente da Regressao). </span></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a><span class="do">## Deve-se usar o QMErroPuro, obtido na 3a ANALISE</span></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a><span class="do">## Uma opcao para corrigir seria utilizar o "Std. Error" da analise</span></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a><span class="do">## errada e multiplica-lo pela raiz quadrada da razao </span></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a><span class="do">## QMErroPuro/QMIndep Regressao, como mostrado a seguir:</span></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>(summ.reg1.errada<span class="ot">&lt;-</span><span class="fu">summary</span>(reg1.errada))</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>(an.reg1.errada<span class="ot">&lt;-</span> <span class="fu">anova</span>(reg1.errada))</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>(an.reg1.correta<span class="ot">&lt;-</span> <span class="fu">anova</span>(reg1.correta))</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>(GL.correto<span class="ot">&lt;-</span> an.reg1.correta[<span class="dv">3</span>,<span class="dv">1</span>])</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>(QMErroPuro<span class="ot">&lt;-</span> an.reg1.correta[<span class="dv">3</span>,<span class="dv">3</span>])</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>(QMIndepReg<span class="ot">&lt;-</span> an.reg1.errada[<span class="dv">2</span>,<span class="dv">3</span>])</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>t.reg1.correta<span class="ot">&lt;-</span> summ.reg1.errada<span class="sc">$</span>coefficients</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>t.reg1.correta[,<span class="dv">2</span>]<span class="ot">&lt;-</span> t.reg1.correta[,<span class="dv">2</span>] <span class="sc">*</span> <span class="fu">sqrt</span>(QMErroPuro<span class="sc">/</span>QMIndepReg)</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>t.reg1.correta[,<span class="dv">3</span>]<span class="ot">&lt;-</span> <span class="fu">round</span>(t.reg1.correta[,<span class="dv">1</span>]<span class="sc">/</span>t.reg1.correta[,<span class="dv">2</span>],<span class="dv">4</span>)</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>t.reg1.correta[,<span class="dv">4</span>]<span class="ot">&lt;-</span> <span class="dv">2</span><span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span><span class="fu">pt</span>(<span class="fu">abs</span>(t.reg1.correta[,<span class="dv">3</span>]), GL.correto))</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>t.reg1.correta</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>summ.reg1.errada</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a><span class="do">## SQ calculadas a partir das definicoes apresentadas</span></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a><span class="do">## no material de aula</span></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>(yi.bar<span class="ot">&lt;-</span> dados1.med<span class="sc">$</span>Diam.med)</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>(y.bar<span class="ot">&lt;-</span> <span class="fu">mean</span>(dados1<span class="sc">$</span>Diam))</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>(n.rep<span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(dados1<span class="sc">$</span>Rep)))</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>(SQTrat<span class="ot">&lt;-</span> n.rep <span class="sc">*</span> <span class="fu">sum</span>((yi.bar<span class="sc">-</span>y.bar)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>(SQReg<span class="ot">&lt;-</span> n.rep <span class="sc">*</span> <span class="fu">sum</span>((<span class="fu">predict</span>(reg1.med)<span class="sc">-</span>y.bar)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>(SQFaltaj<span class="ot">&lt;-</span> n.rep <span class="sc">*</span> <span class="fu">sum</span>((yi.bar<span class="sc">-</span><span class="fu">predict</span>(reg1.med))<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a><span class="do">## Comparando com os resultados da 3a ANALISE</span></span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>an.reg1.correta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br>
+</p>
+</section>
+<section id="exemplo-2" class="level3" data-number="8.3.2">
+<h3 data-number="8.3.2" class="anchored" data-anchor-id="exemplo-2"><span class="header-section-number">8.3.2</span> Exemplo 2</h3>
+<div class="data">
+<p>Um experimento para avaliar a porcentagem de xilose em bagaço de cana-de-açúcar com 50% de umidade foi realizado no delineamento inteiramente casualizado com 24 tratamentos e 2 repetições. Os tratamentos foram dispostos no esquema fatorial 4x6 sendo 4 níveis de tempo (minutos) e 6 níveis de % de H<span class="math inline">\(_2\)</span>SO<span class="math inline">\(_4\)</span>. Os dados das médias das repetições foram:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Tratamentos</th>
+<th>X1</th>
+<th>X2</th>
+<th>Rep.&nbsp;1</th>
+<th>Rep.&nbsp;2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>30</td>
+<td>0,25</td>
+<td>0,00</td>
+<td>0,00</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>30</td>
+<td>0,50</td>
+<td>1,21</td>
+<td>1,71</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>30</td>
+<td>0,75</td>
+<td>2,67</td>
+<td>3,50</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>30</td>
+<td>1,00</td>
+<td>3,28</td>
+<td>2,74</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>30</td>
+<td>1,25</td>
+<td>6,28</td>
+<td>6,56</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>30</td>
+<td>1,50</td>
+<td>6,83</td>
+<td>6,87</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>60</td>
+<td>0,25</td>
+<td>1,35</td>
+<td>1,51</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>60</td>
+<td>0,50</td>
+<td>4,73</td>
+<td>5,00</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>60</td>
+<td>0,75</td>
+<td>7,33</td>
+<td>7,18</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>60</td>
+<td>1,00</td>
+<td>7,18</td>
+<td>8,01</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>60</td>
+<td>1,25</td>
+<td>8,32</td>
+<td>7,39</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>60</td>
+<td>1,50</td>
+<td>9,77</td>
+<td>9,20</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>90</td>
+<td>0,25</td>
+<td>1,89</td>
+<td>1,89</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>90</td>
+<td>0,50</td>
+<td>5,90</td>
+<td>6,44</td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td>90</td>
+<td>0,75</td>
+<td>7,72</td>
+<td>8,33</td>
+</tr>
+<tr class="even">
+<td>16</td>
+<td>90</td>
+<td>1,00</td>
+<td>8,21</td>
+<td>8,26</td>
+</tr>
+<tr class="odd">
+<td>17</td>
+<td>90</td>
+<td>1,25</td>
+<td>9,73</td>
+<td>9,03</td>
+</tr>
+<tr class="even">
+<td>18</td>
+<td>90</td>
+<td>1,50</td>
+<td>8,86</td>
+<td>9,53</td>
+</tr>
+<tr class="odd">
+<td>19</td>
+<td>120</td>
+<td>0,25</td>
+<td>3,00</td>
+<td>3,23</td>
+</tr>
+<tr class="even">
+<td>20</td>
+<td>120</td>
+<td>0,50</td>
+<td>7,25</td>
+<td>6,94</td>
+</tr>
+<tr class="odd">
+<td>21</td>
+<td>120</td>
+<td>0,75</td>
+<td>8,06</td>
+<td>8,27</td>
+</tr>
+<tr class="even">
+<td>22</td>
+<td>120</td>
+<td>1,00</td>
+<td>8,88</td>
+<td>8,14</td>
+</tr>
+<tr class="odd">
+<td>23</td>
+<td>120</td>
+<td>1,25</td>
+<td>8,15</td>
+<td>8,85</td>
+</tr>
+<tr class="even">
+<td>24</td>
+<td>120</td>
+<td>1,50</td>
+<td>8,20</td>
+<td>8,54</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!--
+Pode-se realizar o download dos dados utilizando o link:
+
+::: columns
+::: {.column width="35%"}
+
+
+
+
+
+::: {.cell}
+
+:::
+
+
+
+
+:::
+-->
+<p>Obtenha a ANOVA da regressão e aplique o teste F para <em>Regressão</em> e <em>Falta de Ajuste</em>, considerando o modelo de superfície de resposta de segunda ordem, dado por:</p>
+<p><span class="math display">\[
+y_i = \beta_{0} + \beta_{1}x_{1i} + \beta_{2}x_{2i} + \beta_{3}x_{1i}^2 + \beta_{4}x_{2i}^2 + \beta_{5}x_{1i}x_{2i} + \varepsilon_i,
+\]</span></p>
+<p>em que <span class="math inline">\(y_i\)</span> é o i-ésimo valor observado da porcentagem de xilose em bagaço de cana-de-açúcar com 50% de umidade; <span class="math inline">\(x_1\)</span> é o i-ésimo valor do tempo, em minutos; <span class="math inline">\(x_2\)</span> é o i-ésimo valor da % de H<span class="math inline">\(_2\)</span>SO<span class="math inline">\(_4\)</span>; <span class="math inline">\(\beta_0\)</span>, <span class="math inline">\(\beta_1\)</span>, <span class="math inline">\(\beta_2\)</span>, <span class="math inline">\(\beta_3\)</span>, <span class="math inline">\(\beta_4\)</span> e <span class="math inline">\(\beta_5\)</span> são os parâmetros do modelo e <span class="math inline">\(\varepsilon_{i}\)</span> é o erro aleatório associado à observação <span class="math inline">\(y_i\)</span>, sendo estes independentes e identicamente distribuídos, com <span class="math inline">\(\varepsilon_{i} \sim (0,\sigma^2)\)</span>.</p>
+<p>A seguir é apresentado um script do R para a realização das análises do Exemplo 2.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="do">## EXEMPLO 2: Modelo de regressao linear multipla</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>dados2<span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"Dados/Ex_Reg_Multipla.xlsx"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>dados2<span class="sc">$</span>X1<span class="fl">.2</span><span class="ot">&lt;-</span> dados2<span class="sc">$</span>X1<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>dados2<span class="sc">$</span>X2<span class="fl">.2</span><span class="ot">&lt;-</span> dados2<span class="sc">$</span>X2<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>dados2<span class="sc">$</span>X1X2<span class="ot">&lt;-</span> dados2<span class="sc">$</span>X1 <span class="sc">*</span> dados2<span class="sc">$</span>X2</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(dados2)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>dados2.med<span class="ot">&lt;-</span> dados2 <span class="sc">|&gt;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Tratamentos, X1, X2, X1<span class="fl">.2</span>, X2<span class="fl">.2</span>, X1X2) <span class="sc">|&gt;</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">Xilose.med =</span> <span class="fu">mean</span>(Xilose))</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>dados2.med</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 1a ANALISE:</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="do">##  Ajuste do modelo de regressao linear multipla </span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="do">##  Dados medios</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>reg2beta0.med<span class="ot">&lt;-</span> <span class="fu">lm</span>(Xilose.med <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> dados2.med)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>reg2.med<span class="ot">&lt;-</span> <span class="fu">lm</span>(Xilose.med <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X1<span class="fl">.2</span> <span class="sc">+</span> X2<span class="fl">.2</span> <span class="sc">+</span> X1X2, <span class="at">data =</span> dados2.med)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(reg2.med)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>(anreg2.med<span class="ot">&lt;-</span> <span class="fu">anova</span>(reg2.med))</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reg2beta0.med, reg2.med)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>(SQReg.reg2.med<span class="ot">&lt;-</span> <span class="fu">sum</span>(anreg2.med[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">2</span>]))</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>(GLReg.reg2.med<span class="ot">&lt;-</span> <span class="fu">length</span>(anreg2.med[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">2</span>]))</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>(QMReg.reg2.med<span class="ot">&lt;-</span> SQReg.reg2.med<span class="sc">/</span>GLReg.reg2.med)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>(F.reg2.med<span class="ot">&lt;-</span> QMReg.reg2.med<span class="sc">/</span>anreg2.med[<span class="dv">6</span>,<span class="dv">3</span>])</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>(valorp.reg2.med<span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span><span class="fu">pf</span>(F.reg2.med, </span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>                        GLReg.reg2.med, anreg2.med[<span class="dv">6</span>,<span class="dv">1</span>]))</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">FV =</span> <span class="fu">c</span>(<span class="st">"Regressao"</span>, <span class="st">"Erro"</span>),</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>           <span class="at">GL =</span> <span class="fu">c</span>(GLReg.reg2.med, anreg2.med[<span class="dv">6</span>,<span class="dv">1</span>]),</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>           <span class="at">SQ =</span> <span class="fu">c</span>(SQReg.reg2.med, anreg2.med[<span class="dv">6</span>,<span class="dv">2</span>]),</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>           <span class="at">QM =</span> <span class="fu">c</span>(QMReg.reg2.med, anreg2.med[<span class="dv">6</span>,<span class="dv">3</span>]),</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>           <span class="at">Fc =</span> <span class="fu">c</span>(F.reg2.med, <span class="cn">NA</span>),</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>           <span class="at">Valor.p =</span> <span class="fu">c</span>(valorp.reg2.med, <span class="cn">NA</span>))</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="do">## 2a ANALISE:</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="do">## Ajuste do modelo linear simples - dados com repeticoes</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="do">## ** ANALISE ERRADA **</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="do">##  Equacao estimada correta, mas inferencias erradas, pois</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="do">##  considera-se o GLErro, SQErro errados e, consequentemente,</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="do">##  QMErro errado</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="do">##  Aqui a SQErro = SQErro puro + SQFalta de ajustamento</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="do">##  (relacao valida para GL tambem)</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>reg2beta0.errada<span class="ot">&lt;-</span> <span class="fu">lm</span>(Xilose <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> dados2)</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>reg2.errada<span class="ot">&lt;-</span> <span class="fu">lm</span>(Xilose <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X1<span class="fl">.2</span> <span class="sc">+</span> X2<span class="fl">.2</span> <span class="sc">+</span> X1X2, <span class="at">data =</span> dados2)</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reg2.errada)</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reg2beta0.errada, reg2.errada)</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(reg2.errada)</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="do">## 3a ANALISE:</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="do">## Ajuste do modelo linear simples - dados com repeticoes</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="do">## ** ANALISE PARCIALMENTE CORRETA **</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="do">##  Equacao estimada incorreta e teste F da ANOVA correto, pois</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a><span class="do">##  considera-se o QMErro puro</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a><span class="do">##  Porem, os resultados do teste t para os parametros</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="do">##  e o R^2 estao errados, pois as estimativas estao incorretas</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a><span class="do">##  Portanto, nao se deve considerar os resultados da funcao summary()</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a><span class="do">##  Aqui tem-se SQErro puro e SQFalta de ajuste separadas</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a><span class="do">##  (vale para GL tambem)</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="do">##  As correcoes do R^2 e dos testes t serao mostrados </span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a><span class="do">##  mais a frente</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>dados2<span class="sc">$</span>Faltajuste<span class="ot">&lt;-</span> <span class="fu">as.factor</span>(dados2<span class="sc">$</span>Tratamentos)</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>reg2.correta<span class="ot">&lt;-</span> <span class="fu">lm</span>(Xilose <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X1<span class="fl">.2</span> <span class="sc">+</span> X2<span class="fl">.2</span> <span class="sc">+</span> X1X2 <span class="sc">+</span> </span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>                    Faltajuste, <span class="at">data =</span> dados2)</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>(anreg2.correta<span class="ot">&lt;-</span> <span class="fu">anova</span>(reg2.correta))</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>(SQReg.reg2.correta<span class="ot">&lt;-</span> <span class="fu">sum</span>(anreg2.correta[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">2</span>]))</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>(GLReg.reg2.correta<span class="ot">&lt;-</span> <span class="fu">length</span>(anreg2.correta[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">2</span>]))</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>(QMReg.reg2.correta<span class="ot">&lt;-</span> SQReg.reg2.correta<span class="sc">/</span>GLReg.reg2.correta)</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>(F.reg2.correta<span class="ot">&lt;-</span> QMReg.reg2.correta<span class="sc">/</span>anreg2.correta[<span class="dv">7</span>,<span class="dv">3</span>])</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>(valorp.reg2.correta<span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span><span class="fu">pf</span>(F.reg2.correta, </span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>                        GLReg.reg2.correta, anreg2.correta[<span class="dv">7</span>,<span class="dv">1</span>]))</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">FV =</span> <span class="fu">c</span>(<span class="st">"Regressao"</span>, <span class="st">"Erro"</span>),</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>           <span class="at">GL =</span> <span class="fu">c</span>(GLReg.reg2.correta, anreg2.correta[<span class="dv">6</span>,<span class="dv">1</span>]),</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>           <span class="at">SQ =</span> <span class="fu">c</span>(SQReg.reg2.correta, anreg2.correta[<span class="dv">6</span>,<span class="dv">2</span>]),</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>           <span class="at">QM =</span> <span class="fu">c</span>(QMReg.reg2.correta, anreg2.correta[<span class="dv">6</span>,<span class="dv">3</span>]),</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>           <span class="at">Fc =</span> <span class="fu">c</span>(F.reg2.correta, <span class="cn">NA</span>),</span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>           <span class="at">Valor.p =</span> <span class="fu">c</span>(valorp.reg2.correta, <span class="cn">NA</span>))</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a><span class="do">## Comparacao das tres ANOVA's</span></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reg2.med)</span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reg2.errada)</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reg2.correta)</span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a><span class="do">## 4a ANALISE:</span></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a><span class="do">## ANOVA dos dados experimentais</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>an2<span class="ot">&lt;-</span> <span class="fu">lm</span>(Xilose <span class="sc">~</span> <span class="fu">as.factor</span>(Tratamentos), <span class="at">data =</span> dados2)</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>(an2.exp<span class="ot">&lt;-</span> <span class="fu">anova</span>(an2))</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a><span class="do">## Correcao do R^2 na análise correta</span></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>(SQTrat <span class="ot">&lt;-</span> an2.exp[<span class="dv">1</span>,<span class="dv">2</span>])</span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>(R2<span class="ot">&lt;-</span> <span class="fu">round</span>(SQReg.reg2.correta<span class="sc">/</span>SQTrat, <span class="dv">4</span>))</span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a><span class="do">## Correcao dos testes t para os parametros do modelo</span></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a><span class="do">## Da 1a ANALISE tem-se estimativas corretas, mas inferencias</span></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a><span class="do">## incorretas, pois os erros padroes estao errados, pois o</span></span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a><span class="do">## QMErro esta errado (QMIndependente da Regressao). </span></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a><span class="do">## Deve-se usar o QMErroPuro, obtido na 3a ANALISE</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a><span class="do">## Uma opcao para corrigir seria utilizar o "Std. Error" da analise</span></span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a><span class="do">## errada e multiplica-lo pela raiz quadrada da razao </span></span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a><span class="do">## QMErroPuro/QMIndep Regressao, como mostrado a seguir:</span></span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>(summ.reg2.errada<span class="ot">&lt;-</span><span class="fu">summary</span>(reg2.errada))</span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>(an.reg2.errada<span class="ot">&lt;-</span> <span class="fu">anova</span>(reg2.errada))</span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>(an.reg2.correta<span class="ot">&lt;-</span> <span class="fu">anova</span>(reg2.correta))</span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>(GL.correto<span class="ot">&lt;-</span> an.reg2.correta[<span class="dv">7</span>,<span class="dv">1</span>])</span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>(QMErroPuro<span class="ot">&lt;-</span> an.reg2.correta[<span class="dv">7</span>,<span class="dv">3</span>])</span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>(QMIndepReg<span class="ot">&lt;-</span> an.reg2.errada[<span class="dv">6</span>,<span class="dv">3</span>])</span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>t.reg2.correta<span class="ot">&lt;-</span> summ.reg2.errada<span class="sc">$</span>coefficients</span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>t.reg2.correta[,<span class="dv">2</span>]<span class="ot">&lt;-</span> t.reg2.correta[,<span class="dv">2</span>] <span class="sc">*</span> <span class="fu">sqrt</span>(QMErroPuro<span class="sc">/</span>QMIndepReg)</span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>t.reg2.correta[,<span class="dv">3</span>]<span class="ot">&lt;-</span> <span class="fu">round</span>(t.reg2.correta[,<span class="dv">1</span>]<span class="sc">/</span>t.reg2.correta[,<span class="dv">2</span>],<span class="dv">4</span>)</span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>t.reg2.correta[,<span class="dv">4</span>]<span class="ot">&lt;-</span> <span class="dv">2</span><span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span><span class="fu">pt</span>(<span class="fu">abs</span>(t.reg2.correta[,<span class="dv">3</span>]), GL.correto))</span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>t.reg2.correta</span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>summ.reg2.errada</span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a><span class="do">## SQ calculadas a partir das definicoes apresentadas</span></span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a><span class="do">## no material de aula</span></span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>(yi.bar<span class="ot">&lt;-</span> dados2.med<span class="sc">$</span>Xilose.med)</span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>(y.bar<span class="ot">&lt;-</span> <span class="fu">mean</span>(dados2<span class="sc">$</span>Xilose))</span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>(n.rep<span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(dados2<span class="sc">$</span>Rep)))</span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>(SQTrat<span class="ot">&lt;-</span> n.rep <span class="sc">*</span> <span class="fu">sum</span>((yi.bar<span class="sc">-</span>y.bar)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>(SQReg<span class="ot">&lt;-</span> n.rep <span class="sc">*</span> <span class="fu">sum</span>((<span class="fu">predict</span>(reg2.med)<span class="sc">-</span>y.bar)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>(SQFaltaj<span class="ot">&lt;-</span> n.rep <span class="sc">*</span> <span class="fu">sum</span>((yi.bar<span class="sc">-</span><span class="fu">predict</span>(reg2.med))<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a><span class="do">## Comparando com os resultados da 3a ANALISE</span></span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>an.reg2.correta</span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(an.reg2.correta[<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>,<span class="dv">2</span>]); SQTrat</span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(an.reg2.correta[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">2</span>]); SQReg</span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>an.reg2.correta[<span class="dv">6</span>,<span class="dv">2</span>]; SQFaltaj</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-agresti2007introduction" class="csl-entry" role="listitem">
+Agresti, Alan. 2007. <em>An Introduction to Categorical Data Analysis</em>. 2nd ed. Hoboken: John Wiley &amp; Sons.
+</div>
+<div id="ref-agresti2012categorical" class="csl-entry" role="listitem">
+———. 2012. <em>Categorical Data Analysis</em>. 3rd ed. Hoboken, NJ: John Wiley &amp; Sons.
+</div>
+<div id="ref-allison1999logistic" class="csl-entry" role="listitem">
+Allison, Paul D. 1999. <em>Logistic Regression Using the SAS System: Theory and Application</em>. Cary: SAS Institute Inc.
+</div>
+<div id="ref-cetinkaya2023introduction" class="csl-entry" role="listitem">
+Çetinkaya-Rundel, Mine, and Johanna Hardin. 2023. <em>Introduction to Modern Statistics</em>. 2nd ed. OpenIntro Inc. <a href="https://openintro-ims.netlify.app/">https://openintro-ims.netlify.app/</a>.
+</div>
+<div id="ref-charnet2008analise" class="csl-entry" role="listitem">
+Charnet, Reinaldo, Clarice Azevedo de Luna Freire, Eugênia Maria R. Charnet, and Helio Bonvino. 2008. <em>An<span>á</span>lise de Modelos de Regress<span>ã</span>o Linear: Com Aplica<span>ç</span><span>õ</span>es</em>. 2nd ed. Campinas: Editora Unicamp.
+</div>
+<div id="ref-cordeiro2024modelos" class="csl-entry" role="listitem">
+Cordeiro, Gauss M., Clarice G. B. Demétrio, and Rafael A. Moral. 2024. <em>Modelos Lineares Generalizados e Aplica<span>ç</span><span>õ</span>es</em>. S<span>ã</span>o Paulo: Blucher.
+</div>
+<div id="ref-demetrio2011modelos" class="csl-entry" role="listitem">
+Demétrio, Clarice G. B., and S. S. Zocchi. 2011. <em>Modelos de Regress<span>ã</span>o</em>. Piracicaba: ESALQ.
+</div>
+<div id="ref-draper1998applied" class="csl-entry" role="listitem">
+Draper, Norman R., and Harry Smith. 1998. <em>Applied Regression Analysis</em>. 3rd ed. New York: John Wiley &amp; Sons.
+</div>
+<div id="ref-ferreira2013recursos" class="csl-entry" role="listitem">
+Ferreira, Daniel Furtado. 2013. <em>Recursos Computacionais Utilizando r</em>. Lavras.
+</div>
+<div id="ref-hoffmann1977analise" class="csl-entry" role="listitem">
+Hoffmann, Rodolfo, and Sonia Vieira. 1977. <em>An<span>á</span>lise de Regress<span>ã</span>o: Uma Introdu<span>ç</span><span>ã</span>o <span class="nocase">à</span> Econometria</em>. 2nd ed. S<span>ã</span>o Paulo: Editora Hucitec.
+</div>
+<div id="ref-kutner2005applied" class="csl-entry" role="listitem">
+Kutner, Michael H., Christopher J. Nachtsheim, John Neter, and William Li. 2005. <em>Applied Linear Statistical Models</em>. 5th ed. New York: McGraw-Hill/Irwin.
+</div>
+<div id="ref-levine2016estatistica" class="csl-entry" role="listitem">
+Levine, David M., David F. Stephan, and Kathryn A. Szabat. 2016. <em>Estat<span>ı́</span>stica - Teoria e Aplica<span>ç</span><span>õ</span>es Usando o Microsoft Excel Em Portugu<span>ê</span>s</em>. 7th ed. Rio de Janeiro: LTC.
+</div>
+<div id="ref-mallows1973comments" class="csl-entry" role="listitem">
+Mallows, Colin L. 1973. <span>“Some Comments on <span class="math inline">\(C_p\)</span>.”</span> <em>Technometrics</em> 15 (4): 661–75.
+</div>
+<div id="ref-morais2001introducao" class="csl-entry" role="listitem">
+Morais, Augusto Ramalho de, Lı́via Maria Chaves, and Maria Cristina R. P. Toledo. 2001. <em>Introdu<span>ç</span><span>ã</span>o <span class="nocase">à</span> <span class="nocase">á</span>lgebra de Matrizes</em>. Lavras: UFLA/FAEPE.
+</div>
+<div id="ref-noble1977applied" class="csl-entry" role="listitem">
+Noble, Ben, and James W. Daniel. 1977. <em>Applied Linear Algebra</em>. 3rd ed. Englewood Cliffs: Prentice-Hall.
+</div>
+<div id="ref-regazzi2010modelos" class="csl-entry" role="listitem">
+Regazzi, Adair José. 2010. <em>Modelos Lineares i</em>. Vi<span>ç</span>osa: UFV.
+</div>
+<div id="ref-rencher2008linear" class="csl-entry" role="listitem">
+Rencher, Alvin C., and G. Bruce Schaalje. 2008. <em>Linear Models in Statistics</em>. 2nd ed. Hoboken, New Jersey: John Wiley &amp; Sons.
+</div>
+<div id="ref-santos2017curso" class="csl-entry" role="listitem">
+Santos, Reginaldo J. 2017. <em>Um Curso de Geometria Anal<span>ı́</span>tica e <span class="nocase">á</span>lgebra Linear</em>. Belo Horizonte: Imprensa Universit<span>á</span>ria da UFMG.
+</div>
+<div id="ref-searle1982matrix" class="csl-entry" role="listitem">
+Searle, Shayle R. 1982. <em>Matrix Algebra Useful for Statistics</em>. New York: John Wiley &amp; Sons.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./MRL_ANOVA.html" class="pagination-link" aria-label="Análise de variância (ANOVA) da regressão">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Análise de variância (ANOVA) da regressão</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./TH_comparacao_modelos.html" class="pagination-link" aria-label="Testes de hipóteses: Comparação de modelos">
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Testes de hipóteses: Comparação de modelos</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
