@@ -1,32 +1,11 @@
 ---
-title: "Análise de variância (ANOVA) da regressão - teste da falta de ajuste"
-subtitle: "GES119 - Modelos Lineares I <br> Departamento de Estatística - DES <br> Universidade Federal de Lavras - UFLA "
-format:
-  html:
-    theme: [estilo.scss]
-    linkcolor: "#808080" 
-    toc: true
-    code-copy: true
-    code-overflow: wrap
-    mainfont: "Atkinson Hyperlegible"
-    highlight-style: a11y-dark
-    #logo: imagens/logo.png
-    embed-resources: true
-execute:
-  freeze: auto
-  echo: false
-editor: source
-toc-title: "Conteúdo"
-author: 
-  - Izabela R. Cardoso de Oliveira 
-  - Renato Ribeiro de Lima
-lang: pt
+title: "Análise de variância (ANOVA) da regressão: Teste da falta de ajuste"
 ---
 
 ::: {.chapterintro data-latex=""}
-Na aula de hoje vamos apresentar a Análise de Variância (ANOVA) da Regressão para o caso de dados com repetições, em que podemos testar o que se chama de falta de ajuste de um modelo de regressão linear. A metodologia será apresentada considerando um exemplo de regressão linear simples e outro de regressão linear múltipla.
+Neste capítulo vamos apresentar a Análise de Variância (ANOVA) da Regressão para o caso de dados com repetições, em que podemos testar o que se chama de falta de ajuste de um modelo de regressão linear. A metodologia será apresentada considerando um exemplo de regressão linear simples e outro de regressão linear múltipla.
 
-Essa aula é baseada nos capítulos 5 e 8 de Charnet et al. (2008) e na apostila _Modelos de Regressão_ (Demétrio e Zocchi, 2011).
+Esse material é baseado nos capítulos 5 e 8 de Charnet et al. (2008) e na apostila _Modelos de Regressão_ (Demétrio e Zocchi, 2011).
 :::
 
 ## Introdução
@@ -36,8 +15,11 @@ Conforme visto em aulas anteriores, a Análise de Variância da Regressão pode 
 Até o momento, ao efetuar a ANOVA da regressão, a variação total dos dados foi decomposta em fontes como _Regressão_ (a variação explicada pelo modelo proposto) e _Erro_ (a variação não explicada ou independente da regressão). Assim, o teste F foi utilizado para verificar se temos evidências de que a variação explicada pelo modelo de regressão proposto é maior do que a independente da regressão. Pode-se observar que nos estudos analisados, para cada valor das $X_i$ variáveis independentes, com $i=1,2,\ldots,k$, tinha-se um único valor de $Y$.
 
 Também foi definido que 
-$$SQErro = SQIndependente \mbox{ } da \mbox{ } Regressão = \displaystyle \sum_{i=1}^n \hat{\varepsilon}_i^2 = \displaystyle \sum_{i=1}^n (y_i - \hat{y}_i)^2 .
+
 $$
+SQErro = SQIndependente \mbox{ } da \mbox{ } Regressão = \displaystyle \sum_{i=1}^n \hat{\varepsilon}_i^2 = \displaystyle \sum_{i=1}^n (y_i - \hat{y}_i)^2 .
+$$
+
 Portanto, de alguma forma, a $SQErro$ ou o $QMErro = \dfrac{SQErro}{GLErro}$ são dependentes do modelo ajustado, pois no cálculo utiliza-se $\hat{y}_i$. Dessa forma, tem-se que $\hat{\sigma}^2 = QMErro$ é um estimador não-viesado de $\sigma^2$, sob a suposição de que o modelo ajustado é o correto para explicar a variabilidade observada em $Y$.
 
 Conforme demonstrado e ilustrado na Figura 2.10 de Demétrio e Zocchi (2011, p.48), comparando-se os modelos de regressão linear simples e quadrático, caso o modelo não seja o correto tem-se um viés $B_i$ no valor esperado de $Y_i$, ou seja, em $E(Y_i)$. Assim, o $QMErro$ será um estimador viesado de $\sigma^2$, pois $E(QMErro) = \sigma^2 + \dfrac{1}{n-k-1} B_i^2$. Porém, essa comparação e visualização do viés se torna muito difícil se considerarmos modelos mais complexos, como por exemplo modelos de regressão linear múltipla.
@@ -181,10 +163,13 @@ $$
 $$
 
 Pode-se demonstrar que 
+
 $$
 2 \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\bar{y}_i - \bar{y}) (y_{ij} - \bar{y}_i) = 0
 $$
+
 e, assim,
+
 $$
 \begin{array}{rcccc}
 \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i}(y_{ij} - \bar{y})^2 & = &  \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (\bar{y}_i - \bar{y})^2 & + & \displaystyle \sum_{i=1}^{k} \sum_{j=1}^{n_i} (y_{ij} - \bar{y}_i)^2 \\
@@ -197,6 +182,7 @@ Essa partição é equivalente à de um experimento instalado segundo um delinea
 $$
 y_{ij} = \mu + \alpha_i + e_{ij},
 $$
+
 em que $y_{ij}$ é o valor observado na _j-ésima_ repetição do _i-ésimo_ tratamento (ou nível da variável explicativa $X$); $\mu$ é uma constante; $\alpha_i$ é o efeito do _i-ésimo_ tratamento; e $e_{ij}$ é o erro aleatório associado a cada observação $y_{ij}$, tal que $e_{ij} \sim N(0,\sigma^2)$. Assim, tem-se um estimador não-viesado de $\sigma^2$ e que independe do modelo de regressão, dado por $\hat{\sigma}^2 = QMErroPuro$.
 
 ::: {.important data-latex=""}
@@ -218,15 +204,18 @@ $$SQTrat = \displaystyle \sum_{i} \dfrac{T_i}{n_i} - \dfrac{\left( \displaystyle
 Conforme definido anteriormente, na ANOVA da Regressão tem-se o objetivo de avaliar, por meio do teste F, se a variabilidade observada em uma variável dependente ($Y$) é significativamente explicada por $k$ variáveis independentes ou explicativas ($X_i$, com $i=1,2,\ldots,k$). Portanto, tem-se de maneira geral, um modelo de regressão linear com $k+1$ parâmetros.
 
 Nos casos em que se tenha mais de uma observação de $Y$ para diferentes níveis (ou valores) de uma mesma variável $X$ ou para diferentes combinações de valores de várias variáveis explicativas $X_i$, ou seja, quando se têm dados repetidos, a variabilidade ou variação observada em $Y$, devido ao efeito dos diferentes níveis ou variáveis explicativas, é quantificada pelo que denominamos anteriormente de **_Soma de quadrados entre níveis de X_** ou de **_Soma de Quadrados de Tratamentos_**. Portanto, deve-se desdobrar essa fonte de variação em duas partes: uma explicada pelo modelo de regressão ajustado, chamada de **_Regressão_**; e outra devido ao que não foi explicado pelo modelo proposto, que chamamos de **_Falta de Ajuste_**. Dessa forma, têm-se que a _SQTrat_, apresentada na tabela da ANOVA definida a partir da @eq-desdobr-SQTotal, pode ser desdobrada em outras duas fontes de variação, ou seja,
+
 $$
 SQTrat = SQRegressão + SQFalta \mbox{ } de \mbox{ } Ajuste.
 $$ {#eq-desdobr-SQTrat}
 
 
 O desdobramento da $SQTrat$, conforme definido na @eq-desdobr-SQTrat, pode ser demonstrado mais facilmente, partindo da representação gráfica apresentada por Demétrio e Zocchi (2011, p.49, Figura 2.12). Pode-se observar nessa representação gráfica que:
+
 $$
 (\bar{y}_i - \bar{y}) = (\hat{y}_i - \bar{y}) + (\bar{y}_i - \hat{y}_i),
 $$
+
 em que $\bar{y}_i$ é a média observada dos $n_i$ valores observados de $Y$, associados a um valor específico da variável explicativa $X$ ou a uma combinação de valores específicos de todas as variáveis $X_i's$, no caso de um modelo de regressão múltipla; $\bar{y}$ é a média geral dos dados observados; e $\hat{y}_i$ é o valor predito para a variável $Y$, considerando um valor específico da variável $X$ ou uma combinação de valores específicos de todas as variáveis $X_i's$, no caso de um modelo de regressão múltipla.
 
 A partição da $SQTrat = SQRegressão + SQFalta \mbox{ } de \mbox{ } Ajuste$ é demonstrada a seguir.
@@ -241,10 +230,13 @@ $$
 $$
 
 Pode-se demonstrar que 
+
 $$
 2 \displaystyle \sum_{i=1}^{k} n_i (\hat{y}_i - \bar{y}) (\bar{y}_i - \hat{y}_i) = 0
 $$
+
 e, assim,
+
 $$
 \begin{array}{rcccc}
 \displaystyle \sum_{i=1}^{k} n_i (\bar{y}_i - \bar{y})^2 & = &  \displaystyle \sum_{i=1}^{k} n_i (\hat{y}_i - \bar{y})^2 & + &  \displaystyle \sum_{i=1}^{k} n_i (\bar{y}_i - \hat{y}_i)^2 \\
@@ -253,6 +245,7 @@ SQTrat & = & SQRegressão & + & SQFalta \mbox{ } de \mbox{ } Ajuste.
 $$
 
 Neste caso, não temos uma forma geral mais explícita para o cálculo da $SQRegressão$, pois ela é dependente do modelo de regressão ajustado. Porém, tem-se a forma geral já apresentada para a $SQTrat$ e, assim, a forma mais fácil para se obter a $SQFalta \mbox{ } de \mbox{ } Ajuste$ é por diferença, ou seja,
+
 $$
 SQFalta \mbox{ } de \mbox{ } Ajuste = SQTrat - SQRegressão
 $$
@@ -321,6 +314,7 @@ Considerando essa última partição, tem-se a seguinte tabela da ANOVA:
 ### Coeficiente de determinação ($R^2$)
 
 Conforme já definido em aula anterior, o coeficiente de determinação ($R^2$) indica a proporção da variabilidade nos $y_i's$ observados que é explicada pelo modelo de regressão considerado. No caso de se ter dados repetidos de $Y$, a variabilidade nos $y_i's$ causada pelos diferentes valores de uma única variável explicativa $X$ ou de várias variáveis exolicativas $X_i's$, é dado pela **_Soma de Quadrados de Tratamentos (SQTrat)_**. Portanto, a maneira correta de se calcular o $R^2$ nesse caso é:
+
 $$
 R^2 = \dfrac{SQRegressão}{SQTrat}.
 $$
@@ -509,32 +503,35 @@ Um experimento para avaliar a porcentagem de xilose em bagaço de cana-de-açúc
 | 24          | 120 | 1,50 |  8,20  |  8,54  |
 :::
 
+<!--
 Pode-se realizar o download dos dados utilizando o link:
 
 ::: columns
 ::: {.column width="35%"}
 
 ```{r,warning=FALSE,message = FALSE, echo=FALSE}
-library(downloadthis)
+#library(downloadthis)
 library(readxl)
 
 dados.m <- read_excel("Dados/Ex_Reg_Multipla.xlsx")
 
-dados.m %>%
-    download_this(
-    output_name = "dados_reg_mult",
-    output_extension = ".xlsx",
-    button_label = "Download dos dados",
-    button_type = "primary",
-    has_icon = TRUE,
-    icon = "fa fa-save"
-  )
+#dados.m %>%
+#    download_this(
+#    output_name = "dados_reg_mult",
+#    output_extension = ".xlsx",
+#    button_label = "Download dos #dados",
+#    button_type = "primary",
+#    has_icon = TRUE,
+#    icon = "fa fa-save"
+#  )
+
 ```
 :::
+-->
 
-\ 
 
 Obtenha a ANOVA da regressão e aplique o teste F para _Regressão_ e _Falta de Ajuste_, considerando o modelo de superfície de resposta de segunda ordem, dado por:
+
 $$
 y_i = \beta_{0} + \beta_{1}x_{1i} + \beta_{2}x_{2i} + \beta_{3}x_{1i}^2 + \beta_{4}x_{2i}^2 + \beta_{5}x_{1i}x_{2i} + \varepsilon_i,
 $$

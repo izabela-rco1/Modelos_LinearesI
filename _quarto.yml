@@ -18,6 +18,7 @@ book:
     - MRL_estimacao_matricial.qmd
     - MRL_estimacao.qmd
     - MRL_ANOVA.qmd
+    - MRL_ANOVA_Falta_Ajuste.qmd
     - TH_comparacao_modelos.qmd
     - Formas_quadraticas_aula1.qmd
     - Residuos_Diagnosticos.qmd

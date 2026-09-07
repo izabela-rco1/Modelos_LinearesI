@@ -30,6 +30,6 @@ Para salvar a referência em gerenciadores de citação (Zotero, Mendeley, LaTeX
 
 ### Licença
 
-![Licença CC BY 4.0](https://licensebuttons.net/l/by-nc/4.0/88x31.png) 
+![Licença CC BY-NC 4.0](https://licensebuttons.net/l/by-nc/4.0/88x31.png) 
 A versão online deste material será sempre gratuita e distribuída sob a [licença CC BY-NC 4.0.](https://creativecommons.org/licenses/by-nc/4.0/)
 
