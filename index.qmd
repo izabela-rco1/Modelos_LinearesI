@@ -4,7 +4,7 @@ Este material foi elaborado pelos docentes Izabela Regina Cardoso de Oliveira e 
 
 O material foi feito usando o [Quarto](https://quarto.org/) e sua diagramação foi inspirada no livro [Introduction to Modern Statistics](https://openintro-ims.netlify.app/).
 
-Data da versão: 11/08/2026
+Data da versão: 07/09/2026
 
 
 ### Como citar
